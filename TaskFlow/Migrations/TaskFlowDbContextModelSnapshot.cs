@@ -44,6 +44,21 @@ namespace TaskFlow.Migrations
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("TaskFlow.Models.TaskDependency", b =>
+                {
+                    b.Property<int>("TaskId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BlockedById")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("TaskId", "BlockedById");
+
+                    b.HasIndex("BlockedById");
+
+                    b.ToTable("Dependencies");
+                });
+
             modelBuilder.Entity("TaskFlow.Models.TaskItem", b =>
                 {
                     b.Property<int>("Id")
@@ -175,6 +190,25 @@ namespace TaskFlow.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TaskFlow.Models.TaskDependency", b =>
+                {
+                    b.HasOne("TaskFlow.Models.TaskItem", "BlockedBy")
+                        .WithMany()
+                        .HasForeignKey("BlockedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaskFlow.Models.TaskItem", "Task")
+                        .WithMany()
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BlockedBy");
+
+                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("TaskFlow.Models.TaskItem", b =>

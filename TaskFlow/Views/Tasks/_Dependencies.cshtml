@@ -1,0 +1,56 @@
+@model TaskItem
+@* Course 2, Chapter 4: what this task waits for. ViewData is filled by TasksController.Details;
+   on other pages that show this view (e.g. after an invalid step), the section is left out. *@
+@{
+    var blockers = ViewData["Blockers"] as List<TaskItem>;
+    var choices = ViewData["DependencyChoices"] as List<TaskItem>;
+}
+@if (blockers is not null && choices is not null)
+{
+    <section id="dependencies" aria-labelledby="dependencies-heading" class="mb-4">
+        <h2 id="dependencies-heading" class="h4">Blocked by</h2>
+
+        @if (TempData["DependencyError"] is string error)
+        {
+            <div class="alert alert-warning" role="alert">@error</div>
+        }
+
+        @if (blockers.Count == 0)
+        {
+            <p>Nothing: this task can start any time.</p>
+        }
+        else
+        {
+            int waiting = blockers.Count(b => !b.Done);
+            <p class="text-muted">@(waiting == 0 ? "Everything it waits for is done." : $"Waiting for {waiting} of {blockers.Count}.")</p>
+            <ul class="list-unstyled">
+                @foreach (var b in blockers)
+                {
+                    <li class="d-flex align-items-center gap-2 mb-1">
+                        <span>@(b.Done ? "✓" : "○")</span>
+                        <a asp-route="TaskDetails" asp-route-id="@b.Id">@b.Title</a>
+                        <form asp-controller="Dependencies" asp-action="Remove" asp-route-taskId="@Model.Id" asp-route-blockedById="@b.Id" method="post" class="ms-auto">
+                            <button type="submit" class="btn btn-link btn-sm text-danger">Remove<span class="visually-hidden"> @b.Title</span></button>
+                        </form>
+                    </li>
+                }
+            </ul>
+        }
+
+        @if (choices.Count > 0)
+        {
+            <form asp-controller="Dependencies" asp-action="Add" asp-route-taskId="@Model.Id" method="post" class="row g-2 align-items-center">
+                <div class="col-auto">
+                    <label for="blockedById" class="visually-hidden">This task waits for</label>
+                    <select id="blockedById" name="blockedById" class="form-select form-select-sm">
+                        @foreach (var c in choices)
+                        {
+                            <option value="@c.Id">@c.Title</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-auto"><button type="submit" class="btn btn-outline-secondary btn-sm">Add: waits for this</button></div>
+            </form>
+        }
+    </section>
+}

@@ -13,11 +13,14 @@ public class TasksController : Controller
     private readonly IProjectRepository _projects;
     private readonly TimeProvider _time;
     private readonly ILogger<TasksController> _logger;
+    private readonly IDependencyRepository _dependencies;   // Course 2, Chapter 4
 
-    // Dependency injection passes in all four: see Program.cs.
+    // Dependency injection passes them all in: see Program.cs.
     public TasksController(ITaskRepository repository, IProjectRepository projects,
-                           TimeProvider time, ILogger<TasksController> logger)
+                           TimeProvider time, ILogger<TasksController> logger,
+                           IDependencyRepository dependencies)
     {
+        _dependencies = dependencies;
         _repository = repository;
         _projects = projects;
         _time = time;
@@ -74,6 +77,12 @@ public class TasksController : Controller
             _logger.LogWarning("Task {TaskId} was requested but doesn't exist", id);
             return NotFound();
         }
+        // Course 2, Chapter 4: what it waits for, and the tasks it could wait for.
+        var blockers = await _dependencies.BlockersOfAsync(id);
+        ViewData["Blockers"] = blockers;
+        ViewData["DependencyChoices"] = (await _repository.GetAllAsync())
+            .Where(t => t.Id != id && blockers.All(b => b.Id != t.Id))
+            .OrderBy(t => t.Title).ToList();
         return View(task);
     }
 

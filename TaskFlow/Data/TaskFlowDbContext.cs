@@ -15,6 +15,7 @@ public class TaskFlowDbContext : DbContext
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<User> Users => Set<User>();
     public DbSet<TaskStep> Steps => Set<TaskStep>();     // Chapter 30
+    public DbSet<TaskDependency> Dependencies => Set<TaskDependency>();   // Course 2, Chapter 4
 
     // The rules for the table: the same ones as Chapter 22's 01_schema.sql.
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -72,6 +73,16 @@ public class TaskFlowDbContext : DbContext
                 .HasForeignKey(s => s.TaskItemId)
                 .OnDelete(DeleteBehavior.Cascade);
             step.HasIndex(s => new { s.TaskItemId, s.Position });   // "this task's steps, in order"
+        });
+
+        // Course 2, Chapter 4: one row per "Task waits for BlockedBy". The pair is the key: no duplicates.
+        // Deleting either task deletes the dependency (Cascade).
+        modelBuilder.Entity<TaskDependency>(dep =>
+        {
+            dep.HasKey(d => new { d.TaskId, d.BlockedById });
+            dep.HasOne(d => d.Task).WithMany().HasForeignKey(d => d.TaskId).OnDelete(DeleteBehavior.Cascade);
+            dep.HasOne(d => d.BlockedBy).WithMany().HasForeignKey(d => d.BlockedById).OnDelete(DeleteBehavior.Cascade);
+            dep.HasIndex(d => d.BlockedById);                         // "which tasks wait for this one?"
         });
     }
 }

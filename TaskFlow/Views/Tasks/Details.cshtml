@@ -49,6 +49,9 @@
 @* Chapter 30: the full path, because StepsController shows this view too: "_Steps" alone is searched in Views/Steps. *@
 <partial name="~/Views/Tasks/_Steps.cshtml" model="Model" />
 
+@* Course 2, Chapter 4: what this task waits for. *@
+<partial name="~/Views/Tasks/_Dependencies.cshtml" model="Model" />
+
 @* Chapter 30: asp-controller="Tasks", because StepsController shows this view too (when a step is invalid). *@
 <p>
     <a asp-controller="Tasks" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">Edit</a>

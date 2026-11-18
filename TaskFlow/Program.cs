@@ -33,6 +33,7 @@ builder.Services.AddDbContext<TaskFlowDbContext>(options =>
 builder.Services.AddScoped<ITaskRepository, EfTaskRepository>();
 builder.Services.AddScoped<IProjectRepository, EfProjectRepository>();   // Chapter 24
 builder.Services.AddScoped<IStepRepository, EfStepRepository>();         // Chapter 30
+builder.Services.AddScoped<IDependencyRepository, EfDependencyRepository>();   // Course 2, Chapter 4
 
 // Chapter 25: accounts. Who is signed in is remembered in an encrypted cookie.
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
