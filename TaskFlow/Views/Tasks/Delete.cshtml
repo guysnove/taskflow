@@ -1,0 +1,16 @@
+@model TaskItem
+@{
+    ViewData["Title"] = "Delete " + Model.Title;
+}
+
+<h1>Delete "@Model.Title"?</h1>
+
+<p>
+    @(Model.Done ? "This task is done." : "This task isn't done yet.")
+    Deleting it can't be undone.
+</p>
+
+<form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
+    <button type="submit" class="btn btn-danger">Yes, delete it</button>
+    <a asp-route="TaskDetails" asp-route-id="@Model.Id" class="btn btn-link">No, keep it</a>
+</form>

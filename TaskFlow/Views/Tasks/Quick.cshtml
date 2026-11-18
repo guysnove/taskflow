@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Quick list";
+}
+
+<h1>Quick list</h1>
+<p>This page never reloads: JavaScript talks to <code>/api/tasks</code> and redraws the list.</p>
+
+@* The anti-forgery token, for quick.js to send in the X-CSRF-TOKEN header. *@
+@Html.AntiForgeryToken()
+
+<form id="quick-add" class="d-flex gap-2 mb-3">
+    <input id="quick-title" class="form-control" placeholder="New task title" autocomplete="off" />
+    <button type="submit" class="btn btn-primary">Add</button>
+</form>
+<p id="quick-message" role="status" class="text-danger"></p>
+
+<ul id="quick-list" class="list-group"></ul>
+
+<p class="mt-3"><a asp-action="Index">Back to my tasks</a></p>
+
+@section Scripts {
+    <script src="~/js/quick.js" asp-append-version="true"></script>
+}

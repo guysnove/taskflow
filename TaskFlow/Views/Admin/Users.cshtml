@@ -1,0 +1,25 @@
+@model List<TaskFlow.Controllers.UserSummary>
+@{
+    ViewData["Title"] = "Accounts";
+}
+
+<h1>Accounts</h1>
+
+<table class="table">
+    <thead>
+        <tr><th>Id</th><th>Name</th><th>Email</th><th>Joined</th><th>Tasks</th><th>Admin</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.DisplayName</td>
+                <td>@user.Email</td>
+                <td>@user.CreatedOn.ToString("d MMM yyyy")</td>
+                <td>@user.Tasks</td>
+                <td>@(user.IsAdmin ? "yes" : "")</td>
+            </tr>
+        }
+    </tbody>
+</table>

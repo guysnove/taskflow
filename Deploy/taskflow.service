@@ -1,0 +1,21 @@
+# Chapter 29: a systemd service for TaskFlow on a Linux server (copy to /etc/systemd/system/).
+# Then: sudo systemctl enable --now taskflow     Logs: journalctl -u taskflow -f
+# (Not run in the video: shown as a typical example.)
+[Unit]
+Description=TaskFlow (ASP.NET Core)
+After=network.target
+
+[Service]
+WorkingDirectory=/srv/taskflow/app
+ExecStart=/usr/bin/dotnet /srv/taskflow/app/TaskFlow.dll
+Restart=always
+RestartSec=5
+User=taskflow
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://127.0.0.1:5000
+Environment=ASPNETCORE_HTTPS_PORT=443
+Environment=ConnectionStrings__TaskFlow=Data Source=/srv/taskflow/data/taskflow.db
+Environment=DataProtection__KeysPath=/srv/taskflow/data/keys
+
+[Install]
+WantedBy=multi-user.target

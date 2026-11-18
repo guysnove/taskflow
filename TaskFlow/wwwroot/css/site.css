@@ -1,0 +1,103 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+/* TaskFlow, Chapter 17 */
+.task-done td {
+  color: #6c757d;
+  text-decoration: line-through;
+}
+
+.task-form {
+  max-width: 32rem;
+}
+
+/* TaskFlow, Chapter 18: the current filter and sort are shown in bold */
+a[aria-current="true"] {
+  font-weight: bold;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* TaskFlow, Chapter 19: validation messages and fields */
+.field-validation-error {
+  display: block;
+  margin-top: 0.25rem;
+}
+
+.input-validation-error {
+  border-color: #b02a37;
+}
+
+/* The summary is only shown when it has messages in it. */
+.validation-summary-valid {
+  display: none;
+}
+
+/* TaskFlow, Chapter 20: priority labels (from the <priority> tag helper) */
+.priority {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.85em;
+  border: 1px solid currentColor;
+}
+.priority-high   { color: #a52834; }
+.priority-medium { color: #6c4a00; }
+.priority-low    { color: #3d5a80; }
+
+/* Chapter 20: on small screens, each task becomes a card instead of a table row */
+@media (max-width: 575.98px) {
+  .task-table thead {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
+  }
+  .task-table tr {
+    display: block;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
+  .task-table td {
+    display: flex;
+    gap: 0.5rem;
+    border: none;
+    padding: 0.2rem 0;
+  }
+  .task-table td[data-label]::before {
+    content: attr(data-label);
+    min-width: 5.5rem;
+    font-weight: 600;
+    color: #495057;
+  }
+}
+
+/* Chapter 30: a ticked checklist step is crossed out (the button also says "Done" to screen readers) */
+.step-done .step-text { text-decoration: line-through; color: #495057; }

@@ -1,0 +1,14 @@
+@model TaskFlow.ViewComponents.OverdueSummary
+@if (Model.Overdue == 0)
+{
+    <span class="navbar-text small text-success">No overdue tasks</span>
+}
+else
+{
+    <a class="navbar-text small text-danger fw-semibold" asp-controller="Tasks" asp-action="Index"
+       asp-route-show="open" asp-route-sort="due">@Model.Overdue overdue @(Model.Overdue == 1 ? "task" : "tasks")</a>
+}
+@if (Model.DueSoon > 0)
+{
+    <span class="navbar-text small ms-2">· @Model.DueSoon due in the next @Model.Days days</span>
+}

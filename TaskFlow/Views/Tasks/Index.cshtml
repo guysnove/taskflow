@@ -1,0 +1,88 @@
+@model List<TaskItem>
+@{
+    ViewData["Title"] = "My tasks";
+    int left = Model.Count(t => !t.Done);
+    string show = (string)ViewData["Show"]!;   // "all" or "open"
+    string sort = (string)ViewData["Sort"]!;   // "due", "priority" or "title"
+    int? project = (int?)ViewData["Project"];  // only this project's tasks, or null for all
+}
+
+<h1>My tasks</h1>
+<p><a asp-action="Quick">Quick list</a> (the same tasks, through the API)</p>
+
+@if (project is not null)
+{
+    <p>Showing one project's tasks. <a asp-action="Index">Show all tasks</a></p>
+}
+
+@if (TempData["Message"] is string message)
+{
+    <div class="alert alert-success" role="status">@message</div>
+}
+
+<p>
+    @left of @Model.Count tasks still to do.
+    <a asp-action="Create" class="btn btn-primary btn-sm ms-2">Add a task</a>
+</p>
+
+<nav aria-label="Filter and sort" class="small mb-2">
+    Show:
+    <a asp-action="Index" asp-route-sort="@sort"
+       aria-current="@(show == "all" ? "true" : null)">all</a> ·
+    <a asp-action="Index" asp-route-show="open" asp-route-sort="@sort"
+       aria-current="@(show == "open" ? "true" : null)">still to do</a>
+    <span class="mx-2">|</span>
+    Sort by:
+    <a asp-action="Index" asp-route-show="@show" asp-route-sort="due"
+       aria-current="@(sort == "due" ? "true" : null)">due date</a> ·
+    <a asp-action="Index" asp-route-show="@show" asp-route-sort="priority"
+       aria-current="@(sort == "priority" ? "true" : null)">priority</a> ·
+    <a asp-action="Index" asp-route-show="@show" asp-route-sort="title"
+       aria-current="@(sort == "title" ? "true" : null)">title</a>
+</nav>
+
+@if (Model.Count == 0)
+{
+    <p>No tasks yet. Add your first one!</p>
+}
+else
+{
+    <table class="table align-middle task-table">
+        <thead>
+            <tr><th>Task</th><th>Project</th><th>Priority</th><th>Due</th><th><span class="visually-hidden">Actions</span></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model)
+            {
+                <tr class="@(task.Done ? "task-done" : "")">
+                    <td data-label="Task">
+                        <a asp-action="Details" asp-route-id="@task.Id">@task.Title</a>
+                        @if (task.StepProgress() is string progress)
+                        {
+                            <div class="small text-muted">@progress</div>    @* Chapter 30 *@
+                        }
+                    </td>
+                    <td data-label="Project">
+                        @if (task.Project is not null)
+                        {
+                            <a asp-action="Index" asp-route-project="@task.ProjectId">@task.Project.Name</a>
+                        }
+                    </td>
+                    <td data-label="Priority"><priority value="@task.Priority" /></td>
+                    <td data-label="Due">
+                        @(task.Due?.ToString("ddd d MMM") ?? "—")
+                        <partial name="_StatusBadge" model="task" />
+                    </td>
+                    <td>
+                        @if (!task.Done)
+                        {
+                            <form asp-action="Done" asp-route-id="@task.Id" method="post">
+                                <button type="submit" class="btn btn-outline-success btn-sm">Done</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

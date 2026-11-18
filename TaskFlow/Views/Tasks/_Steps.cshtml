@@ -1,0 +1,38 @@
+@model TaskItem
+@* Chapter 30: a task's checklist, on its details page. Every button is a small form: it works without JavaScript. *@
+
+<section id="steps" aria-labelledby="steps-heading" class="mb-4">
+    <h2 id="steps-heading" class="h4">Checklist</h2>
+
+    @if (Model.StepProgress() is string progress)
+    {
+        <p class="text-muted">@progress</p>
+    }
+
+    @if (Model.Steps.Count > 0)
+    {
+        <ul class="list-unstyled step-list">
+            @foreach (var step in Model.Steps)
+            {
+                <li class="d-flex align-items-center gap-2 mb-1 @(step.Done ? "step-done" : "")">
+                    <form asp-controller="Steps" asp-action="Toggle" asp-route-taskId="@Model.Id" asp-route-stepId="@step.Id" method="post">
+                        <button type="submit" class="btn btn-sm @(step.Done ? "btn-success" : "btn-outline-secondary")"
+                                aria-pressed="@(step.Done ? "true" : "false")">
+                            @(step.Done ? "✓" : "○")<span class="visually-hidden"> Done: @step.Text</span>
+                        </button>
+                    </form>
+                    <span class="step-text">@step.Text</span>
+                    <form asp-controller="Steps" asp-action="Delete" asp-route-taskId="@Model.Id" asp-route-stepId="@step.Id" method="post" class="ms-auto">
+                        <button type="submit" class="btn btn-link btn-sm text-danger">Remove<span class="visually-hidden"> @step.Text</span></button>
+                    </form>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No steps yet. Break the task into small steps, and tick them off as you go.</p>
+    }
+
+    <partial name="~/Views/Tasks/_AddStep.cshtml" model="@((StepInput?)ViewData["StepInput"] ?? new StepInput())" view-data="@(new ViewDataDictionary(ViewData) { ["TaskId"] = Model.Id })" />
+</section>

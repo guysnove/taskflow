@@ -1,0 +1,8 @@
+# Chapter 29: files Docker should not copy into the build (see Deploy/Dockerfile)
+**/bin/
+**/obj/
+**/*.db
+**/*.db-shm
+**/*.db-wal
+.git/
+TaskFlow.Tests/

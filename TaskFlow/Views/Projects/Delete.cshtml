@@ -1,0 +1,28 @@
+@model Project
+@{
+    ViewData["Title"] = "Delete " + Model.Name;
+}
+
+<h1>Delete "@Model.Name"?</h1>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger" role="alert">@error</div>
+}
+
+@if (Model.Tasks.Count > 0)
+{
+    <p>
+        This project still has @Model.Tasks.Count task(s). Move them to another project,
+        or delete them, before deleting the project.
+    </p>
+    <p><a asp-route="ProjectDetails" asp-route-id="@Model.Id" class="btn btn-link">Back to the project</a></p>
+}
+else
+{
+    <p>The project has no tasks. Deleting it can't be undone.</p>
+    <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
+        <button type="submit" class="btn btn-danger">Yes, delete it</button>
+        <a asp-route="ProjectDetails" asp-route-id="@Model.Id" class="btn btn-link">No, keep it</a>
+    </form>
+}

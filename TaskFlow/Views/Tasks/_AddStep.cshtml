@@ -1,0 +1,13 @@
+@model StepInput
+@* Chapter 30: the "add a step" form. Its own model, so asp-for and the validation messages work. *@
+
+<form asp-controller="Steps" asp-action="Add" asp-route-taskId="@ViewData["TaskId"]" method="post" class="row g-2 align-items-start">
+    <div class="col-sm-8">
+        <label asp-for="Text" class="visually-hidden"></label>
+        <input asp-for="Text" class="form-control" placeholder="e.g. Buy boxes">
+        <span asp-validation-for="Text" class="text-danger"></span>
+    </div>
+    <div class="col-sm-4">
+        <button type="submit" class="btn btn-primary">Add step</button>
+    </div>
+</form>

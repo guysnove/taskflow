@@ -1,0 +1,42 @@
+@model Project
+@{
+    ViewData["Title"] = Model.Name;
+    int open = Model.Tasks.Count(t => !t.Done);
+}
+
+<h1>@Model.Name</h1>
+
+@if (TempData["Message"] is string message)
+{
+    <div class="alert alert-success" role="status">@message</div>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.Description))
+{
+    <p class="lead">@Model.Description</p>
+}
+
+<p>
+    @open of @Model.Tasks.Count tasks still to do.
+    <a asp-controller="Tasks" asp-action="Create" asp-route-project="@Model.Id"
+       class="btn btn-primary btn-sm ms-2">Add a task to this project</a>
+</p>
+
+@if (Model.Tasks.Count > 0)
+{
+    <ul>
+        @foreach (var task in Model.Tasks)
+        {
+            <li class="@(task.Done ? "task-done" : "")">
+                <a asp-route="TaskDetails" asp-route-id="@task.Id">@task.Title</a>
+                <priority value="@task.Priority" />
+            </li>
+        }
+    </ul>
+}
+
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">Edit</a>
+    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger btn-sm">Delete</a>
+    <a asp-action="Index" class="btn btn-link btn-sm">All projects</a>
+</p>

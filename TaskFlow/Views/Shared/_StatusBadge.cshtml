@@ -1,0 +1,14 @@
+@model TaskItem
+@inject TimeProvider Time
+@* A small badge for a task's status. Shows nothing for a task that is simply "to do". *@
+@{
+    var today = Time.Today();
+}
+@if (Model.Done)
+{
+    <span class="badge text-bg-secondary">Done</span>
+}
+else if (Model.IsOverdue(today))
+{
+    <span class="badge text-bg-danger">Overdue</span>
+}

@@ -1,0 +1,18 @@
+@model TaskInput
+@{
+    ViewData["Title"] = "Add a task";
+}
+
+<h1>Add a task</h1>
+
+<div asp-validation-summary="All" class="alert alert-danger validation-summary"></div>
+
+<form asp-action="Create" method="post" class="task-form" novalidate>
+    <partial name="_TaskFields" model="Model" />
+    <button type="submit" class="btn btn-primary">Add task</button>
+    <a asp-action="Index" class="btn btn-link">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

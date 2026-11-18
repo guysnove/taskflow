@@ -1,0 +1,37 @@
+@model TaskInput
+@* The fields shared by the add and edit forms. Used with: <partial name="_TaskFields" model="Model" /> *@
+@{
+    var projects = (SelectList)ViewData["Projects"]!;   // filled in by the controller
+}
+
+<div class="mb-3">
+    <label asp-for="Title" class="form-label"></label>
+    <input asp-for="Title" class="form-control">
+    <span asp-validation-for="Title" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Priority" class="form-label"></label>
+    <select asp-for="Priority" class="form-select">
+        <option>High</option>
+        <option>Medium</option>
+        <option>Low</option>
+    </select>
+    <span asp-validation-for="Priority" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Due" class="form-label"></label>
+    <input asp-for="Due" class="form-control">
+    <span asp-validation-for="Due" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="ProjectId" class="form-label"></label>
+    <select asp-for="ProjectId" asp-items="projects" class="form-select">
+        <option value="">(no project)</option>
+    </select>
+    <span asp-validation-for="ProjectId" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Notes" class="form-label"></label>
+    <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+    <span asp-validation-for="Notes" class="text-danger"></span>
+</div>

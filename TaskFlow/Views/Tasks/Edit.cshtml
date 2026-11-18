@@ -1,0 +1,30 @@
+@model TaskInput
+@{
+    int id = (int)ViewData["Id"]!;
+    var current = ViewData["Current"] as TaskItem;     // set only after an edit conflict
+    ViewData["Title"] = "Edit task";
+}
+
+<h1>Edit task</h1>
+
+<div asp-validation-summary="All" class="alert alert-danger validation-summary"></div>
+
+@if (current is not null)
+{
+    <div class="alert alert-warning">
+        <strong>Saved now:</strong> "@current.Title", @current.Priority priority,
+        due @(current.Due?.ToString("d MMM yyyy") ?? "never"),
+        project: @(current.Project?.Name ?? "none").
+    </div>
+}
+
+<form asp-action="Edit" asp-route-id="@id" method="post" class="task-form" novalidate>
+    <input asp-for="Version" type="hidden">
+    <partial name="_TaskFields" model="Model" />
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-route="TaskDetails" asp-route-id="@id" class="btn btn-link">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
