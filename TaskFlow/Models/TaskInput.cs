@@ -28,6 +28,11 @@ public class TaskInput
     [StringLength(500, ErrorMessage = "Notes can be at most 500 characters.")]
     public string? Notes { get; set; }
 
+    // Course 2, Chapter 2: ticked when the user confirms they really want a second task
+    // with the same title as an open one. Only the add form shows it.
+    [Display(Name = "Add it anyway")]
+    public bool AllowDuplicate { get; set; }
+
     // Builds a form model from an existing task, for the edit page.
     public static TaskInput From(TaskItem task) => new()
     {

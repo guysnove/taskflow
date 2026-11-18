@@ -100,6 +100,18 @@ public class TasksController : Controller
         }
         await CheckProjectExistsAsync(input);
 
+        // Course 2, Chapter 2: warn about a probable duplicate, unless the user confirmed it.
+        if (ModelState.IsValid && !input.AllowDuplicate)
+        {
+            var existing = TitleMatcher.FindOpenDuplicate(input.Title, await _repository.GetAllAsync());
+            if (existing is not null)
+            {
+                ModelState.AddModelError(nameof(input.Title),
+                    $"You already have an open task called \"{existing.Title}\". Tick \"Add it anyway\" to add another.");
+                ViewData["PossibleDuplicate"] = true;
+            }
+        }
+
         if (!ModelState.IsValid)
         {
             await LoadProjectChoicesAsync();

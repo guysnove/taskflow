@@ -9,6 +9,13 @@
 
 <form asp-action="Create" method="post" class="task-form" novalidate>
     <partial name="_TaskFields" model="Model" />
+    @if (ViewData["PossibleDuplicate"] is true)
+    {
+        <div class="form-check mb-3">
+            <input asp-for="AllowDuplicate" class="form-check-input">
+            <label asp-for="AllowDuplicate" class="form-check-label"></label>
+        </div>
+    }
     <button type="submit" class="btn btn-primary">Add task</button>
     <a asp-action="Index" class="btn btn-link">Cancel</a>
 </form>

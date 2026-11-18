@@ -75,6 +75,33 @@ public class SiteTests : IClassFixture<TaskFlowFactory>
         Assert.Equal(HttpStatusCode.NotFound, (await ben.SendAsync(delete)).StatusCode);
     }
 
+    // Course 2, Chapter 2: the add form warns about a probable duplicate, and allows it once confirmed.
+    [Fact]
+    public async Task AddForm_WarnsAboutDuplicateTitle_UntilConfirmed()
+    {
+        var ana = NewBrowser();
+        await Browser.RegisterAsync(ana, $"ana-{Guid.NewGuid():N}@example.com", "Ana");
+
+        async Task<HttpResponseMessage> Add(string title, bool allow)
+        {
+            string token = await Browser.TokenFromAsync(ana, "/tasks/new");
+            var form = new Dictionary<string, string>
+            {
+                ["Title"] = title, ["Priority"] = "Medium", ["__RequestVerificationToken"] = token,
+            };
+            if (allow) form["AllowDuplicate"] = "true";
+            return await ana.PostAsync("/tasks/new", new FormUrlEncodedContent(form));
+        }
+
+        Assert.Equal(HttpStatusCode.Redirect, (await Add("Renew passport", false)).StatusCode);   // added
+
+        var again = await Add("  renew PASSPORT ", false);                                          // probable duplicate
+        Assert.Equal(HttpStatusCode.OK, again.StatusCode);                                          // the form again...
+        Assert.Contains("You already have an open task called", await again.Content.ReadAsStringAsync());
+
+        Assert.Equal(HttpStatusCode.Redirect, (await Add("Renew passport", true)).StatusCode);    // confirmed: added
+    }
+
     [Fact]
     public async Task ApiPost_WithoutToken_Returns400()
     {
