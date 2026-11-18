@@ -7,10 +7,10 @@ TaskFlow is the task-management web application used in two video courses:
 
 ## Versions and milestones
 
-| Tag | What it is |
+| Branch | What it is |
 |---|---|
-| `v1.0` | **TaskFlow v1 — teaching baseline.** The application exactly as it stands at the end of Course 1 (Chapter 30): accounts, projects, tasks with checklists, EF Core + SQLite, a JSON API, security headers and rate limits, 41 automated tests, deployment files. |
-| `ch01` … `ch30` | Course 2 milestones, one tag per chapter that changes the code (added as the course is produced). |
+| `milestone/v1.0` | **TaskFlow v1 — teaching baseline.** The application exactly as it stands at the end of Course 1 (Chapter 30): accounts, projects, tasks with checklists, EF Core + SQLite, a JSON API, security headers and rate limits, 41 automated tests, deployment files. |
+| `milestone/ch01` … `milestone/ch30` | Course 2 milestones, one branch per chapter that changes the code (added as the course is produced). `main` always holds the newest version.. |
 
 ## Run it
 
@@ -19,13 +19,13 @@ Requirements: the .NET 10 SDK (LTS). Editor used in the course: Visual Studio Co
 ```bash
 dotnet restore
 dotnet build
-dotnet test                         # 41 tests at v1.0
+dotnet test                         # 41 tests at milestone/v1.0
 cd TaskFlow && dotnet run           # then open the address it prints
 ```
 
 The first run creates a SQLite database (`taskflow.db`) and applies the migrations. In Development, sample tasks are added for the first account you register.
 
-## Project layout (v1.0)
+## Project layout (TaskFlow v1)
 
 ```
 TaskFlow/            the ASP.NET Core MVC application (controllers, views, API, EF Core data, services)
