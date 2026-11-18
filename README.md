@@ -21,6 +21,7 @@ Small programs used in Course 2 chapters live in `exercises/chNN/`, separate fro
 | `exercises/ch01/BrightCart.Orders` | 1 | A deliberately flawed legacy console app (fictitious shop) to review. Run with `dotnet run` in its folder. |
 | `exercises/ch01/MoneyDemo` | 1 | `money.cs`: double vs decimal for money. Run with `dotnet run money.cs` (.NET 10 file-based app). |
 | `exercises/ch02` | 2 | `Ch02.slnx`: duplicate finding (pairs vs groups), discount rules, scheduling strategies, with 23 tests. `Ch02.Demo`: `dotnet run -c Release -- duplicates` / `dotnet run -- schedule`. `ZuneBug/zune.cs`: the case study's loop. |
+| `exercises/ch03` | 3 | `Ch03.slnx`: array/list, linked list, stack, ring queue and hash map built from scratch, plus a task search (List vs Dictionary), with 29 tests. `Ch03.Demo`: `capacity`, `locality`, `search`, `hash`, `hashcode`, `modify`. |
 
 ## Run it
 

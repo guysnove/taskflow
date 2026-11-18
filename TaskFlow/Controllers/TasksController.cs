@@ -28,10 +28,12 @@ public class TasksController : Controller
     // GET /tasks?show=open  only unfinished tasks
     // GET /tasks?sort=priority
     // GET /tasks?project=2  only one project's tasks (Chapter 24)
+    // GET /tasks?q=login   only tasks whose title has all these words (Course 2, Chapter 3)
     [HttpGet("")]
-    public async Task<IActionResult> Index(string? show, string? sort, int? project)
+    public async Task<IActionResult> Index(string? show, string? sort, int? project, string? q)
     {
         var tasks = await _repository.GetAllAsync();
+        tasks = TaskSearch.Filter(tasks, q);
 
         if (project is not null)
         {
@@ -58,6 +60,7 @@ public class TasksController : Controller
         ViewData["Show"] = show == "open" ? "open" : "all";
         ViewData["Sort"] = sort is "priority" or "title" ? sort : "due";
         ViewData["Project"] = project;
+        ViewData["Q"] = string.IsNullOrWhiteSpace(q) ? null : q.Trim();
         return View(tasks);
     }
 

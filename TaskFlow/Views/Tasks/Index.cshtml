@@ -5,6 +5,7 @@
     string show = (string)ViewData["Show"]!;   // "all" or "open"
     string sort = (string)ViewData["Sort"]!;   // "due", "priority" or "title"
     int? project = (int?)ViewData["Project"];  // only this project's tasks, or null for all
+    string? q = (string?)ViewData["Q"];         // the search words, or null (Course 2, Chapter 3)
 }
 
 <h1>My tasks</h1>
@@ -25,25 +26,46 @@
     <a asp-action="Create" class="btn btn-primary btn-sm ms-2">Add a task</a>
 </p>
 
+<form method="get" asp-action="Index" class="row g-2 align-items-center mb-2" role="search">
+    <div class="col-auto">
+        <label for="q" class="visually-hidden">Search tasks</label>
+        <input id="q" name="q" value="@q" class="form-control form-control-sm" placeholder="Search titles, e.g. login bug">
+    </div>
+    <input type="hidden" name="show" value="@(show == "open" ? "open" : null)" disabled="@(show != "open")">
+    <input type="hidden" name="sort" value="@sort">
+    <div class="col-auto"><button type="submit" class="btn btn-outline-secondary btn-sm">Search</button></div>
+    @if (q is not null)
+    {
+        <div class="col-auto small"><a asp-action="Index" asp-route-show="@show" asp-route-sort="@sort">Clear search</a></div>
+    }
+</form>
+
 <nav aria-label="Filter and sort" class="small mb-2">
     Show:
-    <a asp-action="Index" asp-route-sort="@sort"
+    <a asp-action="Index" asp-route-sort="@sort" asp-route-q="@q"
        aria-current="@(show == "all" ? "true" : null)">all</a> ·
-    <a asp-action="Index" asp-route-show="open" asp-route-sort="@sort"
+    <a asp-action="Index" asp-route-show="open" asp-route-sort="@sort" asp-route-q="@q"
        aria-current="@(show == "open" ? "true" : null)">still to do</a>
     <span class="mx-2">|</span>
     Sort by:
-    <a asp-action="Index" asp-route-show="@show" asp-route-sort="due"
+    <a asp-action="Index" asp-route-show="@show" asp-route-sort="due" asp-route-q="@q"
        aria-current="@(sort == "due" ? "true" : null)">due date</a> ·
-    <a asp-action="Index" asp-route-show="@show" asp-route-sort="priority"
+    <a asp-action="Index" asp-route-show="@show" asp-route-sort="priority" asp-route-q="@q"
        aria-current="@(sort == "priority" ? "true" : null)">priority</a> ·
-    <a asp-action="Index" asp-route-show="@show" asp-route-sort="title"
+    <a asp-action="Index" asp-route-show="@show" asp-route-sort="title" asp-route-q="@q"
        aria-current="@(sort == "title" ? "true" : null)">title</a>
 </nav>
 
 @if (Model.Count == 0)
 {
-    <p>No tasks yet. Add your first one!</p>
+    @if (q is not null)
+    {
+        <p>No tasks match “@q”.</p>
+    }
+    else
+    {
+        <p>No tasks yet. Add your first one!</p>
+    }
 }
 else
 {

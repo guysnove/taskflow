@@ -102,6 +102,30 @@ public class SiteTests : IClassFixture<TaskFlowFactory>
         Assert.Equal(HttpStatusCode.Redirect, (await Add("Renew passport", true)).StatusCode);    // confirmed: added
     }
 
+    // Course 2, Chapter 3: searching the task list.
+    [Fact]
+    public async Task TaskList_Search_ShowsOnlyMatchingTasks()
+    {
+        var ana = NewBrowser();
+        await Browser.RegisterAsync(ana, $"ana-{Guid.NewGuid():N}@example.com", "Ana");
+        foreach (var title in new[] { "Fix login bug", "Plan the budget" })
+        {
+            string token = await Browser.TokenFromAsync(ana, "/tasks/new");
+            await ana.PostAsync("/tasks/new", new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["Title"] = title, ["Priority"] = "Medium", ["__RequestVerificationToken"] = token,
+            }));
+        }
+
+        await ana.GetStringAsync("/tasks");          // shows (and uses up) the "Added …" message first
+        string html = await ana.GetStringAsync("/tasks?q=LOGIN");
+        Assert.Contains("Fix login bug", html);
+        Assert.DoesNotContain("Plan the budget", html);
+
+        string none = await ana.GetStringAsync("/tasks?q=holiday");
+        Assert.Contains("No tasks match", none);
+    }
+
     [Fact]
     public async Task ApiPost_WithoutToken_Returns400()
     {
