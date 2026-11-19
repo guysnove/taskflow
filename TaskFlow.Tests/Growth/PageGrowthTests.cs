@@ -12,6 +12,7 @@ namespace TaskFlow.Tests.Growth;
 // Not a pass/fail test: it prints timings. It's slow, so it only runs when asked:
 //   dotnet test -c Release --filter Category=Growth --logger "console;verbosity=detailed"
 [Trait("Category", "Growth")]
+[Trait("Req", "NFR-PERF-1")]
 public class PageGrowthTests(ITestOutputHelper output)
 {
     [Fact]

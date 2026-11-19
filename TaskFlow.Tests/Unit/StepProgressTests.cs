@@ -3,6 +3,7 @@ using TaskFlow.Models;
 namespace TaskFlow.Tests.Unit;
 
 // Chapter 30: written before StepProgress() existed (red), then made to pass (green).
+[Trait("Req", "FR-STEP-1")]
 public class StepProgressTests
 {
     [Fact]

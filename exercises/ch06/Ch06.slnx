@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Ch06.Requirements.Tests/Ch06.Requirements.Tests.csproj" />
+  <Project Path="Ch06.Requirements/Ch06.Requirements.csproj" />
+  <Project Path="Ch06.Demo/Ch06.Demo.csproj" />
+</Solution>

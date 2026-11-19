@@ -4,6 +4,7 @@ using TaskFlow.Models;
 namespace TaskFlow.Tests.Unit;
 
 // The validation rules on TaskInput, checked the same way ASP.NET Core checks them.
+[Trait("Req", "FR-TASK-1")]
 public class TaskInputTests
 {
     private static List<string> Errors(TaskInput input)

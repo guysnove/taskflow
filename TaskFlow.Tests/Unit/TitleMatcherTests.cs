@@ -4,6 +4,7 @@ using TaskFlow.Services;
 namespace TaskFlow.Tests.Unit;
 
 // Course 2, Chapter 2: the duplicate-title algorithm, edge cases first.
+[Trait("Req", "FR-DUP-1")]
 public class TitleMatcherTests
 {
     [Theory]

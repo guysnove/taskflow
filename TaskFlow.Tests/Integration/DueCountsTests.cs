@@ -7,6 +7,7 @@ namespace TaskFlow.Tests.Integration;
 
 // Course 2, Chapter 5: the database's counts must agree with the C# rules (TaskItem.IsOverdue / IsDueSoon),
 // especially at the edges: yesterday, today, the last "soon" day, the day after it, done tasks, no due date.
+[Trait("Req", "FR-DUE-1")]
 public class DueCountsTests : IClassFixture<TaskFlowFactory>
 {
     private readonly TaskFlowFactory _factory;

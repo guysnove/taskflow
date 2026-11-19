@@ -5,6 +5,7 @@ namespace TaskFlow.Tests.Integration;
 
 // Chapter 30: found while testing the practice exercises. The API's limit (20 requests per 10 seconds)
 // must belong to each user — not to everyone who happens to have the same display name.
+[Trait("Req", "NFR-SEC-3")]
 public class RateLimitTests : IClassFixture<TaskFlowFactory>
 {
     private readonly TaskFlowFactory _factory;

@@ -12,6 +12,10 @@ TaskFlow is the task-management web application used in two video courses:
 | `milestone/v1.0` | **TaskFlow v1 — teaching baseline.** The application exactly as it stands at the end of Course 1 (Chapter 30): accounts, projects, tasks with checklists, EF Core + SQLite, a JSON API, security headers and rate limits, 41 automated tests, deployment files. |
 | `milestone/ch01` … `milestone/ch30` | Course 2 milestones, one branch per chapter that changes the code (added as the course is produced). `main` always holds the newest version. |
 
+## Requirements (Course 2, Chapter 6)
+
+`docs/requirements/` holds TaskFlow's requirements, with IDs. Tests carry `[Trait("Req", "…")]`. `dotnet run --project tools/Traceability` reports which requirements have tests; `dotnet test --filter "Req=FR-DUP-1"` runs one requirement's tests.
+
 ## Growth timings (Course 2, Chapter 5)
 
 `dotnet test -c Release --filter Category=Growth --logger "console;verbosity=detailed"` prints how pages behave as one user's task list grows. Normal runs and CI skip it.
@@ -28,6 +32,7 @@ Small programs used in Course 2 chapters live in `exercises/chNN/`, separate fro
 | `exercises/ch03` | 3 | `Ch03.slnx`: array/list, linked list, stack, ring queue and hash map built from scratch, plus a task search (List vs Dictionary), with 29 tests. `Ch03.Demo`: `capacity`, `locality`, `search`, `hash`, `hashcode`, `modify`. |
 | `exercises/ch04` | 4 | `Ch04.slnx`: recursion, a binary search tree, a min-heap, a graph (BFS, cycle detection, topological sort), searching and sorting, fewest coins, with 29 tests. `Ch04.Demo`: `overflow N`, `bst`, `sort`, `search`, `plan`, `queue`, `fib`, `stable`, `tree PATH`, `range`. |
 | `exercises/ch05` | 5 | `Ch05.slnx`: step counters, de-duplication, six searches, snippets to analyse, space and cases, with 32 tests. `Ch05.Demo`: `dedupe`, `steps`, `doubling`, `cases`, `concat`, `space`, `jit`, `setup`. `Ch05.Benchmarks` (BenchmarkDotNet): `dotnet run -c Release -- --filter "*"`. |
+| `exercises/ch06` | 6 | `Ch06.slnx`: US-2's acceptance criteria as tests (`ReminderPolicy`) and a tiny requirement linter, with 11 tests. `Ch06.Demo`: `interviews`, `ours`. |
 
 ## Run it
 

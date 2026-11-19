@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 namespace TaskFlow.Tests.Integration;
 
 // Course 2, Chapter 4: "Blocked by", tested through real HTTP requests.
+[Trait("Req", "FR-DEP-1")]
 public class DependenciesTests : IClassFixture<TaskFlowFactory>
 {
     private readonly TaskFlowFactory _factory;
@@ -58,6 +59,7 @@ public class DependenciesTests : IClassFixture<TaskFlowFactory>
     }
 
     [Fact]
+    [Trait("Req", "FR-OWN-1")]
     public async Task SomeoneElsesTask_Is404()
     {
         var ana = NewBrowser();

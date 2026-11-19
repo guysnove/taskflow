@@ -16,6 +16,7 @@ public class SiteTests : IClassFixture<TaskFlowFactory>
     private HttpClient NewBrowser() => _factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
 
     [Fact]
+    [Trait("Req", "NFR-OPS-1")]
     public async Task Health_ReturnsHealthy()
     {
         var response = await NewBrowser().GetAsync("/health");
@@ -24,6 +25,7 @@ public class SiteTests : IClassFixture<TaskFlowFactory>
     }
 
     [Fact]
+    [Trait("Req", "FR-ACC-1")]
     public async Task TasksPage_WhenSignedOut_RedirectsToSignIn()
     {
         var response = await NewBrowser().GetAsync("/tasks");
@@ -32,6 +34,7 @@ public class SiteTests : IClassFixture<TaskFlowFactory>
     }
 
     [Fact]
+    [Trait("Req", "FR-ACC-1")]
     public async Task Api_WhenSignedOut_Returns401()
     {
         var response = await NewBrowser().GetAsync("/api/tasks");
@@ -39,6 +42,7 @@ public class SiteTests : IClassFixture<TaskFlowFactory>
     }
 
     [Fact]
+    [Trait("Req", "NFR-SEC-1")]
     public async Task EveryPage_HasTheSecurityHeaders()
     {
         var response = await NewBrowser().GetAsync("/");
@@ -47,6 +51,7 @@ public class SiteTests : IClassFixture<TaskFlowFactory>
     }
 
     [Fact]
+    [Trait("Req", "FR-OWN-1")]
     public async Task Ben_CannotReadOrDelete_AnasTask()
     {
         var ana = NewBrowser();
@@ -77,6 +82,7 @@ public class SiteTests : IClassFixture<TaskFlowFactory>
 
     // Course 2, Chapter 2: the add form warns about a probable duplicate, and allows it once confirmed.
     [Fact]
+    [Trait("Req", "FR-DUP-1")]
     public async Task AddForm_WarnsAboutDuplicateTitle_UntilConfirmed()
     {
         var ana = NewBrowser();
@@ -104,6 +110,7 @@ public class SiteTests : IClassFixture<TaskFlowFactory>
 
     // Course 2, Chapter 3: searching the task list.
     [Fact]
+    [Trait("Req", "FR-SRCH-1")]
     public async Task TaskList_Search_ShowsOnlyMatchingTasks()
     {
         var ana = NewBrowser();
@@ -127,6 +134,7 @@ public class SiteTests : IClassFixture<TaskFlowFactory>
     }
 
     [Fact]
+    [Trait("Req", "NFR-SEC-2")]
     public async Task ApiPost_WithoutToken_Returns400()
     {
         var ana = NewBrowser();

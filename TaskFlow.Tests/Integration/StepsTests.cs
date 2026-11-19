@@ -8,6 +8,7 @@ using TaskFlow.Data;
 namespace TaskFlow.Tests.Integration;
 
 // Chapter 30: the checklist feature, tested through real HTTP requests (pages and API).
+[Trait("Req", "FR-STEP-1")]
 public class StepsTests : IClassFixture<TaskFlowFactory>
 {
     private readonly TaskFlowFactory _factory;

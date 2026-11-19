@@ -9,6 +9,7 @@ namespace TaskFlow.Tests.Unit;
 
 // A test with a stand-in ("fake") for the database: the in-memory repository from Chapter 21.
 // The view component only knows ITaskRepository, so it can't tell the difference.
+[Trait("Req", "FR-DUE-1")]
 public class OverdueSummaryTests
 {
     private class SignedInUser : ICurrentUser          // a tiny fake: always "user 1, signed in"

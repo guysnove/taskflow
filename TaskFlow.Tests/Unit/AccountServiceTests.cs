@@ -11,6 +11,7 @@ namespace TaskFlow.Tests.Unit;
 
 // AccountService needs a database, so these tests use SQLite "in memory":
 // a real database that lives only as long as the connection, and starts empty every time.
+[Trait("Req", "FR-ACC-1")]
 public class AccountServiceTests : IDisposable
 {
     private readonly SqliteConnection _connection = new("Data Source=:memory:");

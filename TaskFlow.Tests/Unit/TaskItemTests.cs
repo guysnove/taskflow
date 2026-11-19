@@ -3,6 +3,7 @@ using TaskFlow.Models;
 namespace TaskFlow.Tests.Unit;
 
 // Unit tests (Chapter 28): one small piece of code, on its own, with no web server and no database.
+[Trait("Req", "FR-DUE-1")]
 public class TaskItemTests
 {
     private static readonly DateOnly Today = new(2026, 11, 8);   // a fixed "today": the result never depends on the real date

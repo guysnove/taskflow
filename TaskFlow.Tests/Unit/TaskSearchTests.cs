@@ -4,6 +4,7 @@ using TaskFlow.Services;
 namespace TaskFlow.Tests.Unit;
 
 // Course 2, Chapter 3: task search with a set of words.
+[Trait("Req", "FR-SRCH-1")]
 public class TaskSearchTests
 {
     private static readonly List<TaskItem> Tasks =

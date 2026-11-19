@@ -3,6 +3,7 @@ using TaskFlow.Models;
 namespace TaskFlow.Tests.Unit;
 
 // Written BEFORE TaskItem.IsDueSoon existed (Chapter 28): first the tests, then the code.
+[Trait("Req", "FR-DUE-1")]
 public class IsDueSoonTests
 {
     private static readonly DateOnly Today = new(2026, 11, 8);

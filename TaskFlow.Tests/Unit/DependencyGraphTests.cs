@@ -4,6 +4,7 @@ namespace TaskFlow.Tests.Unit;
 
 // Course 2, Chapter 4: cycle detection for task dependencies.
 // Edges are (BlockedById, TaskId): "BlockedById must be done before TaskId".
+[Trait("Req", "FR-DEP-1")]
 public class DependencyGraphTests
 {
     // 1 Design -> 2 Build -> 3 Test -> 4 Deploy, and 2 Build -> 5 Docs -> 4 Deploy
