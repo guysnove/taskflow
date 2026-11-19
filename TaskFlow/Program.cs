@@ -35,6 +35,14 @@ builder.Services.AddScoped<IProjectRepository, EfProjectRepository>();   // Chap
 builder.Services.AddScoped<IStepRepository, EfStepRepository>();         // Chapter 30
 builder.Services.AddScoped<IDependencyRepository, EfDependencyRepository>();   // Course 2, Chapter 4
 
+// Course 2, Chapter 8: the rules for a new task, checked in this order.
+// A new rule: write the class, add one line here. Nothing else changes.
+builder.Services.AddScoped<INewTaskRule, DueNotInPastRule>();
+builder.Services.AddScoped<INewTaskRule, DueWithinFiveYearsRule>();   // FR-TASK-3
+builder.Services.AddScoped<INewTaskRule, ProjectExistsRule>();
+builder.Services.AddScoped<INewTaskRule, DuplicateTitleRule>();
+builder.Services.AddScoped<NewTaskChecker>();
+
 // Chapter 25: accounts. Who is signed in is remembered in an encrypted cookie.
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

@@ -9,6 +9,8 @@ Written down in Course 2, Chapter 6, from the features built in Courses 1 and 2,
 | FR-ACC-1 | A visitor can register with an email and password, and sign in. | Course 1, Ch. 25 | tests |
 | FR-OWN-1 | A user can see and change only their own tasks, projects, steps and dependencies. | Course 1, Ch. 25 | tests |
 | FR-TASK-1 | A task has a title of 3 to 80 characters, and a priority of High, Medium or Low; otherwise the form explains what's wrong. | Course 1 | tests |
+| FR-TASK-2 | A new task can't be due in the past (the form and the API). | Course 1; API since Course 2, Ch. 8 | tests |
+| FR-TASK-3 | A new task can't be due more than five years ahead: almost always a typo. | Course 2, Ch. 8 | tests |
 | FR-STEP-1 | A task can have an ordered checklist of steps; the task shows "2 of 5 done". | Course 1, Ch. 30 | tests |
 | FR-DUP-1 | Adding a task whose title matches an open task's title (ignoring case and spaces) shows a warning; the user may add it anyway. | Course 2, Ch. 2 | tests |
 | FR-SRCH-1 | The task list can be filtered to tasks whose titles contain all the search words, in any order, ignoring case. | Course 2, Ch. 3 | tests |

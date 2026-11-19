@@ -14,13 +14,15 @@ public class TasksController : Controller
     private readonly TimeProvider _time;
     private readonly ILogger<TasksController> _logger;
     private readonly IDependencyRepository _dependencies;   // Course 2, Chapter 4
+    private readonly NewTaskChecker _newTaskRules;          // Course 2, Chapter 8
 
     // Dependency injection passes them all in: see Program.cs.
     public TasksController(ITaskRepository repository, IProjectRepository projects,
                            TimeProvider time, ILogger<TasksController> logger,
-                           IDependencyRepository dependencies)
+                           IDependencyRepository dependencies, NewTaskChecker newTaskRules)
     {
         _dependencies = dependencies;
+        _newTaskRules = newTaskRules;
         _repository = repository;
         _projects = projects;
         _time = time;
@@ -104,22 +106,13 @@ public class TasksController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(TaskInput input)
     {
-        // A rule for new tasks only: no due dates in the past.
-        var today = _time.Today();
-        if (input.Due is not null && input.Due < today)
+        // Course 2, Chapter 8: the rules live in their own classes (Services/NewTaskRules.cs).
+        // The controller only turns their answers into messages on the form.
+        foreach (var problem in await _newTaskRules.CheckAsync(input, alreadyInvalid: !ModelState.IsValid))
         {
-            ModelState.AddModelError(nameof(input.Due), "A new task can't be due in the past.");
-        }
-        await CheckProjectExistsAsync(input);
-
-        // Course 2, Chapter 2: warn about a probable duplicate, unless the user confirmed it.
-        if (ModelState.IsValid && !input.AllowDuplicate)
-        {
-            var existing = TitleMatcher.FindOpenDuplicate(input.Title, await _repository.GetAllAsync());
-            if (existing is not null)
+            ModelState.AddModelError(problem.Field, problem.Message);
+            if (problem.Warning)
             {
-                ModelState.AddModelError(nameof(input.Title),
-                    $"You already have an open task called \"{existing.Title}\". Tick \"Add it anyway\" to add another.");
                 ViewData["PossibleDuplicate"] = true;
             }
         }

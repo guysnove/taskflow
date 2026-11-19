@@ -17,11 +17,13 @@ public class TasksApiController : ControllerBase
 {
     private readonly ITaskRepository _tasks;
     private readonly IProjectRepository _projects;
+    private readonly NewTaskChecker _newTaskRules;          // Course 2, Chapter 8
 
-    public TasksApiController(ITaskRepository tasks, IProjectRepository projects)
+    public TasksApiController(ITaskRepository tasks, IProjectRepository projects, NewTaskChecker newTaskRules)
     {
         _tasks = tasks;
         _projects = projects;
+        _newTaskRules = newTaskRules;
     }
 
     // GET /api/tasks  the signed-in user's tasks
@@ -52,9 +54,15 @@ public class TasksApiController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<TaskDto>> Create(TaskInput input)
     {
-        if (!await ProjectIsMineAsync(input))
+        // Course 2, Chapter 8: the same rules as the form. Warnings (a probable duplicate)
+        // are for people at a form; a program gets only the errors.
+        var errors = (await _newTaskRules.CheckAsync(input, alreadyInvalid: false)).Where(p => !p.Warning).ToList();
+        if (errors.Count > 0)
         {
-            ModelState.AddModelError(nameof(input.ProjectId), "There is no such project.");
+            foreach (var error in errors)
+            {
+                ModelState.AddModelError(error.Field, error.Message);
+            }
             return ValidationProblem(ModelState);
         }
         var task = await _tasks.AddAsync(input);
