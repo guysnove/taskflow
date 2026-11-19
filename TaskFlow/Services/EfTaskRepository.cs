@@ -41,6 +41,17 @@ public class EfTaskRepository : ITaskRepository
                   .ToListAsync();
     }
 
+    // Course 2, Chapter 5: the database counts; no task is loaded. The same rules as
+    // TaskItem.IsOverdue and IsDueSoon (a test checks they agree), written as queries.
+    public async Task<DueCounts> CountDueAsync(DateOnly today, int days)
+    {
+        DateOnly last = today.AddDays(days);
+        var open = MyTasks().Where(t => !t.Done && t.Due != null);
+        int overdue = await open.CountAsync(t => t.Due < today);
+        int dueSoon = await open.CountAsync(t => t.Due >= today && t.Due <= last);
+        return new DueCounts(overdue, dueSoon);
+    }
+
     public Task<TaskItem?> FindAsync(int id)
     {
         return MyTasks().AsNoTracking()

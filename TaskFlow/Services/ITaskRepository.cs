@@ -13,7 +13,11 @@ public interface ITaskRepository
     Task<SaveResult> UpdateAsync(int id, TaskInput input);    // Chapter 24: Saved, NotFound or Conflict
     Task<bool> MarkDoneAsync(int id);
     Task<bool> DeleteAsync(int id);                           // Chapter 24
+    Task<DueCounts> CountDueAsync(DateOnly today, int days);  // Course 2, Chapter 5: counted by the database
 }
+
+// How many open tasks are overdue, and how many are due in the next few days (Course 2, Chapter 5).
+public record DueCounts(int Overdue, int DueSoon);
 
 // The three ways an update can end (Chapter 24).
 public enum SaveResult

@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Ch05.Efficiency.Tests/Ch05.Efficiency.Tests.csproj" />
+  <Project Path="Ch05.Efficiency/Ch05.Efficiency.csproj" />
+  <Project Path="Ch05.Demo/Ch05.Demo.csproj" />
+  <Project Path="Ch05.Benchmarks/Ch05.Benchmarks.csproj" />
+</Solution>

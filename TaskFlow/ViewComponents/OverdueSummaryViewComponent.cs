@@ -32,9 +32,9 @@ public class OverdueSummaryViewComponent : ViewComponent
             return Content("");              // Chapter 25: nobody signed in, no tasks to count
         }
         var today = _time.Today();
-        var open = (await _repository.GetAllAsync()).Where(t => !t.Done).ToList();
-        int overdue = open.Count(t => t.IsOverdue(today));
-        int dueSoon = open.Count(t => t.IsDueSoon(today, _options.DueSoonDays));   // Chapter 28: one rule, tested
-        return View(new OverdueSummary(overdue, dueSoon, _options.DueSoonDays));
+        // Course 2, Chapter 5: this runs on EVERY page. It used to load every task (with projects
+        // and steps) just to count two numbers: O(n) rows per page. Now the database counts.
+        var counts = await _repository.CountDueAsync(today, _options.DueSoonDays);
+        return View(new OverdueSummary(counts.Overdue, counts.DueSoon, _options.DueSoonDays));
     }
 }

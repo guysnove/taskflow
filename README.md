@@ -12,6 +12,10 @@ TaskFlow is the task-management web application used in two video courses:
 | `milestone/v1.0` | **TaskFlow v1 — teaching baseline.** The application exactly as it stands at the end of Course 1 (Chapter 30): accounts, projects, tasks with checklists, EF Core + SQLite, a JSON API, security headers and rate limits, 41 automated tests, deployment files. |
 | `milestone/ch01` … `milestone/ch30` | Course 2 milestones, one branch per chapter that changes the code (added as the course is produced). `main` always holds the newest version. |
 
+## Growth timings (Course 2, Chapter 5)
+
+`dotnet test -c Release --filter Category=Growth --logger "console;verbosity=detailed"` prints how pages behave as one user's task list grows. Normal runs and CI skip it.
+
 ## Chapter exercises (Course 2)
 
 Small programs used in Course 2 chapters live in `exercises/chNN/`, separate from TaskFlow itself.
@@ -23,6 +27,7 @@ Small programs used in Course 2 chapters live in `exercises/chNN/`, separate fro
 | `exercises/ch02` | 2 | `Ch02.slnx`: duplicate finding (pairs vs groups), discount rules, scheduling strategies, with 23 tests. `Ch02.Demo`: `dotnet run -c Release -- duplicates` / `dotnet run -- schedule`. `ZuneBug/zune.cs`: the case study's loop. |
 | `exercises/ch03` | 3 | `Ch03.slnx`: array/list, linked list, stack, ring queue and hash map built from scratch, plus a task search (List vs Dictionary), with 29 tests. `Ch03.Demo`: `capacity`, `locality`, `search`, `hash`, `hashcode`, `modify`. |
 | `exercises/ch04` | 4 | `Ch04.slnx`: recursion, a binary search tree, a min-heap, a graph (BFS, cycle detection, topological sort), searching and sorting, fewest coins, with 29 tests. `Ch04.Demo`: `overflow N`, `bst`, `sort`, `search`, `plan`, `queue`, `fib`, `stable`, `tree PATH`, `range`. |
+| `exercises/ch05` | 5 | `Ch05.slnx`: step counters, de-duplication, six searches, snippets to analyse, space and cases, with 32 tests. `Ch05.Demo`: `dedupe`, `steps`, `doubling`, `cases`, `concat`, `space`, `jit`, `setup`. `Ch05.Benchmarks` (BenchmarkDotNet): `dotnet run -c Release -- --filter "*"`. |
 
 ## Run it
 

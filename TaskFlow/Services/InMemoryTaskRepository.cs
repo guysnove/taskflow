@@ -32,6 +32,16 @@ public class InMemoryTaskRepository : ITaskRepository
         }
     }
 
+    // Course 2, Chapter 5: here the C# rules themselves do the counting.
+    public Task<DueCounts> CountDueAsync(DateOnly today, int days)
+    {
+        lock (_lock)
+        {
+            return Task.FromResult(new DueCounts(_tasks.Count(t => t.IsOverdue(today)),
+                                                 _tasks.Count(t => t.IsDueSoon(today, days))));
+        }
+    }
+
     // One task, or null if there is no task with that id.
     public Task<TaskItem?> FindAsync(int id)
     {
