@@ -11,21 +11,22 @@ public class TasksController : Controller
 {
     private readonly ITaskRepository _repository;
     private readonly IProjectRepository _projects;
-    private readonly TimeProvider _time;
     private readonly ILogger<TasksController> _logger;
     private readonly IDependencyRepository _dependencies;   // Course 2, Chapter 4
     private readonly NewTaskChecker _newTaskRules;          // Course 2, Chapter 8
+    private readonly ProjectExistsRule _projectRule;        // Course 2, Chapter 9
 
     // Dependency injection passes them all in: see Program.cs.
     public TasksController(ITaskRepository repository, IProjectRepository projects,
-                           TimeProvider time, ILogger<TasksController> logger,
-                           IDependencyRepository dependencies, NewTaskChecker newTaskRules)
+                           ILogger<TasksController> logger,
+                           IDependencyRepository dependencies, NewTaskChecker newTaskRules,
+                           ProjectExistsRule projectRule)
     {
+        _projectRule = projectRule;
         _dependencies = dependencies;
         _newTaskRules = newTaskRules;
         _repository = repository;
         _projects = projects;
-        _time = time;
         _logger = logger;
     }
 
@@ -37,35 +38,14 @@ public class TasksController : Controller
     [HttpGet("")]
     public async Task<IActionResult> Index(string? show, string? sort, int? project, string? q)
     {
-        var tasks = await _repository.GetAllAsync();
-        tasks = TaskSearch.Filter(tasks, q);
+        // Course 2, Chapter 9: the filtering and sorting moved to TaskListQuery (Extract Class).
+        var query = TaskListQuery.From(show, sort, project, q);
+        var tasks = query.Apply(await _repository.GetAllAsync());
 
-        if (project is not null)
-        {
-            tasks = tasks.Where(t => t.ProjectId == project).ToList();
-        }
-
-        if (show == "open")
-        {
-            tasks = tasks.Where(t => !t.Done).ToList();
-        }
-
-        if (sort == "priority")
-        {
-            tasks = tasks.OrderBy(t => t.Done)
-                         .ThenBy(t => PriorityRank(t.Priority))
-                         .ToList();
-        }
-        else if (sort == "title")
-        {
-            tasks = tasks.OrderBy(t => t.Done).ThenBy(t => t.Title).ToList();
-        }
-        // anything else: the repository's order (by due date)
-
-        ViewData["Show"] = show == "open" ? "open" : "all";
-        ViewData["Sort"] = sort is "priority" or "title" ? sort : "due";
-        ViewData["Project"] = project;
-        ViewData["Q"] = string.IsNullOrWhiteSpace(q) ? null : q.Trim();
+        ViewData["Show"] = query.Show;
+        ViewData["Sort"] = query.Sort;
+        ViewData["Project"] = query.Project;
+        ViewData["Q"] = query.Q;
         return View(tasks);
     }
 
@@ -82,9 +62,7 @@ public class TasksController : Controller
         // Course 2, Chapter 4: what it waits for, and the tasks it could wait for.
         var blockers = await _dependencies.BlockersOfAsync(id);
         ViewData["Blockers"] = blockers;
-        ViewData["DependencyChoices"] = (await _repository.GetAllAsync())
-            .Where(t => t.Id != id && blockers.All(b => b.Id != t.Id))
-            .OrderBy(t => t.Title).ToList();
+        ViewData["DependencyChoices"] = await DependencyChoicesAsync(id, blockers);
         return View(task);
     }
 
@@ -137,9 +115,7 @@ public class TasksController : Controller
         {
             return NotFound();
         }
-        ViewData["Id"] = id;
-        await LoadProjectChoicesAsync();
-        return View(TaskInput.From(task));
+        return await EditFormAsync(id, TaskInput.From(task));
     }
 
     // POST /tasks/3/edit  [FromRoute]: the id comes from the address, never from the form
@@ -147,41 +123,54 @@ public class TasksController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit([FromRoute] int id, TaskInput input)
     {
-        await CheckProjectExistsAsync(input);
+        if (await _projectRule.CheckAsync(input) is RuleProblem problem)     // Chapter 9: one copy of the rule
+        {
+            ModelState.AddModelError(problem.Field, problem.Message);
+        }
         if (!ModelState.IsValid)
         {
-            ViewData["Id"] = id;
-            await LoadProjectChoicesAsync();
-            return View(input);
+            return await EditFormAsync(id, input);
         }
 
-        var result = await _repository.UpdateAsync(id, input);
-        if (result == SaveResult.NotFound)
+        return await _repository.UpdateAsync(id, input) switch
+        {
+            SaveResult.NotFound => NotFound(),
+            SaveResult.Conflict => await ShowConflictAsync(id, input),
+            _ => SavedAndBackToTheTask(id, input),
+        };
+    }
+
+    // Someone saved this task after the form was shown. Keep the visitor's values,
+    // show what is saved now, and let them decide.
+    private async Task<IActionResult> ShowConflictAsync(int id, TaskInput input)
+    {
+        var current = await _repository.FindAsync(id);
+        if (current is null)
         {
             return NotFound();
         }
-        if (result == SaveResult.Conflict)
-        {
-            // Someone saved this task after the form was shown. Keep the visitor's values,
-            // show what is saved now, and let them decide.
-            var current = await _repository.FindAsync(id);
-            if (current is null)
-            {
-                return NotFound();
-            }
-            _logger.LogWarning("Edit conflict on task {TaskId}", id);
-            ModelState.AddModelError("", "Someone else saved this task while you were editing it. "
-                + "Your changes were not saved. Check the saved values below, then save again "
-                + "to replace them with yours.");
-            ModelState.Remove(nameof(input.Version));    // so the form shows the new version
-            input.Version = current.Version;
-            ViewData["Current"] = current;
-            ViewData["Id"] = id;
-            await LoadProjectChoicesAsync();
-            return View(input);
-        }
+        _logger.LogWarning("Edit conflict on task {TaskId}", id);
+        ModelState.AddModelError("", "Someone else saved this task while you were editing it. "
+            + "Your changes were not saved. Check the saved values below, then save again "
+            + "to replace them with yours.");
+        ModelState.Remove(nameof(input.Version));    // so the form shows the new version
+        input.Version = current.Version;
+        ViewData["Current"] = current;
+        return await EditFormAsync(id, input);
+    }
+
+    private RedirectToRouteResult SavedAndBackToTheTask(int id, TaskInput input)
+    {
         TempData["Message"] = $"Saved \"{input.Title!.Trim()}\".";
         return RedirectToRoute("TaskDetails", new { id });
+    }
+
+    // The edit form, with these values (and any messages): used four times.
+    private async Task<ViewResult> EditFormAsync(int id, TaskInput input)
+    {
+        ViewData["Id"] = id;
+        await LoadProjectChoicesAsync();
+        return View(input);
     }
 
     // POST /tasks/3/done  marks a task as done
@@ -231,20 +220,9 @@ public class TasksController : Controller
         ViewData["Projects"] = new SelectList(projects, nameof(Project.Id), nameof(Project.Name));
     }
 
-    // A rule that needs data: the chosen project must exist.
-    private async Task CheckProjectExistsAsync(TaskInput input)
-    {
-        if (input.ProjectId is int projectId && await _projects.FindAsync(projectId) is null)
-        {
-            ModelState.AddModelError(nameof(input.ProjectId), "Please choose a project from the list.");
-        }
-    }
-
-    // High first, then Medium, then Low.
-    private static int PriorityRank(string priority) => priority switch
-    {
-        "High" => 0,
-        "Medium" => 1,
-        _ => 2,
-    };
+    // The tasks this task could wait for: not itself, and not one it already waits for.
+    private async Task<List<TaskItem>> DependencyChoicesAsync(int id, List<TaskItem> blockers) =>
+        (await _repository.GetAllAsync())
+            .Where(t => t.Id != id && blockers.All(b => b.Id != t.Id))
+            .OrderBy(t => t.Title).ToList();
 }

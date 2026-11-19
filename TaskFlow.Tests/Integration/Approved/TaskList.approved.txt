@@ -1,0 +1,480 @@
+/tasks
+  [all, due date] search="" 6 of 7: Write report | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | archive old reports | Call supplier (done)
+/tasks?q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?project={report}
+  [all, due date] search="" 2 of 2: Write report | Review report draft
+/tasks?project={report}&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?project={report}&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?project={report}&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?project=999
+  [all, due date] search="" 0 of 0: 
+/tasks?project=999&q=report
+  [all, due date] search="report" 0 of 0: 
+/tasks?project=999&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 0 of 0: 
+/tasks?project=999&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?sort=due
+  [all, due date] search="" 6 of 7: Write report | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | archive old reports | Call supplier (done)
+/tasks?sort=due&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?sort=due&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?sort=due&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?sort=due&project={report}
+  [all, due date] search="" 2 of 2: Write report | Review report draft
+/tasks?sort=due&project={report}&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?sort=due&project={report}&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?sort=due&project={report}&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?sort=due&project=999
+  [all, due date] search="" 0 of 0: 
+/tasks?sort=due&project=999&q=report
+  [all, due date] search="report" 0 of 0: 
+/tasks?sort=due&project=999&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 0 of 0: 
+/tasks?sort=due&project=999&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?sort=priority
+  [all, priority] search="" 6 of 7: Write report | archive old reports | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | Call supplier (done)
+/tasks?sort=priority&q=report
+  [all, priority] search="report" 2 of 2: Write report | Review report draft
+/tasks?sort=priority&q=%20%20REPORT%20%20
+  [all, priority] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?sort=priority&q=zzz
+  [all, priority] search="zzz" 0 of 0: 
+/tasks?sort=priority&project={report}
+  [all, priority] search="" 2 of 2: Write report | Review report draft
+/tasks?sort=priority&project={report}&q=report
+  [all, priority] search="report" 2 of 2: Write report | Review report draft
+/tasks?sort=priority&project={report}&q=%20%20REPORT%20%20
+  [all, priority] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?sort=priority&project={report}&q=zzz
+  [all, priority] search="zzz" 0 of 0: 
+/tasks?sort=priority&project=999
+  [all, priority] search="" 0 of 0: 
+/tasks?sort=priority&project=999&q=report
+  [all, priority] search="report" 0 of 0: 
+/tasks?sort=priority&project=999&q=%20%20REPORT%20%20
+  [all, priority] search="REPORT" 0 of 0: 
+/tasks?sort=priority&project=999&q=zzz
+  [all, priority] search="zzz" 0 of 0: 
+/tasks?sort=title
+  [all, title] search="" 6 of 7: archive old reports | Book train to Lyon | Plan team lunch | Renew licence | Review report draft | Write report | Call supplier (done)
+/tasks?sort=title&q=report
+  [all, title] search="report" 2 of 2: Review report draft | Write report
+/tasks?sort=title&q=%20%20REPORT%20%20
+  [all, title] search="REPORT" 2 of 2: Review report draft | Write report
+/tasks?sort=title&q=zzz
+  [all, title] search="zzz" 0 of 0: 
+/tasks?sort=title&project={report}
+  [all, title] search="" 2 of 2: Review report draft | Write report
+/tasks?sort=title&project={report}&q=report
+  [all, title] search="report" 2 of 2: Review report draft | Write report
+/tasks?sort=title&project={report}&q=%20%20REPORT%20%20
+  [all, title] search="REPORT" 2 of 2: Review report draft | Write report
+/tasks?sort=title&project={report}&q=zzz
+  [all, title] search="zzz" 0 of 0: 
+/tasks?sort=title&project=999
+  [all, title] search="" 0 of 0: 
+/tasks?sort=title&project=999&q=report
+  [all, title] search="report" 0 of 0: 
+/tasks?sort=title&project=999&q=%20%20REPORT%20%20
+  [all, title] search="REPORT" 0 of 0: 
+/tasks?sort=title&project=999&q=zzz
+  [all, title] search="zzz" 0 of 0: 
+/tasks?sort=nonsense
+  [all, due date] search="" 6 of 7: Write report | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | archive old reports | Call supplier (done)
+/tasks?sort=nonsense&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?sort=nonsense&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?sort=nonsense&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?sort=nonsense&project={report}
+  [all, due date] search="" 2 of 2: Write report | Review report draft
+/tasks?sort=nonsense&project={report}&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?sort=nonsense&project={report}&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?sort=nonsense&project={report}&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?sort=nonsense&project=999
+  [all, due date] search="" 0 of 0: 
+/tasks?sort=nonsense&project=999&q=report
+  [all, due date] search="report" 0 of 0: 
+/tasks?sort=nonsense&project=999&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 0 of 0: 
+/tasks?sort=nonsense&project=999&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=open
+  [still to do, due date] search="" 6 of 6: Write report | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | archive old reports
+/tasks?show=open&q=report
+  [still to do, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=open&q=%20%20REPORT%20%20
+  [still to do, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=open&q=zzz
+  [still to do, due date] search="zzz" 0 of 0: 
+/tasks?show=open&project={report}
+  [still to do, due date] search="" 2 of 2: Write report | Review report draft
+/tasks?show=open&project={report}&q=report
+  [still to do, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=open&project={report}&q=%20%20REPORT%20%20
+  [still to do, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=open&project={report}&q=zzz
+  [still to do, due date] search="zzz" 0 of 0: 
+/tasks?show=open&project=999
+  [still to do, due date] search="" 0 of 0: 
+/tasks?show=open&project=999&q=report
+  [still to do, due date] search="report" 0 of 0: 
+/tasks?show=open&project=999&q=%20%20REPORT%20%20
+  [still to do, due date] search="REPORT" 0 of 0: 
+/tasks?show=open&project=999&q=zzz
+  [still to do, due date] search="zzz" 0 of 0: 
+/tasks?show=open&sort=due
+  [still to do, due date] search="" 6 of 6: Write report | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | archive old reports
+/tasks?show=open&sort=due&q=report
+  [still to do, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=due&q=%20%20REPORT%20%20
+  [still to do, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=due&q=zzz
+  [still to do, due date] search="zzz" 0 of 0: 
+/tasks?show=open&sort=due&project={report}
+  [still to do, due date] search="" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=due&project={report}&q=report
+  [still to do, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=due&project={report}&q=%20%20REPORT%20%20
+  [still to do, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=due&project={report}&q=zzz
+  [still to do, due date] search="zzz" 0 of 0: 
+/tasks?show=open&sort=due&project=999
+  [still to do, due date] search="" 0 of 0: 
+/tasks?show=open&sort=due&project=999&q=report
+  [still to do, due date] search="report" 0 of 0: 
+/tasks?show=open&sort=due&project=999&q=%20%20REPORT%20%20
+  [still to do, due date] search="REPORT" 0 of 0: 
+/tasks?show=open&sort=due&project=999&q=zzz
+  [still to do, due date] search="zzz" 0 of 0: 
+/tasks?show=open&sort=priority
+  [still to do, priority] search="" 6 of 6: Write report | archive old reports | Review report draft | Renew licence | Book train to Lyon | Plan team lunch
+/tasks?show=open&sort=priority&q=report
+  [still to do, priority] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=priority&q=%20%20REPORT%20%20
+  [still to do, priority] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=priority&q=zzz
+  [still to do, priority] search="zzz" 0 of 0: 
+/tasks?show=open&sort=priority&project={report}
+  [still to do, priority] search="" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=priority&project={report}&q=report
+  [still to do, priority] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=priority&project={report}&q=%20%20REPORT%20%20
+  [still to do, priority] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=priority&project={report}&q=zzz
+  [still to do, priority] search="zzz" 0 of 0: 
+/tasks?show=open&sort=priority&project=999
+  [still to do, priority] search="" 0 of 0: 
+/tasks?show=open&sort=priority&project=999&q=report
+  [still to do, priority] search="report" 0 of 0: 
+/tasks?show=open&sort=priority&project=999&q=%20%20REPORT%20%20
+  [still to do, priority] search="REPORT" 0 of 0: 
+/tasks?show=open&sort=priority&project=999&q=zzz
+  [still to do, priority] search="zzz" 0 of 0: 
+/tasks?show=open&sort=title
+  [still to do, title] search="" 6 of 6: archive old reports | Book train to Lyon | Plan team lunch | Renew licence | Review report draft | Write report
+/tasks?show=open&sort=title&q=report
+  [still to do, title] search="report" 2 of 2: Review report draft | Write report
+/tasks?show=open&sort=title&q=%20%20REPORT%20%20
+  [still to do, title] search="REPORT" 2 of 2: Review report draft | Write report
+/tasks?show=open&sort=title&q=zzz
+  [still to do, title] search="zzz" 0 of 0: 
+/tasks?show=open&sort=title&project={report}
+  [still to do, title] search="" 2 of 2: Review report draft | Write report
+/tasks?show=open&sort=title&project={report}&q=report
+  [still to do, title] search="report" 2 of 2: Review report draft | Write report
+/tasks?show=open&sort=title&project={report}&q=%20%20REPORT%20%20
+  [still to do, title] search="REPORT" 2 of 2: Review report draft | Write report
+/tasks?show=open&sort=title&project={report}&q=zzz
+  [still to do, title] search="zzz" 0 of 0: 
+/tasks?show=open&sort=title&project=999
+  [still to do, title] search="" 0 of 0: 
+/tasks?show=open&sort=title&project=999&q=report
+  [still to do, title] search="report" 0 of 0: 
+/tasks?show=open&sort=title&project=999&q=%20%20REPORT%20%20
+  [still to do, title] search="REPORT" 0 of 0: 
+/tasks?show=open&sort=title&project=999&q=zzz
+  [still to do, title] search="zzz" 0 of 0: 
+/tasks?show=open&sort=nonsense
+  [still to do, due date] search="" 6 of 6: Write report | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | archive old reports
+/tasks?show=open&sort=nonsense&q=report
+  [still to do, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=nonsense&q=%20%20REPORT%20%20
+  [still to do, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=nonsense&q=zzz
+  [still to do, due date] search="zzz" 0 of 0: 
+/tasks?show=open&sort=nonsense&project={report}
+  [still to do, due date] search="" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=nonsense&project={report}&q=report
+  [still to do, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=nonsense&project={report}&q=%20%20REPORT%20%20
+  [still to do, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=open&sort=nonsense&project={report}&q=zzz
+  [still to do, due date] search="zzz" 0 of 0: 
+/tasks?show=open&sort=nonsense&project=999
+  [still to do, due date] search="" 0 of 0: 
+/tasks?show=open&sort=nonsense&project=999&q=report
+  [still to do, due date] search="report" 0 of 0: 
+/tasks?show=open&sort=nonsense&project=999&q=%20%20REPORT%20%20
+  [still to do, due date] search="REPORT" 0 of 0: 
+/tasks?show=open&sort=nonsense&project=999&q=zzz
+  [still to do, due date] search="zzz" 0 of 0: 
+/tasks?show=all
+  [all, due date] search="" 6 of 7: Write report | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | archive old reports | Call supplier (done)
+/tasks?show=all&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=all&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=all&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=all&project={report}
+  [all, due date] search="" 2 of 2: Write report | Review report draft
+/tasks?show=all&project={report}&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=all&project={report}&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=all&project={report}&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=all&project=999
+  [all, due date] search="" 0 of 0: 
+/tasks?show=all&project=999&q=report
+  [all, due date] search="report" 0 of 0: 
+/tasks?show=all&project=999&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 0 of 0: 
+/tasks?show=all&project=999&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=all&sort=due
+  [all, due date] search="" 6 of 7: Write report | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | archive old reports | Call supplier (done)
+/tasks?show=all&sort=due&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=due&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=due&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=all&sort=due&project={report}
+  [all, due date] search="" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=due&project={report}&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=due&project={report}&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=due&project={report}&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=all&sort=due&project=999
+  [all, due date] search="" 0 of 0: 
+/tasks?show=all&sort=due&project=999&q=report
+  [all, due date] search="report" 0 of 0: 
+/tasks?show=all&sort=due&project=999&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 0 of 0: 
+/tasks?show=all&sort=due&project=999&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=all&sort=priority
+  [all, priority] search="" 6 of 7: Write report | archive old reports | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | Call supplier (done)
+/tasks?show=all&sort=priority&q=report
+  [all, priority] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=priority&q=%20%20REPORT%20%20
+  [all, priority] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=priority&q=zzz
+  [all, priority] search="zzz" 0 of 0: 
+/tasks?show=all&sort=priority&project={report}
+  [all, priority] search="" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=priority&project={report}&q=report
+  [all, priority] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=priority&project={report}&q=%20%20REPORT%20%20
+  [all, priority] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=priority&project={report}&q=zzz
+  [all, priority] search="zzz" 0 of 0: 
+/tasks?show=all&sort=priority&project=999
+  [all, priority] search="" 0 of 0: 
+/tasks?show=all&sort=priority&project=999&q=report
+  [all, priority] search="report" 0 of 0: 
+/tasks?show=all&sort=priority&project=999&q=%20%20REPORT%20%20
+  [all, priority] search="REPORT" 0 of 0: 
+/tasks?show=all&sort=priority&project=999&q=zzz
+  [all, priority] search="zzz" 0 of 0: 
+/tasks?show=all&sort=title
+  [all, title] search="" 6 of 7: archive old reports | Book train to Lyon | Plan team lunch | Renew licence | Review report draft | Write report | Call supplier (done)
+/tasks?show=all&sort=title&q=report
+  [all, title] search="report" 2 of 2: Review report draft | Write report
+/tasks?show=all&sort=title&q=%20%20REPORT%20%20
+  [all, title] search="REPORT" 2 of 2: Review report draft | Write report
+/tasks?show=all&sort=title&q=zzz
+  [all, title] search="zzz" 0 of 0: 
+/tasks?show=all&sort=title&project={report}
+  [all, title] search="" 2 of 2: Review report draft | Write report
+/tasks?show=all&sort=title&project={report}&q=report
+  [all, title] search="report" 2 of 2: Review report draft | Write report
+/tasks?show=all&sort=title&project={report}&q=%20%20REPORT%20%20
+  [all, title] search="REPORT" 2 of 2: Review report draft | Write report
+/tasks?show=all&sort=title&project={report}&q=zzz
+  [all, title] search="zzz" 0 of 0: 
+/tasks?show=all&sort=title&project=999
+  [all, title] search="" 0 of 0: 
+/tasks?show=all&sort=title&project=999&q=report
+  [all, title] search="report" 0 of 0: 
+/tasks?show=all&sort=title&project=999&q=%20%20REPORT%20%20
+  [all, title] search="REPORT" 0 of 0: 
+/tasks?show=all&sort=title&project=999&q=zzz
+  [all, title] search="zzz" 0 of 0: 
+/tasks?show=all&sort=nonsense
+  [all, due date] search="" 6 of 7: Write report | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | archive old reports | Call supplier (done)
+/tasks?show=all&sort=nonsense&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=nonsense&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=nonsense&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=all&sort=nonsense&project={report}
+  [all, due date] search="" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=nonsense&project={report}&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=nonsense&project={report}&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=all&sort=nonsense&project={report}&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=all&sort=nonsense&project=999
+  [all, due date] search="" 0 of 0: 
+/tasks?show=all&sort=nonsense&project=999&q=report
+  [all, due date] search="report" 0 of 0: 
+/tasks?show=all&sort=nonsense&project=999&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 0 of 0: 
+/tasks?show=all&sort=nonsense&project=999&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=nonsense
+  [all, due date] search="" 6 of 7: Write report | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | archive old reports | Call supplier (done)
+/tasks?show=nonsense&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=nonsense&project={report}
+  [all, due date] search="" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&project={report}&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&project={report}&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&project={report}&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=nonsense&project=999
+  [all, due date] search="" 0 of 0: 
+/tasks?show=nonsense&project=999&q=report
+  [all, due date] search="report" 0 of 0: 
+/tasks?show=nonsense&project=999&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 0 of 0: 
+/tasks?show=nonsense&project=999&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=nonsense&sort=due
+  [all, due date] search="" 6 of 7: Write report | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | archive old reports | Call supplier (done)
+/tasks?show=nonsense&sort=due&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=due&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=due&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=nonsense&sort=due&project={report}
+  [all, due date] search="" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=due&project={report}&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=due&project={report}&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=due&project={report}&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=nonsense&sort=due&project=999
+  [all, due date] search="" 0 of 0: 
+/tasks?show=nonsense&sort=due&project=999&q=report
+  [all, due date] search="report" 0 of 0: 
+/tasks?show=nonsense&sort=due&project=999&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 0 of 0: 
+/tasks?show=nonsense&sort=due&project=999&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=nonsense&sort=priority
+  [all, priority] search="" 6 of 7: Write report | archive old reports | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | Call supplier (done)
+/tasks?show=nonsense&sort=priority&q=report
+  [all, priority] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=priority&q=%20%20REPORT%20%20
+  [all, priority] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=priority&q=zzz
+  [all, priority] search="zzz" 0 of 0: 
+/tasks?show=nonsense&sort=priority&project={report}
+  [all, priority] search="" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=priority&project={report}&q=report
+  [all, priority] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=priority&project={report}&q=%20%20REPORT%20%20
+  [all, priority] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=priority&project={report}&q=zzz
+  [all, priority] search="zzz" 0 of 0: 
+/tasks?show=nonsense&sort=priority&project=999
+  [all, priority] search="" 0 of 0: 
+/tasks?show=nonsense&sort=priority&project=999&q=report
+  [all, priority] search="report" 0 of 0: 
+/tasks?show=nonsense&sort=priority&project=999&q=%20%20REPORT%20%20
+  [all, priority] search="REPORT" 0 of 0: 
+/tasks?show=nonsense&sort=priority&project=999&q=zzz
+  [all, priority] search="zzz" 0 of 0: 
+/tasks?show=nonsense&sort=title
+  [all, title] search="" 6 of 7: archive old reports | Book train to Lyon | Plan team lunch | Renew licence | Review report draft | Write report | Call supplier (done)
+/tasks?show=nonsense&sort=title&q=report
+  [all, title] search="report" 2 of 2: Review report draft | Write report
+/tasks?show=nonsense&sort=title&q=%20%20REPORT%20%20
+  [all, title] search="REPORT" 2 of 2: Review report draft | Write report
+/tasks?show=nonsense&sort=title&q=zzz
+  [all, title] search="zzz" 0 of 0: 
+/tasks?show=nonsense&sort=title&project={report}
+  [all, title] search="" 2 of 2: Review report draft | Write report
+/tasks?show=nonsense&sort=title&project={report}&q=report
+  [all, title] search="report" 2 of 2: Review report draft | Write report
+/tasks?show=nonsense&sort=title&project={report}&q=%20%20REPORT%20%20
+  [all, title] search="REPORT" 2 of 2: Review report draft | Write report
+/tasks?show=nonsense&sort=title&project={report}&q=zzz
+  [all, title] search="zzz" 0 of 0: 
+/tasks?show=nonsense&sort=title&project=999
+  [all, title] search="" 0 of 0: 
+/tasks?show=nonsense&sort=title&project=999&q=report
+  [all, title] search="report" 0 of 0: 
+/tasks?show=nonsense&sort=title&project=999&q=%20%20REPORT%20%20
+  [all, title] search="REPORT" 0 of 0: 
+/tasks?show=nonsense&sort=title&project=999&q=zzz
+  [all, title] search="zzz" 0 of 0: 
+/tasks?show=nonsense&sort=nonsense
+  [all, due date] search="" 6 of 7: Write report | Review report draft | Renew licence | Book train to Lyon | Plan team lunch | archive old reports | Call supplier (done)
+/tasks?show=nonsense&sort=nonsense&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=nonsense&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=nonsense&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=nonsense&sort=nonsense&project={report}
+  [all, due date] search="" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=nonsense&project={report}&q=report
+  [all, due date] search="report" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=nonsense&project={report}&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 2 of 2: Write report | Review report draft
+/tasks?show=nonsense&sort=nonsense&project={report}&q=zzz
+  [all, due date] search="zzz" 0 of 0: 
+/tasks?show=nonsense&sort=nonsense&project=999
+  [all, due date] search="" 0 of 0: 
+/tasks?show=nonsense&sort=nonsense&project=999&q=report
+  [all, due date] search="report" 0 of 0: 
+/tasks?show=nonsense&sort=nonsense&project=999&q=%20%20REPORT%20%20
+  [all, due date] search="REPORT" 0 of 0: 
+/tasks?show=nonsense&sort=nonsense&project=999&q=zzz
+  [all, due date] search="zzz" 0 of 0: 

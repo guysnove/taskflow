@@ -12,6 +12,7 @@ Written down in Course 2, Chapter 6, from the features built in Courses 1 and 2,
 | FR-TASK-2 | A new task can't be due in the past (the form and the API). | Course 1; API since Course 2, Ch. 8 | tests |
 | FR-TASK-3 | A new task can't be due more than five years ahead: almost always a typo. | Course 2, Ch. 8 | tests |
 | FR-STEP-1 | A task can have an ordered checklist of steps; the task shows "2 of 5 done". | Course 1, Ch. 30 | tests |
+| FR-LIST-1 | The task list can show all or only open tasks, one project's tasks, and sort by due date, priority or title; unknown values fall back to all tasks, by due date. | Course 1; written down in Course 2, Ch. 9 | tests (golden master) |
 | FR-DUP-1 | Adding a task whose title matches an open task's title (ignoring case and spaces) shows a warning; the user may add it anyway. | Course 2, Ch. 2 | tests |
 | FR-SRCH-1 | The task list can be filtered to tasks whose titles contain all the search words, in any order, ignoring case. | Course 2, Ch. 3 | tests |
 | FR-DEP-1 | A task can wait for other tasks; a dependency that would create a loop is refused, and the loop is named. | Course 2, Ch. 4 | tests |
@@ -21,6 +22,7 @@ Written down in Course 2, Chapter 6, from the features built in Courses 1 and 2,
 
 | ID | Requirement | Measure | Verified by |
 |---|---|---|---|
+| NFR-CONC-1 | Saving an edited task never silently overwrites a save made since the form was opened: the visitor sees a conflict, with both versions. | second save from a stale form | tests |
 | NFR-SEC-1 | Every response carries security headers, including a Content Security Policy and `nosniff`. | checked on the home page | tests |
 | NFR-SEC-2 | State-changing requests require an anti-forgery token. | POST without token → 400 | tests |
 | NFR-SEC-3 | The API is rate limited per signed-in user. | more than 20 requests in 10 s → 429; other users unaffected | tests |

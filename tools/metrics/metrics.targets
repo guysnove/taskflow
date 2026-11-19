@@ -1,0 +1,8 @@
+<Project>
+  <!-- Course 2, Chapter 9: an on-demand complexity report (CA1502), not part of the normal build.
+       Usage: tools/metrics/complexity.sh [threshold]  -->
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeMetricsConfig.txt" />
+    <EditorConfigFiles Include="$(MSBuildThisFileDirectory)metrics.globalconfig" />
+  </ItemGroup>
+</Project>

@@ -485,3 +485,6 @@ $RECYCLE.BIN/
 *.db
 *.db-shm
 *.db-wal
+
+# Course 2, Chapter 9: golden-master runs write *.received.txt next to the approved file
+*.received.txt

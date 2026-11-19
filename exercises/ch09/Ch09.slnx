@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Ch09.Demo/Ch09.Demo.csproj" />
+  <Project Path="Ch09.Shipping.Tests/Ch09.Shipping.Tests.csproj" />
+  <Project Path="Ch09.Shipping/Ch09.Shipping.csproj" />
+</Solution>

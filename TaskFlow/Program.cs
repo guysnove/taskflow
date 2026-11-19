@@ -42,6 +42,7 @@ builder.Services.AddScoped<INewTaskRule, DueWithinFiveYearsRule>();   // FR-TASK
 builder.Services.AddScoped<INewTaskRule, ProjectExistsRule>();
 builder.Services.AddScoped<INewTaskRule, DuplicateTitleRule>();
 builder.Services.AddScoped<NewTaskChecker>();
+builder.Services.AddScoped<ProjectExistsRule>();   // Course 2, Chapter 9: the edit form uses it on its own
 
 // Chapter 25: accounts. Who is signed in is remembered in an encrypted cookie.
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
