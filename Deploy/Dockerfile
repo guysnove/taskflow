@@ -5,9 +5,17 @@
 # Stage 1: build and publish with the full SDK
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
+# Course 2, Chapter 12: TaskFlow is four projects; restore needs every project file first.
+COPY Directory.Build.props ./
 COPY TaskFlow/TaskFlow.csproj TaskFlow/
+COPY TaskFlow.Application/TaskFlow.Application.csproj TaskFlow.Application/
+COPY TaskFlow.Domain/TaskFlow.Domain.csproj TaskFlow.Domain/
+COPY TaskFlow.Infrastructure/TaskFlow.Infrastructure.csproj TaskFlow.Infrastructure/
 RUN dotnet restore TaskFlow/TaskFlow.csproj
 COPY TaskFlow/ TaskFlow/
+COPY TaskFlow.Application/ TaskFlow.Application/
+COPY TaskFlow.Domain/ TaskFlow.Domain/
+COPY TaskFlow.Infrastructure/ TaskFlow.Infrastructure/
 RUN dotnet publish TaskFlow/TaskFlow.csproj -c Release -o /app --no-restore
 
 # Stage 2: run with the smaller ASP.NET Core runtime image

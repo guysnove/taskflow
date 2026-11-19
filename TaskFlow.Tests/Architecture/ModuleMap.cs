@@ -9,9 +9,20 @@ public sealed class ModuleMap
 {
     public SortedDictionary<string, SortedDictionary<string, int>> Uses { get; } = new(StringComparer.Ordinal);
 
-    public static ModuleMap Read(string projectFolder)
+    // Course 2, Chapter 12: one or more project folders; a module is a top-level folder in any of them.
+    public static ModuleMap Read(params string[] projectFolders)
     {
         var map = new ModuleMap();
+        foreach (string folder in projectFolders)
+        {
+            map.Add(folder);
+        }
+        return map;
+    }
+
+    private void Add(string projectFolder)
+    {
+        var map = this;
         foreach (string file in Directory.EnumerateFiles(projectFolder, "*.cs", SearchOption.AllDirectories))
         {
             string rel = Path.GetRelativePath(projectFolder, file);
@@ -31,7 +42,6 @@ public sealed class ModuleMap
                 }
             }
         }
-        return map;
     }
 
     // Every cycle, as a path: Data -> Services -> Data.

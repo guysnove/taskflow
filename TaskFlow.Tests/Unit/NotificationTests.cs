@@ -83,7 +83,7 @@ public class NotifierTests : IDisposable
     }
 
     private Notifier With(params INotificationChannel[] channels) =>
-        new(channels, _repository, _db, NullLogger<Notifier>.Instance);
+        new(channels, _repository, new EfNotificationQueries(_db), NullLogger<Notifier>.Instance);
 
     private NotificationMessage Message(string key = "k1") => new(_userId, "DueSoon", key, "Due today: Logo", "/tasks/1");
 
@@ -171,8 +171,8 @@ public class DueRemindersTests : IDisposable
             new TaskItem { Title = "Overdue", Due = today.AddDays(-1), UserId = sam.Id });
         await _db.SaveChangesAsync();
         var repository = new EfNotificationRepository(_db, _clock);
-        var notifier = new Notifier([new InAppChannel(repository)], repository, _db, NullLogger<Notifier>.Instance);
-        var reminders = new DueReminders(_db, notifier, _clock, Options.Create(new TaskFlowOptions { DueSoonDays = 2 }));
+        var notifier = new Notifier([new InAppChannel(repository)], repository, new EfNotificationQueries(_db), NullLogger<Notifier>.Instance);
+        var reminders = new DueReminders(new EfNotificationQueries(_db), notifier, _clock, Options.Create(new TaskFlowOptions { DueSoonDays = 2 }));
 
         Assert.Equal(2, await reminders.RunAsync());
         Assert.Equal(0, await reminders.RunAsync());                 // the next run: nothing new

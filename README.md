@@ -48,15 +48,20 @@ dotnet restore
 dotnet build
 dotnet test                         # 41 tests at milestone/v1.0
 cd TaskFlow && dotnet run           # then open the address it prints
+# migrations now live in TaskFlow.Infrastructure:
+# dotnet ef migrations add <Name> --project TaskFlow.Infrastructure --startup-project TaskFlow
 ```
 
 The first run creates a SQLite database (`taskflow.db`) and applies the migrations. In Development, sample tasks are added for the first account you register.
 
-## Project layout (TaskFlow v1)
+## Project layout (Course 2, Chapter 12: four layers)
 
 ```
-TaskFlow/            the ASP.NET Core MVC application (controllers, views, API, EF Core data, services)
-TaskFlow.Tests/      xUnit unit and integration tests
+TaskFlow/                  Presentation: the ASP.NET Core MVC app (controllers, views, API) and Program.cs, the composition root
+TaskFlow.Application/      Application: use cases, rules, notifications, and the ports (interfaces) they need
+TaskFlow.Domain/           Domain: entities and pure domain logic; no packages, no references
+TaskFlow.Infrastructure/   Infrastructure: EF Core + SQLite, migrations, SMTP, the background job (adapters for the ports)
+TaskFlow.Tests/            xUnit unit, integration and architecture tests
 Deploy/              example Dockerfile, systemd service, nginx configuration, a small test proxy
 .github/workflows/   continuous integration: restore, build, test, vulnerable-package check
 ```

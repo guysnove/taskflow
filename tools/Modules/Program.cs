@@ -2,8 +2,9 @@
 //   dotnet run --project tools/Modules            (from the repository root)
 using TaskFlow.Architecture;
 
-string root = args.Length > 0 ? args[0] : "TaskFlow";
-var map = ModuleMap.Read(Path.GetFullPath(root));
+// Course 2, Chapter 12: TaskFlow is now four projects; read them all (or the folders given).
+string[] roots = args.Length > 0 ? args : ["TaskFlow", "TaskFlow.Application", "TaskFlow.Domain", "TaskFlow.Infrastructure"];
+var map = ModuleMap.Read(roots.Select(Path.GetFullPath).ToArray());
 var modules = map.Uses.Keys.Union(map.Uses.Values.SelectMany(v => v.Keys)).Order(StringComparer.Ordinal).ToList();
 
 Console.WriteLine("Files in the row's module with \"using TaskFlow.<column>;\"\n");

@@ -1,47 +1,59 @@
-# TaskFlow — module design
+# TaskFlow — module and layer design
 
-Course 2, Chapter 11. Version 1.0. The architecture tests (`TaskFlow.Tests/Architecture/ModuleRulesTests.cs`) check the code against the **allowed dependencies** table below; the tool `dotnet run --project tools/Modules` prints what the code actually does.
+Version 2.0 (Course 2, Chapter 12). Checked by the architecture tests in `TaskFlow.Tests/Architecture/`:
+`LayerRulesTests` (project references and packages) and `ModuleRulesTests` (modules inside the projects).
+`dotnet run --project tools/Modules` prints what the code actually does.
 
-## 1. Modules (today: folders and namespaces in one project)
+## 1. Layers (projects)
 
-| Module | Responsibility (one sentence) | Public face (what others may use) | Hides |
+| Project | Layer | Responsibility | May reference |
 |---|---|---|---|
-| **Web**: Controllers, Api, ViewComponents, TagHelpers, Middleware | Turns HTTP into calls, and results into pages or JSON. | routes and pages | model binding, view data, status codes |
-| **Services** (tasks, projects, steps, dependencies, rules, accounts) | The application's rules and use cases. | `ITaskRepository`, `IProjectRepository`, `NewTaskChecker`, `AccountService`, … | EF Core queries; "only my data"; password hashing |
-| **Notifications** | Telling people about things, by any channel. | `Notifier`, `TaskEvents`, `INotificationRepository` | channels, email delivery, retries, keys |
-| **Data** | Storing everything in SQLite. | `TaskFlowDbContext` (to Services and Notifications only) | the schema, migrations, sample data |
-| **Models** | The shapes of TaskFlow's data. | entities and input records | — |
-| **Settings** | Typed, validated configuration. | `TaskFlowOptions` | configuration sources |
-| **Common** | Tiny helpers that depend on nothing in TaskFlow. | `TimeProvider.Today()` | — |
-
-## 2. Allowed dependencies (arrows point "uses")
+| `TaskFlow.Domain` | Domain | Entities and pure domain logic (`TaskItem.IsOverdue`, `DependencyGraph`, `TitleMatcher`). | nothing — no packages either |
+| `TaskFlow.Application` | Application | Use cases (`CompleteTask`), rules (`NewTaskChecker`), notifications, accounts — and the **ports** they need (`ITaskRepository`, `INotificationQueries`, `IAccountStore`, `IEmailSender`, …). | Domain; small abstractions packages (logging, options, password hashing) — **no EF Core, no ASP.NET Core** |
+| `TaskFlow.Infrastructure` | Infrastructure | **Adapters** for the ports: EF Core + SQLite, migrations, SMTP, the background job. | Application, Domain, ASP.NET Core |
+| `TaskFlow` | Presentation + composition root | Controllers, API, views; `Program.cs` wires every layer together. | all three |
 
 ```
-Web ──► Services ──► Data ──► Models ──► Common
-  │        ▲           ▲         ▲
-  └──► Notifications ──┘─────────┘        (Settings and Common: anyone)
+          TaskFlow (web)  ──────────────┐
+             │                          ▼
+             │                TaskFlow.Infrastructure
+             ▼                          │ implements the ports
+     TaskFlow.Application  ◄────────────┘
+             │
+             ▼
+       TaskFlow.Domain
 ```
 
-| Module | May use |
-|---|---|
-| Controllers, ViewComponents | Models, Services, Notifications, Settings, Common |
-| Api | Models, Services, Notifications, Common |
-| TagHelpers | Models, Common |
-| Middleware | Common |
-| Services | Models, Data, Settings, Common |
-| Notifications | Models, Data, Services, Settings, Common |
-| Data | Models, Common |
-| Models | Common |
-| Settings, Common | nothing |
+Every arrow points inwards, towards the Domain. Infrastructure depends on Application (to implement its interfaces), **not** the other way round: that's the dependency inversion principle (Chapter 8) at project scale.
 
-Rules: **no cycles**; **Web never uses Data** (every database question goes through a service, which applies "only my data"); **Data knows nothing above it**.
+## 2. Modules (folders) inside the projects
+
+| Module | Project | May use |
+|---|---|---|
+| Controllers, ViewComponents | Web | Models, Services, UseCases, Notifications, Settings, Common |
+| Api | Web | Models, Services, UseCases, Notifications, Common |
+| TagHelpers | Web | Models, Common |
+| Middleware | Web | Common |
+| Security | Web | Services, Common |
+| UseCases | Application | Models, Services, Notifications, Common |
+| Services | Application | Models, Settings, Common |
+| Notifications | Application (+ SMTP and the job in Infrastructure) | Models, Services, Settings, Common |
+| Data | Infrastructure | Models, Services, Notifications, Common |
+| Models | Domain (+ input records in Application) | Common |
+| Settings, Common | Application, Domain | nothing |
+
+Rules: no cycles; the web never uses Data (only `Program.cs`, the composition root, may); Application never uses Data.
 
 ## 3. Decisions and trade-offs
 
-- **One project, folders as modules** (for now). Cheaper to change while the boundaries are still moving; enforced by tests instead of the compiler. Chapter 12 revisits this (separate projects), with the costs.
-- **Notifications may use Data directly** (the Notifier loads users; the observer runs one query). A repository for each of those queries would add files without hiding a rule. Revisit if a second storage appears.
-- **Accounts live in Services** (`AccountService`), so the admin page and the notification settings ask it instead of the database (moved in Chapter 11).
+- **Four projects (ADR 0001).** The compiler now refuses an outward reference. Cost: four project files, slower to reshape. The boundaries had stopped moving (Chapter 11), so the cost is worth it.
+- **Namespaces kept** (`TaskFlow.Models`, `TaskFlow.Services`, …) instead of `TaskFlow.Domain.Models`, … — the move changed project files, not hundreds of `using` lines and every view. Revisit if two projects ever need the same folder name for different things.
+- **Ports only where Application needed the database**: `INotificationQueries`, `IAccountStore`. The existing repository interfaces were already ports.
+- **No interface for each use case.** `CompleteTask` is a class; controllers depend on it directly. Extract an interface if a second implementation appears.
+- **The domain model is simple.** Entities with a little behaviour (`IsOverdue`, `IsDueSoon`, `StepProgress`) and public setters for EF Core. A richer domain model (private setters, methods for every change) is not worth it at TaskFlow's size; revisit if rules start appearing in several services.
+- **Infrastructure references ASP.NET Core** (`FrameworkReference`) for the background service and configuration. Acceptable: it's the outer layer.
 
 ## 4. Change log
 
+- 2.0 (Course 2, Chapter 12): four projects. `INotificationQueries` and `IAccountStore` ports with EF Core adapters; `CompleteTask` use case; each layer registers its own services. Migrations moved to `TaskFlow.Infrastructure`.
 - 1.0 (Course 2, Chapter 11): first version. Found and fixed: a cycle Data ↔ Services (`TimeProviderExtensions` moved to Common), and Controllers → Data in `AdminController` and `NotificationsController` (now `AccountService`).

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using TaskFlow.Models;
 using TaskFlow.Notifications;
 using TaskFlow.Services;
+using TaskFlow.UseCases;
 
 namespace TaskFlow.Api;
 
@@ -19,12 +20,12 @@ public class TasksApiController : ControllerBase
     private readonly ITaskRepository _tasks;
     private readonly IProjectRepository _projects;
     private readonly NewTaskChecker _newTaskRules;          // Course 2, Chapter 8
-    private readonly TaskEvents _events;                    // Course 2, Chapter 10
+    private readonly CompleteTask _completeTask;            // Course 2, Chapter 12: a use case
 
     public TasksApiController(ITaskRepository tasks, IProjectRepository projects, NewTaskChecker newTaskRules,
-                              TaskEvents events)
+                              CompleteTask completeTask)
     {
-        _events = events;
+        _completeTask = completeTask;
         _tasks = tasks;
         _projects = projects;
         _newTaskRules = newTaskRules;
@@ -108,11 +109,10 @@ public class TasksApiController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> MarkDone(int id)
     {
-        if (!await _tasks.MarkDoneAsync(id))
+        if (!await _completeTask.RunAsync(id))               // Course 2, Chapter 12: the same use case as the form
         {
             return NotFound();
         }
-        await _events.TaskCompletedAsync(id);       // Course 2, Chapter 10: the same event as the form
         return NoContent();
     }
 

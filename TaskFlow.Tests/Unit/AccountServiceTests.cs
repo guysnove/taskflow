@@ -24,7 +24,7 @@ public class AccountServiceTests : IDisposable
         _connection.Open();
         _db = new TaskFlowDbContext(new DbContextOptionsBuilder<TaskFlowDbContext>().UseSqlite(_connection).Options);
         _db.Database.Migrate();                             // the same migrations as the real app
-        _accounts = new AccountService(_db, new PasswordHasher<User>(), _clock, NullLogger<AccountService>.Instance);
+        _accounts = new AccountService(new EfAccountStore(_db), new PasswordHasher<User>(), _clock, NullLogger<AccountService>.Instance);
     }
 
     public void Dispose()

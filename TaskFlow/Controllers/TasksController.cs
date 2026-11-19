@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using TaskFlow.Models;
 using TaskFlow.Notifications;
 using TaskFlow.Services;
+using TaskFlow.UseCases;
 
 namespace TaskFlow.Controllers;
 
@@ -16,15 +17,15 @@ public class TasksController : Controller
     private readonly IDependencyRepository _dependencies;   // Course 2, Chapter 4
     private readonly NewTaskChecker _newTaskRules;          // Course 2, Chapter 8
     private readonly ProjectExistsRule _projectRule;        // Course 2, Chapter 9
-    private readonly TaskEvents _events;                    // Course 2, Chapter 10
+    private readonly CompleteTask _completeTask;            // Course 2, Chapter 12: a use case
 
     // Dependency injection passes them all in: see Program.cs.
     public TasksController(ITaskRepository repository, IProjectRepository projects,
                            ILogger<TasksController> logger,
                            IDependencyRepository dependencies, NewTaskChecker newTaskRules,
-                           ProjectExistsRule projectRule, TaskEvents events)
+                           ProjectExistsRule projectRule, CompleteTask completeTask)
     {
-        _events = events;
+        _completeTask = completeTask;
         _projectRule = projectRule;
         _dependencies = dependencies;
         _newTaskRules = newTaskRules;
@@ -181,12 +182,10 @@ public class TasksController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Done([FromRoute] int id)
     {
-        if (!await _repository.MarkDoneAsync(id))
+        if (!await _completeTask.RunAsync(id))               // Course 2, Chapter 12: the use case
         {
             return NotFound();
         }
-        _logger.LogInformation("Task {TaskId} marked done", id);
-        await _events.TaskCompletedAsync(id);       // Course 2, Chapter 10: whoever is listening
         return RedirectToAction(nameof(Index));
     }
 

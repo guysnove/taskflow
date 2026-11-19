@@ -4,15 +4,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using TaskFlow;
 using TaskFlow.Data;
 using TaskFlow.Middleware;
-using TaskFlow.Models;
 using TaskFlow.Notifications;
+using TaskFlow.Security;
 using TaskFlow.Services;
 using TaskFlow.Settings;
 
@@ -27,40 +25,12 @@ builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
 // A machine-readable description of the API, at /openapi/v1.json.
 builder.Services.AddOpenApi();
 
-// The database: SQLite, in the file named by ConnectionStrings:TaskFlow.
-builder.Services.AddDbContext<TaskFlowDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("TaskFlow")));
-
-// Storage: since Chapter 23, the database. Scoped, like the DbContext it uses.
-builder.Services.AddScoped<ITaskRepository, EfTaskRepository>();
-builder.Services.AddScoped<IProjectRepository, EfProjectRepository>();   // Chapter 24
-builder.Services.AddScoped<IStepRepository, EfStepRepository>();         // Chapter 30
-builder.Services.AddScoped<IDependencyRepository, EfDependencyRepository>();   // Course 2, Chapter 4
-
-// Course 2, Chapter 8: the rules for a new task, checked in this order.
-// A new rule: write the class, add one line here. Nothing else changes.
-builder.Services.AddScoped<INewTaskRule, DueNotInPastRule>();
-builder.Services.AddScoped<INewTaskRule, DueWithinFiveYearsRule>();   // FR-TASK-3
-builder.Services.AddScoped<INewTaskRule, ProjectExistsRule>();
-builder.Services.AddScoped<INewTaskRule, DuplicateTitleRule>();
-builder.Services.AddScoped<NewTaskChecker>();
-builder.Services.AddScoped<ProjectExistsRule>();   // Course 2, Chapter 9: the edit form uses it on its own
-
-// Course 2, Chapter 10: notifications. Each pattern has one line here (see the chapter):
-builder.Services.AddScoped<INotificationRepository, EfNotificationRepository>();     // Repository
-builder.Services.AddScoped<INotificationChannel, InAppChannel>();                    // Strategy: channel 1
-builder.Services.AddScoped<INotificationChannel, EmailChannel>();                    // Strategy: channel 2
-builder.Services.AddScoped<Notifier>();
-builder.Services.AddScoped<ITaskCompletedObserver, UnblockedTasksObserver>();        // Observer
-builder.Services.AddScoped<TaskEvents>();
-builder.Services.AddScoped<DueReminders>();
-builder.Services.AddHostedService<DueReminderService>();
+// Course 2, Chapter 12: each layer registers its own classes. This file, the composition root,
+// is the only place that knows every layer.
+builder.Services.AddTaskFlowApplication();
+builder.Services.AddTaskFlowInfrastructure(builder.Configuration);
 builder.Services.AddOptions<EmailOptions>().Bind(builder.Configuration.GetSection(EmailOptions.Section))
     .ValidateDataAnnotations().ValidateOnStart();
-builder.Services.AddSingleton<SmtpEmailSender>();                                    // Adapter…
-builder.Services.AddSingleton<IEmailSender>(sp => new RetryingEmailSender(           // …wrapped by a Decorator
-    sp.GetRequiredService<SmtpEmailSender>(), sp.GetRequiredService<IOptions<EmailOptions>>(),
-    sp.GetRequiredService<ILogger<RetryingEmailSender>>(), sp.GetRequiredService<TimeProvider>()));
 
 // Chapter 25: accounts. Who is signed in is remembered in an encrypted cookie.
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -83,8 +53,6 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddScoped<AccountService>();
 
 // Chapter 27: rate limiting. Too many requests in a short time are answered with 429.
 builder.Services.AddRateLimiter(options =>

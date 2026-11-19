@@ -10,24 +10,31 @@ public class ModuleRulesTests
     public static readonly Dictionary<string, string[]> Allowed = new()
     {
         // Web: turns HTTP into calls, and results into pages or JSON. Never touches the database directly.
-        ["Controllers"] = ["Models", "Services", "Notifications", "Settings", "Common"],
-        ["Api"] = ["Models", "Services", "Notifications", "Common"],
+        ["Controllers"] = ["Models", "Services", "UseCases", "Notifications", "Settings", "Common"],
+        ["Api"] = ["Models", "Services", "UseCases", "Notifications", "Common"],
         ["ViewComponents"] = ["Models", "Services", "Notifications", "Settings", "Common"],
         ["TagHelpers"] = ["Models", "Common"],
         ["Middleware"] = ["Common"],
-        // Application: the rules and the features.
-        ["Services"] = ["Models", "Data", "Settings", "Common"],
-        ["Notifications"] = ["Models", "Data", "Services", "Settings", "Common"],
-        // Data access: knows the models, nothing above it.
-        ["Data"] = ["Models", "Common"],
+        ["Security"] = ["Services", "Common"],                         // Course 2, Chapter 12: CurrentUser
+        // Application: the rules and the features. Course 2, Chapter 12: no longer allowed to use Data.
+        ["Services"] = ["Models", "Settings", "Common"],
+        ["Notifications"] = ["Models", "Services", "Settings", "Common"],
+        ["UseCases"] = ["Models", "Services", "Notifications", "Common"],          // Chapter 12: what the app does
+        // Infrastructure (Data): implements the Application's ports, so it uses them (Chapter 12: the arrow flipped).
+        ["Data"] = ["Models", "Services", "Notifications", "Common"],
         // The core: depends on nothing.
         ["Models"] = ["Common"],
         ["Settings"] = [],
         ["Common"] = [],
     };
 
-    private static ModuleMap Map([CallerFilePath] string here = "") =>
-        ModuleMap.Read(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(here)!, "..", "..", "TaskFlow")));
+    // Course 2, Chapter 12: the modules now live in four projects; read them all.
+    public static readonly string[] Projects = ["TaskFlow", "TaskFlow.Application", "TaskFlow.Domain", "TaskFlow.Infrastructure"];
+
+    public static string Root([CallerFilePath] string here = "") =>
+        Path.GetFullPath(Path.Combine(Path.GetDirectoryName(here)!, "..", ".."));
+
+    private static ModuleMap Map() => ModuleMap.Read(Projects.Select(p => Path.Combine(Root(), p)).ToArray());
 
     [Fact]
     public void EveryModule_UsesOnlyWhatTheDesignAllows()
