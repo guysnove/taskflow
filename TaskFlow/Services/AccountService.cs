@@ -1,11 +1,16 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using TaskFlow.Common;
 using TaskFlow.Data;
 using TaskFlow.Models;
 
 namespace TaskFlow.Services;
 
 public enum SignInCheck { Success, Failed, LockedOut }
+
+// Course 2, Chapter 11: moved from AdminController, so the Accounts module owns its own queries.
+public record UserSummary(int Id, string Email, string DisplayName, DateOnly CreatedOn,
+                          bool IsAdmin, int Tasks);
 
 // Registering and checking passwords (Chapter 25). Signing in with a cookie is the controller's job.
 public class AccountService
@@ -113,4 +118,20 @@ public class AccountService
         await _db.SaveChangesAsync();
         return (SignInCheck.Success, user);
     }
+
+    // Course 2, Chapter 11: the Accounts module answers questions about accounts, so controllers
+    // don't need the database (docs/design/modules.md).
+
+    // Every account, with its number of tasks (the admin page).
+    public Task<List<UserSummary>> SummariesAsync() =>
+        _db.Users.OrderBy(u => u.Id)
+                 .Select(u => new UserSummary(u.Id, u.Email, u.DisplayName, u.CreatedOn, u.IsAdmin, u.Tasks.Count()))
+                 .ToListAsync();
+
+    // FR-NOTIF-4: does this user want notifications by email?
+    public Task<bool> EmailNotificationsAsync(int userId) =>
+        _db.Users.Where(u => u.Id == userId).Select(u => u.EmailNotifications).SingleAsync();
+
+    public Task SetEmailNotificationsAsync(int userId, bool on) =>
+        _db.Users.Where(u => u.Id == userId).ExecuteUpdateAsync(set => set.SetProperty(u => u.EmailNotifications, on));
 }

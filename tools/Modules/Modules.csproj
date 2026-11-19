@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- The same code the architecture tests use: one definition of "a dependency". -->
+  <ItemGroup>
+    <Compile Include="../../TaskFlow.Tests/Architecture/ModuleMap.cs" Link="ModuleMap.cs" />
+  </ItemGroup>
+
+</Project>

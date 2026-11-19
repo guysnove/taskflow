@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Ch11.Demo/Ch11.Demo.csproj" />
+  <Project Path="Ch11.Kwic.Tests/Ch11.Kwic.Tests.csproj" />
+  <Project Path="Ch11.Kwic/Ch11.Kwic.csproj" />
+</Solution>
