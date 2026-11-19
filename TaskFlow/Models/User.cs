@@ -14,6 +14,9 @@ public class User
     public int FailedSignIns { get; set; }
     public DateTimeOffset? LockedUntil { get; set; }
 
+    // Course 2, Chapter 10 (FR-NOTIF-4): also send each notification by email. Off by default.
+    public bool EmailNotifications { get; set; }
+
     public List<TaskItem> Tasks { get; set; } = new();
     public List<Project> Projects { get; set; } = new();
 }

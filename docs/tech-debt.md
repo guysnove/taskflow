@@ -13,6 +13,7 @@ Sizes: S = under an hour, M = half a day, L = days. Last reviewed: milestone/ch0
 | TD-3 | `Program.cs` is ~190 lines: services, security, rate limits, pipeline and endpoints in one file. | Startup | Hard to see what's registered; but it changes rarely and is well commented. | M | Accept; split into extension methods in Chapter 13 (dependency injection). |
 | TD-4 | The API rate limit (20 per 10 s) is hard-coded, while the sign-in limit is a setting. | `Program.cs` | Can't tune it per environment without a release. | S | Accept until someone needs a different value. |
 | TD-5 | Each task's page loads **all** the user's tasks to offer dependency choices. | `TasksController.DependencyChoicesAsync` | Grows with the number of tasks (Chapter 5); fine at today's sizes. | M | Accept; measure in Chapter 26 (performance). |
+| TD-8 | Notification times are shown in UTC (`CreatedAt.ToString`), not the user's local time. | Notifications page | Confusing for anyone not in UTC. | S | Pay with time-zone settings (users have none yet). Added in Chapter 10. |
 | ~~TD-6~~ | ~~No tests for the edit form (save, conflict, unknown project).~~ | ~~Tasks~~ | ~~The riskiest form had no safety net.~~ | ~~S~~ | **Paid in Chapter 9** (`EditFormTests`). |
 | ~~TD-7~~ | ~~`TasksController.Index` filtered and sorted in the controller (complexity 8); the project check was duplicated in the controller.~~ | ~~Tasks~~ | ~~Untestable without HTTP; two copies of a rule.~~ | ~~M~~ | **Paid in Chapter 9** (`TaskListQuery`, `ProjectExistsRule`). |
 

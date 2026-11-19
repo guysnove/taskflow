@@ -488,3 +488,6 @@ $RECYCLE.BIN/
 
 # Course 2, Chapter 9: golden-master runs write *.received.txt next to the approved file
 *.received.txt
+
+# Course 2, Chapter 10: development emails, written as .eml files
+mail-outbox/

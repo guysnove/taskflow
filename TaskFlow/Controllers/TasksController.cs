@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TaskFlow.Models;
+using TaskFlow.Notifications;
 using TaskFlow.Services;
 
 namespace TaskFlow.Controllers;
@@ -15,13 +16,15 @@ public class TasksController : Controller
     private readonly IDependencyRepository _dependencies;   // Course 2, Chapter 4
     private readonly NewTaskChecker _newTaskRules;          // Course 2, Chapter 8
     private readonly ProjectExistsRule _projectRule;        // Course 2, Chapter 9
+    private readonly TaskEvents _events;                    // Course 2, Chapter 10
 
     // Dependency injection passes them all in: see Program.cs.
     public TasksController(ITaskRepository repository, IProjectRepository projects,
                            ILogger<TasksController> logger,
                            IDependencyRepository dependencies, NewTaskChecker newTaskRules,
-                           ProjectExistsRule projectRule)
+                           ProjectExistsRule projectRule, TaskEvents events)
     {
+        _events = events;
         _projectRule = projectRule;
         _dependencies = dependencies;
         _newTaskRules = newTaskRules;
@@ -183,6 +186,7 @@ public class TasksController : Controller
             return NotFound();
         }
         _logger.LogInformation("Task {TaskId} marked done", id);
+        await _events.TaskCompletedAsync(id);       // Course 2, Chapter 10: whoever is listening
         return RedirectToAction(nameof(Index));
     }
 

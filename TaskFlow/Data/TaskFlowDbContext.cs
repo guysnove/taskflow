@@ -16,6 +16,7 @@ public class TaskFlowDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<TaskStep> Steps => Set<TaskStep>();     // Chapter 30
     public DbSet<TaskDependency> Dependencies => Set<TaskDependency>();   // Course 2, Chapter 4
+    public DbSet<Notification> Notifications => Set<Notification>();     // Course 2, Chapter 10
 
     // The rules for the table: the same ones as Chapter 22's 01_schema.sql.
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -83,6 +84,19 @@ public class TaskFlowDbContext : DbContext
             dep.HasOne(d => d.Task).WithMany().HasForeignKey(d => d.TaskId).OnDelete(DeleteBehavior.Cascade);
             dep.HasOne(d => d.BlockedBy).WithMany().HasForeignKey(d => d.BlockedById).OnDelete(DeleteBehavior.Cascade);
             dep.HasIndex(d => d.BlockedById);                         // "which tasks wait for this one?"
+        });
+
+        // Course 2, Chapter 10: notifications. (UserId, Key) is unique, so a reminder for the same
+        // task and due date can never be stored twice, even if two reminder runs overlap.
+        modelBuilder.Entity<Notification>(n =>
+        {
+            n.Property(x => x.Kind).IsRequired().HasMaxLength(20);
+            n.Property(x => x.Key).IsRequired().HasMaxLength(80);
+            n.Property(x => x.Text).IsRequired().HasMaxLength(200);
+            n.Property(x => x.Link).HasMaxLength(200);
+            n.HasIndex(x => new { x.UserId, x.Key }).IsUnique();
+            n.HasIndex(x => new { x.UserId, x.ReadAt });          // "my unread notifications"
+            n.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

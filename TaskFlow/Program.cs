@@ -8,9 +8,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using TaskFlow.Data;
 using TaskFlow.Middleware;
 using TaskFlow.Models;
+using TaskFlow.Notifications;
 using TaskFlow.Services;
 using TaskFlow.Settings;
 
@@ -43,6 +45,22 @@ builder.Services.AddScoped<INewTaskRule, ProjectExistsRule>();
 builder.Services.AddScoped<INewTaskRule, DuplicateTitleRule>();
 builder.Services.AddScoped<NewTaskChecker>();
 builder.Services.AddScoped<ProjectExistsRule>();   // Course 2, Chapter 9: the edit form uses it on its own
+
+// Course 2, Chapter 10: notifications. Each pattern has one line here (see the chapter):
+builder.Services.AddScoped<INotificationRepository, EfNotificationRepository>();     // Repository
+builder.Services.AddScoped<INotificationChannel, InAppChannel>();                    // Strategy: channel 1
+builder.Services.AddScoped<INotificationChannel, EmailChannel>();                    // Strategy: channel 2
+builder.Services.AddScoped<Notifier>();
+builder.Services.AddScoped<ITaskCompletedObserver, UnblockedTasksObserver>();        // Observer
+builder.Services.AddScoped<TaskEvents>();
+builder.Services.AddScoped<DueReminders>();
+builder.Services.AddHostedService<DueReminderService>();
+builder.Services.AddOptions<EmailOptions>().Bind(builder.Configuration.GetSection(EmailOptions.Section))
+    .ValidateDataAnnotations().ValidateOnStart();
+builder.Services.AddSingleton<SmtpEmailSender>();                                    // Adapter…
+builder.Services.AddSingleton<IEmailSender>(sp => new RetryingEmailSender(           // …wrapped by a Decorator
+    sp.GetRequiredService<SmtpEmailSender>(), sp.GetRequiredService<IOptions<EmailOptions>>(),
+    sp.GetRequiredService<ILogger<RetryingEmailSender>>(), sp.GetRequiredService<TimeProvider>()));
 
 // Chapter 25: accounts. Who is signed in is remembered in an encrypted cookie.
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

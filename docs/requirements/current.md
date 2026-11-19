@@ -16,6 +16,10 @@ Written down in Course 2, Chapter 6, from the features built in Courses 1 and 2,
 | FR-DUP-1 | Adding a task whose title matches an open task's title (ignoring case and spaces) shows a warning; the user may add it anyway. | Course 2, Ch. 2 | tests |
 | FR-SRCH-1 | The task list can be filtered to tasks whose titles contain all the search words, in any order, ignoring case. | Course 2, Ch. 3 | tests |
 | FR-DEP-1 | A task can wait for other tasks; a dependency that would create a loop is refused, and the loop is named. | Course 2, Ch. 4 | tests |
+| FR-NOTIF-2 | A user gets one in-app notification for each open task due within N days (default 2), once per due date. | Course 2, Ch. 10 | tests |
+| FR-NOTIF-3 | A user sees their notifications and unread count, and can mark them all as read. | Course 2, Ch. 10 | tests |
+| FR-NOTIF-4 | A user can choose to also receive each notification by email. | Course 2, Ch. 10 | tests |
+| FR-NOTIF-6 | Finishing a task notifies the owner of each task that was waiting only for it. | Course 2, Ch. 10 | tests |
 | FR-DUE-1 | Every page shows how many open tasks are overdue, and how many are due within the next N days (default 2). | Course 1 | tests |
 
 ## Non-functional requirements
@@ -23,6 +27,8 @@ Written down in Course 2, Chapter 6, from the features built in Courses 1 and 2,
 | ID | Requirement | Measure | Verified by |
 |---|---|---|---|
 | NFR-CONC-1 | Saving an edited task never silently overwrites a save made since the form was opened: the visitor sees a conflict, with both versions. | second save from a stale form | tests |
+| NFR-NOTIF-2 | Notification emails are retried and failures logged; a failing channel doesn't stop the others. | 3 attempts; logged | tests |
+| NFR-PRIV-1 | Notification texts and emails contain the task title and a link, nothing else. | reviewed factory; test | tests |
 | NFR-SEC-1 | Every response carries security headers, including a Content Security Policy and `nosniff`. | checked on the home page | tests |
 | NFR-SEC-2 | State-changing requests require an anti-forgery token. | POST without token → 400 | tests |
 | NFR-SEC-3 | The API is rate limited per signed-in user. | more than 20 requests in 10 s → 429; other users unaffected | tests |

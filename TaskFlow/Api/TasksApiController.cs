@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using TaskFlow.Models;
+using TaskFlow.Notifications;
 using TaskFlow.Services;
 
 namespace TaskFlow.Api;
@@ -18,9 +19,12 @@ public class TasksApiController : ControllerBase
     private readonly ITaskRepository _tasks;
     private readonly IProjectRepository _projects;
     private readonly NewTaskChecker _newTaskRules;          // Course 2, Chapter 8
+    private readonly TaskEvents _events;                    // Course 2, Chapter 10
 
-    public TasksApiController(ITaskRepository tasks, IProjectRepository projects, NewTaskChecker newTaskRules)
+    public TasksApiController(ITaskRepository tasks, IProjectRepository projects, NewTaskChecker newTaskRules,
+                              TaskEvents events)
     {
+        _events = events;
         _tasks = tasks;
         _projects = projects;
         _newTaskRules = newTaskRules;
@@ -104,7 +108,12 @@ public class TasksApiController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> MarkDone(int id)
     {
-        return await _tasks.MarkDoneAsync(id) ? NoContent() : NotFound();
+        if (!await _tasks.MarkDoneAsync(id))
+        {
+            return NotFound();
+        }
+        await _events.TaskCompletedAsync(id);       // Course 2, Chapter 10: the same event as the form
+        return NoContent();
     }
 
     // DELETE /api/tasks/3

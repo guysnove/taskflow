@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Ch10.Demo/Ch10.Demo.csproj" />
+  <Project Path="Ch10.Patterns.Tests/Ch10.Patterns.Tests.csproj" />
+  <Project Path="Ch10.Patterns/Ch10.Patterns.csproj" />
+</Solution>

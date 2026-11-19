@@ -1,6 +1,6 @@
 # Task notifications and team collaboration — requirements analysis
 
-Course 2, Chapter 6. Status: **analysed, not built**. Version 1.0 of this document. Each change gets a line in the change log at the end.
+Course 2, Chapter 6. Status: **notifications built in Chapter 10 (T5–T7, without teams); teams not built yet**. Version 1.0 of this document. Each change gets a line in the change log at the end.
 
 ## 1. The business problem (not the solution)
 
@@ -46,6 +46,7 @@ Each statement is a starting point, not a requirement. Section 9 lists the quest
 | FR-NOTIF-3 | A user can see their unread notifications, and mark them as read. | Must |
 | FR-NOTIF-4 | A user can choose to also receive each notification by email. | Should |
 | FR-NOTIF-5 | A daily email summary of the day's due tasks. | Could |
+| FR-NOTIF-6 | When a task is done, the owner of each task that was waiting only for it gets a notification: "Ready to start". | Should (added 1.1) |
 | FR-COMM-1 | Comments on tasks. | Won't (this release) |
 | FR-CHAT-1 | Real-time chat, like Slack. | Won't |
 
@@ -151,3 +152,4 @@ Each statement is a starting point, not a requirement. Section 9 lists the quest
 ## Change log
 
 - 1.0 (Course 2, Chapter 6): first analysis.
+- 1.1 (Course 2, Chapter 10): notifications built for single users: FR-NOTIF-2, 3, 4 and the new FR-NOTIF-6 (dependencies, from Chapter 4, made it possible without teams). FR-NOTIF-1 waits for teams. Reminders go to the task's owner until tasks can be assigned.
