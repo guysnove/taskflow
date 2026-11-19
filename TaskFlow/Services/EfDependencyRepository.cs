@@ -34,11 +34,11 @@ public class EfDependencyRepository : IDependencyRepository
         int userId = _user.Id;
         var titles = await _db.Tasks.Where(t => t.UserId == userId && (t.Id == taskId || t.Id == blockedById))
                                     .ToDictionaryAsync(t => t.Id, t => t.Title);
-        if (!titles.ContainsKey(taskId) || !titles.ContainsKey(blockedById))
+        if (!titles.TryGetValue(taskId, out string? taskTitle) || !titles.TryGetValue(blockedById, out string? blockerTitle))
             return new DependencyResult(false, NotFound: true);              // not yours, or no such task
 
         if (await MyDependencies().AnyAsync(d => d.TaskId == taskId && d.BlockedById == blockedById))
-            return new DependencyResult(false, $"\"{titles[taskId]}\" already waits for \"{titles[blockedById]}\".");
+            return new DependencyResult(false, $"\"{taskTitle}\" already waits for \"{blockerTitle}\".");
 
         // Load this user's whole graph (a few hundred edges at most) and check it in memory.
         var edges = await MyDependencies().Select(d => new { d.BlockedById, d.TaskId }).ToListAsync();

@@ -40,5 +40,5 @@ public class DependenciesController : Controller
         return await _dependencies.RemoveAsync(taskId, blockedById) ? Back(taskId) : NotFound();
     }
 
-    private IActionResult Back(int taskId) => RedirectToRoute("TaskDetails", new { id = taskId }, "dependencies");
+    private RedirectToRouteResult Back(int taskId) => RedirectToRoute("TaskDetails", new { id = taskId }, "dependencies");
 }

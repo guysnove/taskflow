@@ -33,8 +33,8 @@ public class StepsTests : IClassFixture<TaskFlowFactory>
         var task = await response.Content.ReadFromJsonAsync<TaskInfo>();
         return (browser, token, task!.Id);
     }
-    private record TaskInfo(int Id);
-    private record StepInfo(int Id, string Text, bool Done, int Position);
+    private sealed record TaskInfo(int Id);
+    private sealed record StepInfo(int Id, string Text, bool Done, int Position);
 
     // Posts a form on a task's page, the way the browser does (with the page's own token).
     private static async Task<HttpResponseMessage> PostFormAsync(HttpClient browser, int taskId, string path, Dictionary<string, string>? fields = null)

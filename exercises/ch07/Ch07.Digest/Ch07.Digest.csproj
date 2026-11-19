@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- Chapter 7: report every method's cyclomatic complexity above 3 (CA1502), to compare Before and After. -->
+  <ItemGroup>
+    <AdditionalFiles Include="CodeMetricsConfig.txt" />
+  </ItemGroup>
+
+</Project>

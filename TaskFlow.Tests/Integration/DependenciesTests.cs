@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -12,7 +13,7 @@ public class DependenciesTests : IClassFixture<TaskFlowFactory>
     public DependenciesTests(TaskFlowFactory factory) => _factory = factory;
 
     private HttpClient NewBrowser() => _factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
-    private record TaskInfo(int Id);
+    private sealed record TaskInfo(int Id);
 
     private static async Task<int> AddTaskAsync(HttpClient browser, string token, string title)
     {
@@ -28,7 +29,7 @@ public class DependenciesTests : IClassFixture<TaskFlowFactory>
         string token = await Browser.TokenFromAsync(browser, $"/tasks/{taskId}");
         return await browser.PostAsync($"/tasks/{taskId}/dependencies", new FormUrlEncodedContent(new Dictionary<string, string>
         {
-            ["blockedById"] = blockedById.ToString(), ["__RequestVerificationToken"] = token,
+            ["blockedById"] = blockedById.ToString(CultureInfo.InvariantCulture), ["__RequestVerificationToken"] = token,
         }));
     }
 

@@ -1,0 +1,3 @@
+[*.cs]
+# Chapter 7: report cyclomatic complexity (threshold in CodeMetricsConfig.txt)
+dotnet_diagnostic.CA1502.severity = warning

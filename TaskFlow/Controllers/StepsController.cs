@@ -63,6 +63,6 @@ public class StepsController : Controller
     }
 
     // 302 to /tasks/3#steps: the browser scrolls to the checklist.
-    private IActionResult BackToChecklist(int taskId) =>
+    private RedirectToRouteResult BackToChecklist(int taskId) =>
         RedirectToRoute("TaskDetails", new { id = taskId }, "steps");
 }

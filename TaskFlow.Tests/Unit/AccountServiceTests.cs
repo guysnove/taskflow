@@ -31,6 +31,7 @@ public class AccountServiceTests : IDisposable
     {
         _db.Dispose();
         _connection.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     private Task<User?> Register(string email, string name = "Test") =>

@@ -13,7 +13,7 @@ public class DueCountsTests : IClassFixture<TaskFlowFactory>
     private readonly TaskFlowFactory _factory;
     public DueCountsTests(TaskFlowFactory factory) => _factory = factory;
 
-    private class FixedUser(int id) : ICurrentUser
+    private sealed class FixedUser(int id) : ICurrentUser
     {
         public bool IsSignedIn => true;
         public int Id => id;

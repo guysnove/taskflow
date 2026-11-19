@@ -16,8 +16,11 @@ public class InMemoryTaskRepository : ITaskRepository
         var today = time.Today();
         _tasks.Add(new() { Id = 1, Title = "Write report", Priority = "High", Due = today.AddDays(-2) });
         _tasks.Add(new() { Id = 2, Title = "Call supplier", Priority = "High", Due = today.AddDays(1) });
-        _tasks.Add(new() { Id = 3, Title = "Renew licence", Priority = "Medium",
-                           Due = today.AddDays(5) });
+        _tasks.Add(new()
+        {
+            Id = 3, Title = "Renew licence", Priority = "Medium",
+            Due = today.AddDays(5)
+        });
         _tasks.Add(new() { Id = 4, Title = "Plan team lunch", Priority = "Low" });
     }
 

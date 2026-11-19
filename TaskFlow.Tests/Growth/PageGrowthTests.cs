@@ -44,8 +44,11 @@ public class PageGrowthTests(ITestOutputHelper output)
         var tasks = new List<TaskItem>();
         for (int i = 0; i < n; i++)
         {
-            var task = new TaskItem { Title = $"Task {i}", UserId = userId, Done = i % 3 == 0,
-                                      Due = new DateOnly(2026, 6, 1).AddDays(rnd.Next(400)) };
+            var task = new TaskItem
+            {
+                Title = $"Task {i}", UserId = userId, Done = i % 3 == 0,
+                Due = new DateOnly(2026, 6, 1).AddDays(rnd.Next(400))
+            };
             for (int s = 1; s <= 3; s++) task.Steps.Add(new TaskStep { Text = $"step {s}", Position = s });
             tasks.Add(task);
         }

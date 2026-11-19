@@ -12,7 +12,7 @@ namespace TaskFlow.Tests.Unit;
 [Trait("Req", "FR-DUE-1")]
 public class OverdueSummaryTests
 {
-    private class SignedInUser : ICurrentUser          // a tiny fake: always "user 1, signed in"
+    private sealed class SignedInUser : ICurrentUser          // a tiny fake: always "user 1, signed in"
     {
         public bool IsSignedIn => true;
         public int Id => 1;

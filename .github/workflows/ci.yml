@@ -15,6 +15,7 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - run: dotnet restore
-      - run: dotnet build --no-restore
+      - run: dotnet format --verify-no-changes --no-restore   # Course 2, Chapter 7: formatting and style, as .editorconfig says
+      - run: dotnet build --no-restore -warnaserror           # Course 2, Chapter 7: analyser warnings fail the build
       - run: dotnet test --no-build --filter "Category!=Growth"   # growth timings run only on request (Course 2, Chapter 5)
       - run: dotnet list package --vulnerable --include-transitive   # Chapter 27: known problems in packages
