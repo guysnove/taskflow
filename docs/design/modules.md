@@ -1,6 +1,6 @@
 # TaskFlow — module and layer design
 
-Version 2.0 (Course 2, Chapter 12). Checked by the architecture tests in `TaskFlow.Tests/Architecture/`:
+Version 2.1 (Course 2, Chapter 13). Checked by the architecture tests in `TaskFlow.Tests/Architecture/`:
 `LayerRulesTests` (project references and packages) and `ModuleRulesTests` (modules inside the projects).
 `dotnet run --project tools/Modules` prints what the code actually does.
 
@@ -44,7 +44,17 @@ Every arrow points inwards, towards the Domain. Infrastructure depends on Applic
 
 Rules: no cycles; the web never uses Data (only `Program.cs`, the composition root, may); Application never uses Data.
 
-## 3. Decisions and trade-offs
+## 3. Service lifetimes (Course 2, Chapter 13)
+
+| Lifetime | Use for | TaskFlow | Never |
+|---|---|---|---|
+| Singleton | stateless, thread-safe objects; one per app | `TimeProvider`, `IEmailSender` (+ decorator), options | hold a scoped object; keep per-user state |
+| Scoped | one per request: the unit of work and everything that uses it | `TaskFlowDbContext`, repositories, `ICurrentUser`, `Notifier`, use cases, rules | be resolved from the root provider |
+| Transient | cheap, stateless helpers | (none today) | be disposable and resolved from the root |
+
+The whole graph is validated at startup in every environment (`ValidateScopes`, `ValidateOnBuild`), and `ServiceGraphTests` checks it on every build. A class registered under two service types is registered once and **forwarded** (`ProjectExistsRule`), so a request gets one object.
+
+## 4. Decisions and trade-offs
 
 - **Four projects (ADR 0001).** The compiler now refuses an outward reference. Cost: four project files, slower to reshape. The boundaries had stopped moving (Chapter 11), so the cost is worth it.
 - **Namespaces kept** (`TaskFlow.Models`, `TaskFlow.Services`, …) instead of `TaskFlow.Domain.Models`, … — the move changed project files, not hundreds of `using` lines and every view. Revisit if two projects ever need the same folder name for different things.
@@ -53,7 +63,8 @@ Rules: no cycles; the web never uses Data (only `Program.cs`, the composition ro
 - **The domain model is simple.** Entities with a little behaviour (`IsOverdue`, `IsDueSoon`, `StepProgress`) and public setters for EF Core. A richer domain model (private setters, methods for every change) is not worth it at TaskFlow's size; revisit if rules start appearing in several services.
 - **Infrastructure references ASP.NET Core** (`FrameworkReference`) for the background service and configuration. Acceptable: it's the outer layer.
 
-## 4. Change log
+## 5. Change log
 
+- 2.1 (Course 2, Chapter 13): service lifetimes section; validation in every environment (ADR 0002); `AddTaskFlowWeb`.
 - 2.0 (Course 2, Chapter 12): four projects. `INotificationQueries` and `IAccountStore` ports with EF Core adapters; `CompleteTask` use case; each layer registers its own services. Migrations moved to `TaskFlow.Infrastructure`.
 - 1.0 (Course 2, Chapter 11): first version. Found and fixed: a cycle Data ↔ Services (`TimeProviderExtensions` moved to Common), and Controllers → Data in `AdminController` and `NotificationsController` (now `AccountService`).

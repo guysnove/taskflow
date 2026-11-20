@@ -14,10 +14,10 @@ public static class ApplicationServices
         // Course 2, Chapter 8: the rules for a new task, checked in this order.
         services.AddScoped<INewTaskRule, DueNotInPastRule>();
         services.AddScoped<INewTaskRule, DueWithinFiveYearsRule>();   // FR-TASK-3
-        services.AddScoped<INewTaskRule, ProjectExistsRule>();
+        services.AddScoped<INewTaskRule>(sp => sp.GetRequiredService<ProjectExistsRule>());   // Chapter 13: forward, don't duplicate
         services.AddScoped<INewTaskRule, DuplicateTitleRule>();
         services.AddScoped<NewTaskChecker>();
-        services.AddScoped<ProjectExistsRule>();                      // Chapter 9: the edit form uses it alone
+        services.AddScoped<ProjectExistsRule>();                      // Chapter 9: the edit form uses it alone; the one object per request
 
         // Course 2, Chapter 10: notifications (Strategy, Observer).
         services.AddScoped<INotificationChannel, InAppChannel>();

@@ -1,86 +1,29 @@
-using System.Security.Claims;
-using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.RateLimiting;
 using TaskFlow;
 using TaskFlow.Data;
 using TaskFlow.Middleware;
 using TaskFlow.Notifications;
-using TaskFlow.Security;
-using TaskFlow.Services;
 using TaskFlow.Settings;
 
 // 1. The builder: configuration, logging and the list of services.
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+// Course 2, Chapter 13: check the whole service graph when the app starts, in EVERY environment.
+// (By default only Development does.) A lifetime mistake now stops the app at startup,
+// instead of leaking data between users in production.
+builder.Host.UseDefaultServiceProvider(options =>
+{
+    options.ValidateScopes = true;
+    options.ValidateOnBuild = true;
+});
 
-// Chapter 26: a JSON API next to the pages.
-// JavaScript sends the anti-forgery token in this header (forms send it as a hidden field).
-builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
-// A machine-readable description of the API, at /openapi/v1.json.
-builder.Services.AddOpenApi();
-
-// Course 2, Chapter 12: each layer registers its own classes. This file, the composition root,
-// is the only place that knows every layer.
+// Each layer registers its own classes. This file, the composition root, is the only place
+// that knows every layer (Course 2, Chapters 12–13).
+builder.Services.AddTaskFlowWeb(builder.Configuration);
 builder.Services.AddTaskFlowApplication();
 builder.Services.AddTaskFlowInfrastructure(builder.Configuration);
 builder.Services.AddOptions<EmailOptions>().Bind(builder.Configuration.GetSection(EmailOptions.Section))
     .ValidateDataAnnotations().ValidateOnStart();
-
-// Chapter 25: accounts. Who is signed in is remembered in an encrypted cookie.
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Cookie.Name = "TaskFlow.SignIn";
-        options.LoginPath = "/account/signin";          // where [Authorize] sends visitors
-        options.AccessDeniedPath = "/account/denied";   // signed in, but not allowed
-        options.ExpireTimeSpan = TimeSpan.FromDays(14);
-        options.SlidingExpiration = true;               // using the site renews the 14 days
-    });
-
-// Secure by default: every page needs a signed-in user, unless it says [AllowAnonymous].
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-});
-
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICurrentUser, CurrentUser>();
-
-// Chapter 27: rate limiting. Too many requests in a short time are answered with 429.
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-    // Signing in and registering: 5 tries per minute from one IP address.
-    // Chapter 30: the number comes from settings (default 5), so the tests can raise it.
-    int signInLimit = builder.Configuration.GetValue("RateLimits:SignInPerMinute", 5);
-    options.AddPolicy("signin", context => RateLimitPartition.GetFixedWindowLimiter(
-        partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-        factory: _ => new FixedWindowRateLimiterOptions
-        {
-            PermitLimit = signInLimit,
-            Window = TimeSpan.FromMinutes(1),
-        }));
-
-    // The API: 20 requests per 10 seconds for each signed-in user.
-    // Chapter 30: the user's id, not Identity.Name — that's the display name, and two people can share one.
-    options.AddPolicy("api", context => RateLimitPartition.GetFixedWindowLimiter(
-        partitionKey: context.User.FindFirstValue(ClaimTypes.NameIdentifier)
-                      ?? context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-        factory: _ => new FixedWindowRateLimiterOptions
-        {
-            PermitLimit = 20,
-            Window = TimeSpan.FromSeconds(10),
-        }));
-});
 
 // The clock: ask for TimeProvider instead of calling DateTime.Today directly.
 builder.Services.AddSingleton(TimeProvider.System);
@@ -90,28 +33,6 @@ builder.Services.AddOptions<TaskFlowOptions>()
     .Bind(builder.Configuration.GetSection(TaskFlowOptions.Section))
     .ValidateDataAnnotations()
     .ValidateOnStart();
-
-// Chapter 29: behind a reverse proxy (nginx, a cloud load balancer…), the proxy talks to TaskFlow.
-// These headers tell TaskFlow the real client's address and whether the client used HTTPS.
-// Only proxies on this machine are trusted by default (127.0.0.1/8 and ::1).
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
-{
-    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-});
-
-// Chapter 29: the keys that encrypt sign-in and anti-forgery cookies.
-// Without a fixed folder, a server or container that loses its files loses the keys,
-// and every user is signed out. Set DataProtection:KeysPath in production.
-var dataProtection = builder.Services.AddDataProtection().SetApplicationName("TaskFlow");
-string? keysPath = builder.Configuration["DataProtection:KeysPath"];
-if (!string.IsNullOrEmpty(keysPath))
-{
-    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysPath));
-}
-
-// A simple "am I alive?" endpoint for hosting platforms (Chapter 29).
-builder.Services.AddHealthChecks()
-    .AddDbContextCheck<TaskFlowDbContext>();       // "can I reach the database?"
 
 // 2. Build the app: after this line, the list of services is fixed.
 var app = builder.Build();
