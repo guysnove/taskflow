@@ -44,6 +44,27 @@ public class EfTaskRepository : ITaskRepository
                   .ToListAsync();
     }
 
+    // Course 2, Chapter 15: filter, count and page IN THE DATABASE. The order must be total (Id last):
+    // with ties, a database may return them in a different order each time, and a task could
+    // appear on two pages, or on none.
+    public async Task<TaskPage> GetPageAsync(TaskFilter filter, int page, int pageSize)
+    {
+        var query = MyTasks().AsNoTracking();
+        if (filter.Done is bool done) query = query.Where(t => t.Done == done);
+        if (filter.ProjectId is int projectId) query = query.Where(t => t.ProjectId == projectId);
+
+        int total = await query.CountAsync();
+        var items = await query.Include(t => t.Project)
+                               .OrderBy(t => t.Done)
+                               .ThenBy(t => t.Due == null)
+                               .ThenBy(t => t.Due)
+                               .ThenBy(t => t.Id)
+                               .Skip((page - 1) * pageSize)
+                               .Take(pageSize)
+                               .ToListAsync();
+        return new TaskPage(items, total);
+    }
+
     // Course 2, Chapter 5: the database counts; no task is loaded. The same rules as
     // TaskItem.IsOverdue and IsDueSoon (a test checks they agree), written as queries.
     public async Task<DueCounts> CountDueAsync(DateOnly today, int days)

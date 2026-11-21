@@ -21,6 +21,8 @@ Written down in Course 2, Chapter 6, from the features built in Courses 1 and 2,
 | FR-NOTIF-4 | A user can choose to also receive each notification by email. | Course 2, Ch. 10 | tests |
 | FR-NOTIF-6 | Finishing a task notifies the owner of each task that was waiting only for it. | Course 2, Ch. 10 | tests |
 | FR-DUE-1 | Every page shows how many open tasks are overdue, and how many are due within the next N days (default 2). | Course 1 | tests |
+| FR-API-1 | The API's task list can be filtered (done, project) and paged (page, pageSize ≤ 100); without parameters it returns every task, as before. | Course 2, Ch. 15 | tests |
+| FR-API-2 | Creating a task through the API with an `Idempotency-Key` is safe to repeat: one task, the same answer. | Course 2, Ch. 15 | tests |
 
 ## Non-functional requirements
 
@@ -29,6 +31,8 @@ Written down in Course 2, Chapter 6, from the features built in Courses 1 and 2,
 | NFR-CONC-1 | Saving an edited task never silently overwrites a save made since the form was opened: the visitor sees a conflict, with both versions. | second save from a stale form | tests |
 | NFR-CONC-2 | Two requests changing dependencies at the same moment never leave a loop. | opposite dependencies added simultaneously → one saved, one refused | tests |
 | NFR-PERF-2 | The overdue summary's query uses an index on (UserId, Due), never a scan of a user's tasks. | EXPLAIN QUERY PLAN | tests |
+| NFR-API-1 | The API contract changes only when a person approves the change. | approved OpenAPI summary | tests |
+| NFR-API-2 | Every API error is a problem details document (`application/problem+json`). | 400, 401, 404 (three kinds), 429 | tests |
 | NFR-NOTIF-2 | Notification emails are retried and failures logged; a failing channel doesn't stop the others. | 3 attempts; logged | tests |
 | NFR-PRIV-1 | Notification texts and emails contain the task title and a link, nothing else. | reviewed factory; test | tests |
 | NFR-SEC-1 | Every response carries security headers, including a Content Security Policy and `nosniff`. | checked on the home page | tests |

@@ -11,32 +11,45 @@ namespace TaskFlow.Api;
 // [ApiController]: invalid input is answered with 400 automatically, and [FromBody] is assumed.
 [ApiController]
 [Route("api/tasks")]
-[SkipStatusCodePages]          // errors stay JSON: no HTML "Something went wrong" page
 [AutoValidateAntiforgeryToken] // POST, PUT and DELETE need the X-CSRF-TOKEN header
-[Produces("application/json")] // every answer is JSON
 [EnableRateLimiting("api")]    // Chapter 27: 20 requests per 10 seconds per user
 public class TasksApiController : ControllerBase
 {
     private readonly ITaskRepository _tasks;
-    private readonly IProjectRepository _projects;
+    private readonly ProjectExistsRule _projectRule;        // Course 2, Chapter 15 (was a private copy: TD-1)
     private readonly NewTaskChecker _newTaskRules;          // Course 2, Chapter 8
     private readonly CompleteTask _completeTask;            // Course 2, Chapter 12: a use case
 
-    public TasksApiController(ITaskRepository tasks, IProjectRepository projects, NewTaskChecker newTaskRules,
+    public TasksApiController(ITaskRepository tasks, ProjectExistsRule projectRule, NewTaskChecker newTaskRules,
                               CompleteTask completeTask)
     {
         _completeTask = completeTask;
         _tasks = tasks;
-        _projects = projects;
+        _projectRule = projectRule;
         _newTaskRules = newTaskRules;
     }
 
     // GET /api/tasks  the signed-in user's tasks
+    // Course 2, Chapter 15: optional filters and paging, e.g. /api/tasks?done=false&page=2&pageSize=20
+    // Without them: every task, as before — programs written for the old API keep working.
+    // The total is in X-Total-Count; a Link header points to the next page, if there is one.
     [HttpGet]
-    public async Task<IEnumerable<TaskDto>> GetAll()
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IEnumerable<TaskDto>> GetAll([FromQuery] TaskListRequest request)
     {
-        var tasks = await _tasks.GetAllAsync();
-        return tasks.Select(TaskDto.From);
+        bool paging = request.Page is not null || request.PageSize is not null;
+        int page = request.Page ?? 1;
+        int pageSize = request.PageSize ?? (paging ? TaskListRequest.DefaultPageSize : int.MaxValue);
+
+        var result = await _tasks.GetPageAsync(new TaskFilter(request.Done, request.ProjectId), page, pageSize);
+        Response.Headers["X-Total-Count"] = result.Total.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        if (paging && (long)page * pageSize < result.Total)
+        {
+            string? next = Url.Action(nameof(GetAll), new { request.Done, request.ProjectId, page = page + 1, pageSize });
+            Response.Headers.Link = $"<{next}>; rel=\"next\"";
+        }
+        return result.Items.Select(TaskDto.From);
     }
 
     // GET /api/tasks/3
@@ -54,9 +67,12 @@ public class TasksApiController : ControllerBase
     }
 
     // POST /api/tasks  with a JSON body; answers 201 Created, and where to find the new task
+    // Course 2, Chapter 15: send an Idempotency-Key header, and repeating the request is safe.
     [HttpPost]
+    [ServiceFilter<IdempotencyFilter>]
     [ProducesResponseType(StatusCodes.Status201Created)]   // tells /openapi/v1.json what really happens
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<TaskDto>> Create(TaskInput input)
     {
         // Course 2, Chapter 8: the same rules as the form. Warnings (a probable duplicate)
@@ -83,9 +99,9 @@ public class TasksApiController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<TaskDto>> Update(int id, TaskInput input)
     {
-        if (!await ProjectIsMineAsync(input))
+        if (await _projectRule.CheckAsync(input) is RuleProblem problem)    // Course 2, Chapter 15: one copy of the rule (TD-1)
         {
-            ModelState.AddModelError(nameof(input.ProjectId), "There is no such project.");
+            ModelState.AddModelError(problem.Field, problem.Message);
             return ValidationProblem(ModelState);
         }
         var result = await _tasks.UpdateAsync(id, input);
@@ -124,8 +140,4 @@ public class TasksApiController : ControllerBase
     {
         return await _tasks.DeleteAsync(id) ? NoContent() : NotFound();
     }
-
-    // A project id in the body must be one of this user's projects.
-    private async Task<bool> ProjectIsMineAsync(TaskInput input) =>
-        input.ProjectId is not int projectId || await _projects.FindAsync(projectId) is not null;
 }

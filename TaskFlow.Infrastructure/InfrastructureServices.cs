@@ -24,6 +24,7 @@ public static class InfrastructureServices
         services.AddScoped<IStepRepository, EfStepRepository>();
         services.AddScoped<IDependencyRepository, EfDependencyRepository>();
         services.AddScoped<INotificationRepository, EfNotificationRepository>();
+        services.AddScoped<IIdempotencyStore, EfIdempotencyStore>();          // Course 2, Chapter 15
         services.AddScoped<INotificationQueries, EfNotificationQueries>();
         services.AddScoped<IAccountStore, EfAccountStore>();
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();

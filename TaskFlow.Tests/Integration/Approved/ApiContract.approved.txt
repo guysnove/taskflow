@@ -1,0 +1,88 @@
+GET /api/tasks
+  query done: boolean (optional)
+  query projectId: int32 (optional)
+  query page: int32 (optional)
+  query pageSize: int32 (optional)
+  200 TaskDto[]
+  400 ProblemDetails
+POST /api/tasks
+  body: TaskInput
+  201 TaskDto
+  400 ProblemDetails
+  422 ProblemDetails
+GET /api/tasks/{id}
+  path id: int32
+  200 TaskDto
+  404 ProblemDetails
+PUT /api/tasks/{id}
+  path id: int32
+  body: TaskInput
+  200 TaskDto
+  400 ProblemDetails
+  404 ProblemDetails
+  409 ProblemDetails
+DELETE /api/tasks/{id}
+  path id: int32
+  204
+  404 ProblemDetails
+POST /api/tasks/{id}/done
+  path id: int32
+  204
+  404 ProblemDetails
+GET /api/tasks/{taskId}/steps
+  path taskId: int32
+  200 StepDto[]
+  404 ProblemDetails
+POST /api/tasks/{taskId}/steps
+  path taskId: int32
+  body: StepInput
+  201 StepDto
+  400 ProblemDetails
+  404 ProblemDetails
+GET /api/tasks/{taskId}/steps/{stepId}
+  path taskId: int32
+  path stepId: int32
+  200 StepDto
+  404 ProblemDetails
+DELETE /api/tasks/{taskId}/steps/{stepId}
+  path taskId: int32
+  path stepId: int32
+  204
+  404 ProblemDetails
+POST /api/tasks/{taskId}/steps/{stepId}/toggle
+  path taskId: int32
+  path stepId: int32
+  200 StepDto
+  404 ProblemDetails
+schema ProblemDetails
+  type: string? (optional)
+  title: string? (optional)
+  status: int32? (optional)
+  detail: string? (optional)
+  instance: string? (optional)
+schema StepDto
+  id: int32
+  text: string
+  done: boolean
+  position: int32
+schema StepInput
+  text: string?
+schema TaskDto
+  id: int32
+  title: string
+  priority: string
+  due: date?
+  done: boolean
+  notes: string?
+  projectId: int32?
+  projectName: string?
+  createdOn: date?
+  version: int32
+schema TaskInput
+  title: string?
+  priority: string
+  due: date? (optional)
+  projectId: int32? (optional)
+  version: int32 (optional)
+  notes: string? (optional)
+  allowDuplicate: boolean (optional)

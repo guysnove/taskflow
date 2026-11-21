@@ -13,9 +13,7 @@ namespace TaskFlow.Api;
 //   DELETE /api/tasks/3/steps/7                                             → 204 No Content
 [ApiController]
 [Route("api/tasks/{taskId:int}/steps")]
-[SkipStatusCodePages]
 [AutoValidateAntiforgeryToken]
-[Produces("application/json")]
 [EnableRateLimiting("api")]
 public class StepsApiController : ControllerBase
 {

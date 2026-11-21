@@ -23,6 +23,12 @@ public static class WebServices
         services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
         // A machine-readable description of the API, at /openapi/v1.json.
         services.AddOpenApi();
+        // Course 2, Chapter 15: one shape for every API error (RFC 9457). UseStatusCodePages uses it too.
+        services.AddProblemDetails(options => options.CustomizeProblemDetails = context =>
+        {
+            // Not every status has a built-in title (429 doesn't): use HTTP's own name for it.
+            context.ProblemDetails.Title ??= Microsoft.AspNetCore.WebUtilities.ReasonPhrases.GetReasonPhrase(context.ProblemDetails.Status ?? 500);
+        });
 
         // Chapter 25: accounts. Who is signed in is remembered in an encrypted cookie.
         services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -44,12 +50,22 @@ public static class WebServices
         });
 
         services.AddHttpContextAccessor();
+        services.AddScoped<TaskFlow.Api.IdempotencyFilter>();     // Course 2, Chapter 15
         services.AddScoped<ICurrentUser, CurrentUser>();
 
         // Chapter 27: rate limiting. Too many requests in a short time are answered with 429.
         services.AddRateLimiter(options =>
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            // Course 2, Chapter 15: tell the client when to try again (in seconds), as HTTP says.
+            options.OnRejected = (context, _) =>
+            {
+                if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out TimeSpan retryAfter))
+                {
+                    context.HttpContext.Response.Headers.RetryAfter = ((int)Math.Ceiling(retryAfter.TotalSeconds)).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                }
+                return ValueTask.CompletedTask;
+            };
 
             // Signing in and registering: 5 tries per minute from one IP address.
             // Chapter 30: the number comes from settings (default 5), so the tests can raise it.

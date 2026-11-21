@@ -38,6 +38,18 @@ public class InMemoryTaskRepository : ITaskRepository
         }
     }
 
+    public Task<TaskPage> GetPageAsync(TaskFilter filter, int page, int pageSize)
+    {
+        lock (_lock)
+        {
+            var matching = _tasks.Where(t => (filter.Done is not bool done || t.Done == done)
+                                          && (filter.ProjectId is not int projectId || t.ProjectId == projectId))
+                                 .OrderBy(t => t.Done).ThenBy(t => t.Due ?? DateOnly.MaxValue).ThenBy(t => t.Id)
+                                 .ToList();
+            return Task.FromResult(new TaskPage(matching.Skip((page - 1) * pageSize).Take(pageSize).ToList(), matching.Count));
+        }
+    }
+
     // Course 2, Chapter 5: here the C# rules themselves do the counting.
     public Task<DueCounts> CountDueAsync(DateOnly today, int days)
     {

@@ -17,6 +17,7 @@ public class TaskFlowDbContext : DbContext
     public DbSet<TaskStep> Steps => Set<TaskStep>();     // Chapter 30
     public DbSet<TaskDependency> Dependencies => Set<TaskDependency>();   // Course 2, Chapter 4
     public DbSet<Notification> Notifications => Set<Notification>();     // Course 2, Chapter 10
+    public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();   // Course 2, Chapter 15
 
     // The rules for the table: the same ones as Chapter 22's 01_schema.sql.
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -100,6 +101,17 @@ public class TaskFlowDbContext : DbContext
             n.HasIndex(x => new { x.UserId, x.Key }).IsUnique();
             n.HasIndex(x => new { x.UserId, x.ReadAt });          // "my unread notifications"
             n.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Course 2, Chapter 15: saved answers to idempotent requests. (UserId, Key) is unique: even if two
+        // requests with the same key slipped past each other, the database would refuse the second answer.
+        modelBuilder.Entity<IdempotencyRecord>(r =>
+        {
+            r.Property(x => x.Key).IsRequired().HasMaxLength(100);
+            r.Property(x => x.RequestHash).IsRequired().HasMaxLength(64);
+            r.Property(x => x.Location).HasMaxLength(200);
+            r.HasIndex(x => new { x.UserId, x.Key }).IsUnique();
+            r.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

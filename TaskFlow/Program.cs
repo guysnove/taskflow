@@ -56,8 +56,13 @@ if (!app.Environment.IsDevelopment())
 app.UseMiddleware<RequestTimingMiddleware>();
 app.UseMiddleware<SecurityHeadersMiddleware>();   // Chapter 27: CSP, nosniff, Referrer-Policy…
 
-// Error status codes without a body (like NotFound()) get a friendly page.
-app.UseStatusCodePagesWithReExecute("/status/{0}");
+// Error status codes without a body (like NotFound()) get a friendly page…
+// Course 2, Chapter 15: …but under /api, a program is asking: it gets a problem details document
+// (application/problem+json), like every other API error. Covers 401, 429, and addresses that match nothing.
+app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"),
+            api => api.UseStatusCodePages());
+app.UseWhen(context => !context.Request.Path.StartsWithSegments("/api"),
+            pages => pages.UseStatusCodePagesWithReExecute("/status/{0}"));
 
 app.UseHttpsRedirection();
 app.UseRouting();
