@@ -1,0 +1,32 @@
+{
+  // Course 2, Chapter 18/19: Terminal > Run Task… (or Ctrl+Shift+P > "Tasks: Run Test Task")
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "test",
+      "command": "dotnet",
+      "args": ["test", "Ch19.Shipping.Tests", "--logger", "console;verbosity=normal"],
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      // Watch mode: re-runs the tests every time you save a file — handy for red-green-refactor.
+      "label": "test: watch",
+      "command": "dotnet",
+      "args": ["watch", "test", "--project", "Ch19.Shipping.Tests"],
+      "group": "test",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      // Mutation testing: Stryker changes the code on purpose and checks the tests notice.
+      // First time: dotnet tool restore
+      "label": "test: mutation (Stryker)",
+      "command": "dotnet",
+      "args": ["stryker", "--reporter", "cleartext", "--reporter", "html"],
+      "options": { "cwd": "${workspaceFolder}/Ch19.Shipping.Tests" },
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

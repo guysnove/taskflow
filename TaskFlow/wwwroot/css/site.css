@@ -72,6 +72,8 @@ a[aria-current="true"] {
 .priority-high   { color: #a52834; }
 .priority-medium { color: #6c4a00; }
 .priority-low    { color: #3d5a80; }
+/* Course 2, Chapter 19: raised by PriorityRules (due soon or overdue) */
+.priority-raised { font-weight: 700; text-decoration: underline dotted; cursor: help; }
 
 /* Chapter 20: on small screens, each task becomes a card instead of a table row */
 @media (max-width: 575.98px) {

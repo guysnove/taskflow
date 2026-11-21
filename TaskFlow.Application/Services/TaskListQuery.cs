@@ -14,7 +14,8 @@ public sealed record TaskListQuery(string Show, string Sort, int? Project, strin
         Project: project,
         Q: string.IsNullOrWhiteSpace(q) ? null : q.Trim());
 
-    public List<TaskItem> Apply(List<TaskItem> tasks)
+    // Course 2, Chapter 19: `today`, because the priority sort uses PriorityRules (FR-PRIO-1).
+    public List<TaskItem> Apply(List<TaskItem> tasks, DateOnly today)
     {
         IEnumerable<TaskItem> shown = TaskSearch.Filter(tasks, Q);
         if (Project is not null)
@@ -27,7 +28,7 @@ public sealed record TaskListQuery(string Show, string Sort, int? Project, strin
         }
         return Sort switch
         {
-            "priority" => shown.OrderBy(t => t.Done).ThenBy(t => PriorityRank(t.Priority)).ToList(),
+            "priority" => shown.OrderBy(t => t.Done).ThenBy(t => PriorityRank(PriorityRules.For(t, today).Level)).ToList(),
             "title" => shown.OrderBy(t => t.Done).ThenBy(t => t.Title).ToList(),
             _ => shown.ToList(),                     // "due": the repository's order already
         };

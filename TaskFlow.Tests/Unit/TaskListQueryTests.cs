@@ -35,9 +35,28 @@ public class TaskListQueryTests
 
     [Fact]
     public void Priority_UnfinishedFirst_ThenHighMediumLow() =>
-        Assert.Equal([3, 4, 1, 2], TaskListQuery.From(null, "priority", null, null).Apply(Tasks).Select(t => t.Id));
+        Assert.Equal([3, 4, 1, 2], TaskListQuery.From(null, "priority", null, null).Apply(Tasks, new DateOnly(2026, 11, 23)).Select(t => t.Id));
 
     [Fact]
     public void OpenTasks_OfOneProject() =>
-        Assert.Equal([3, 4], TaskListQuery.From("open", null, 7, null).Apply(Tasks).Select(t => t.Id));
+        Assert.Equal([3, 4], TaskListQuery.From("open", null, 7, null).Apply(Tasks, new DateOnly(2026, 11, 23)).Select(t => t.Id));
+
+    // Course 2, Chapter 19 (test-first): sorting by priority uses the EFFECTIVE priority (FR-PRIO-1).
+    [Fact]
+    [Trait("Req", "FR-PRIO-1")]
+    public void Priority_UsesTheEffectivePriority()
+    {
+        var today = new DateOnly(2026, 11, 23);
+        List<TaskItem> tasks =
+        [
+            new() { Id = 1, Title = "medium, no date", Priority = "Medium" },
+            new() { Id = 2, Title = "low, due today", Priority = "Low", Due = today },                // -> Medium
+            new() { Id = 3, Title = "low, overdue", Priority = "Low", Due = today.AddDays(-2) },     // -> High
+            new() { Id = 4, Title = "high", Priority = "High" },
+        ];
+
+        var sorted = TaskListQuery.From(null, "priority", null, null).Apply(tasks, today);
+
+        Assert.Equal([3, 4, 1, 2], sorted.Select(t => t.Id));          // High: 3, 4 · Medium: 1, 2 (same level: as before)
+    }
 }

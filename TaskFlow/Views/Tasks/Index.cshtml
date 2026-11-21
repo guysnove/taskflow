@@ -4,6 +4,7 @@
     int left = Model.Count(t => !t.Done);
     string show = (string)ViewData["Show"]!;   // "all" or "open"
     string sort = (string)ViewData["Sort"]!;   // "due", "priority" or "title"
+    var today = (DateOnly)ViewData["Today"]!;  // Course 2, Chapter 19: for the effective priority
     int? project = (int?)ViewData["Project"];  // only this project's tasks, or null for all
     string? q = (string?)ViewData["Q"];         // the search words, or null (Course 2, Chapter 3)
 }
@@ -90,7 +91,7 @@ else
                             <a asp-action="Index" asp-route-project="@task.ProjectId">@task.Project.Name</a>
                         }
                     </td>
-                    <td data-label="Priority"><priority value="@task.Priority" /></td>
+                    <td data-label="Priority"><priority value="@task.Priority" effective="@PriorityRules.For(task, today)" /></td>
                     <td data-label="Due">
                         @(task.Due?.ToString("ddd d MMM") ?? "—")
                         <partial name="_StatusBadge" model="task" />

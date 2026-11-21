@@ -67,3 +67,13 @@ Don't chase a number: an uncovered line can be harmless (`IsWarning => false`), 
 - **The API needs the anti-forgery token** in `X-CSRF-TOKEN` when it is called with the sign-in cookie, just like the forms.
 - **End-to-end tests are few:** one per important journey (register → add a task). They find what HTTP-level tests can't — the screenshot of the first run showed a page with no CSS. Playwright's assertions wait; never `Thread.Sleep`.
 - **If a test fails only sometimes,** it is a bug in the test or the app: find the shared state, the timing, or the order dependency. Don't re-run until green.
+
+## 7. Test-driven development and quality gates (Chapter 19)
+
+- **New rules are written test-first** when the rule can be stated with examples. FR-PRIO-1 (`PriorityRules`) was built in 14 small red–green–refactor commits; `PriorityRulesTests` reads in the order it was written.
+- **Red means red for the right reason:** a compile error counts as red, but then make it compile and watch the *assertion* fail.
+- **Refactor only on green**, and only the code *or* the tests, not both at once.
+- **The golden master** (`TaskListGoldenMasterTests`) didn't notice FR-PRIO-1: its data has no Low or Medium task due soon. A regression test only protects what its data exercises.
+- **Quality gate:** CI runs `./tools/coverage.sh`, which fails if unit-test coverage of Domain + Application drops below **80% of lines** or **90% of branches** (today: 82% / 95.2%). It's a floor against erosion, not a target. Try it: `MIN_LINE=85 ./tools/coverage.sh`.
+- **Every pull request** uses `.github/pull_request_template.md`: how it was tested, and whether each new test was seen to fail.
+

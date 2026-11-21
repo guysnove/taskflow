@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using TaskFlow.Common;
 using TaskFlow.Models;
 using TaskFlow.Notifications;
 using TaskFlow.Services;
@@ -18,13 +19,15 @@ public class TasksController : Controller
     private readonly NewTaskChecker _newTaskRules;          // Course 2, Chapter 8
     private readonly ProjectExistsRule _projectRule;        // Course 2, Chapter 9
     private readonly CompleteTask _completeTask;            // Course 2, Chapter 12: a use case
+    private readonly TimeProvider _time;                    // Course 2, Chapter 19: "today", for priorities
 
     // Dependency injection passes them all in: see Program.cs.
     public TasksController(ITaskRepository repository, IProjectRepository projects,
                            ILogger<TasksController> logger,
                            IDependencyRepository dependencies, NewTaskChecker newTaskRules,
-                           ProjectExistsRule projectRule, CompleteTask completeTask)
+                           ProjectExistsRule projectRule, CompleteTask completeTask, TimeProvider time)
     {
+        _time = time;
         _completeTask = completeTask;
         _projectRule = projectRule;
         _dependencies = dependencies;
@@ -44,7 +47,8 @@ public class TasksController : Controller
     {
         // Course 2, Chapter 9: the filtering and sorting moved to TaskListQuery (Extract Class).
         var query = TaskListQuery.From(show, sort, project, q);
-        var tasks = query.Apply(await _repository.GetAllAsync());
+        var tasks = query.Apply(await _repository.GetAllAsync(), _time.Today());   // Course 2, Chapter 19: effective priority
+        ViewData["Today"] = _time.Today();
 
         ViewData["Show"] = query.Show;
         ViewData["Sort"] = query.Sort;

@@ -42,6 +42,7 @@ Small programs used in Course 2 chapters live in `exercises/chNN/`, separate fro
 | `exercises/ch07` | 7 | `Ch07.slnx`: a messy `DigestService` and its refactored `DailyDigest`, with characterisation tests (6); `CsvImport` to refactor (Independent B). `Ch07.Demo`: `before`, `after`, `clockbug`. |
 | `exercises/ch17` | 17 | `Ch17.slnx`: a small shop's `PriceCalculator` with 17 unit tests (AAA, theories, the five test doubles, isolation); `Ch17.Mistakes.Tests` fails **on purpose** (2 of 4); `Ch17.Legacy/LateFees.cs` to make testable (Guided 2). `.vscode/tasks.json`: run tests as VS Code tasks. |
 | `exercises/ch18` | 18 | `Ch18.slnx`: a tiny notes app (web page + JSON API + SQLite) with integration tests (`WebApplicationFactory`, a test sign-in scheme, real cookie sign-in), end-to-end tests with Playwright (`Category=E2E`, needs Chromium) and a deliberately flaky test (`Category=Flaky`). |
+| `exercises/ch19` | 19 | `Ch19.slnx`: a shipping-cost kata built test-first (14 recorded steps), with 13 tests. Tasks: `test`, `test: watch` (`dotnet watch test`), `test: mutation (Stryker)` (`dotnet tool restore` first). |
 
 ## Run it
 
@@ -51,7 +52,7 @@ Requirements: the .NET 10 SDK (LTS). Editor used in the course: Visual Studio Co
 dotnet restore
 dotnet build
 dotnet test                         # 41 tests at milestone/v1.0
-./tools/coverage.sh                 # Course 2, Chapter 17: unit-test coverage of the business logic
+./tools/coverage.sh                 # Course 2, Chapters 17 and 19: unit-test coverage of the business logic, and its quality gate
 cd TaskFlow && dotnet run           # then open the address it prints
 # migrations now live in TaskFlow.Infrastructure:
 # dotnet ef migrations add <Name> --project TaskFlow.Infrastructure --startup-project TaskFlow
