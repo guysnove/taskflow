@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using TaskFlow.Data;
 
 namespace TaskFlow.Tests.Integration;
 
@@ -21,6 +23,25 @@ public class TaskFlowFactory : WebApplicationFactory<Program>
         builder.UseSetting("Notifications:ReminderInterval", "00:00:00");
         builder.UseSetting("Email:PickupDirectory", MailFolder);
         builder.UseEnvironment("Development");
+    }
+
+    // Course 2, Chapter 18: look straight into the database, the way the app does: a scope, a DbContext.
+    // For checking what a request really stored — things the HTTP answer doesn't show.
+    public async Task<T> DbAsync<T>(Func<TaskFlowDbContext, Task<T>> query)
+    {
+        using var scope = Services.CreateScope();
+        return await query(scope.ServiceProvider.GetRequiredService<TaskFlowDbContext>());
+    }
+
+    // Course 2, Chapter 18: a new account with a unique email (tests share the database, never their data),
+    // signed in through the real register form. The client keeps the cookie; redirects are not followed.
+    public async Task<(HttpClient Client, string Email)> SignedInClientAsync(string name = "Ana")
+    {
+        var client = CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+        var email = $"{name.ToLowerInvariant()}-{Guid.NewGuid():N}@example.com";
+        var response = await Browser.RegisterAsync(client, email, name);
+        Assert.Equal(System.Net.HttpStatusCode.Redirect, response.StatusCode);       // registered and signed in
+        return (client, email);
     }
 
     protected override void Dispose(bool disposing)

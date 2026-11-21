@@ -47,4 +47,11 @@ public class TaskInputTests
         var errors = Errors(new TaskInput { Title = "Valid title", Priority = "Urgent" });
         Assert.Contains("Please choose High, Medium or Low.", errors);
     }
+
+    // Course 2, Chapter 18: the regression test for the bug the workflow test found, at unit-test speed.
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData(null)]
+    public void BlankNotes_AreNoNotes(string? notes) => Assert.Null(new TaskInput { Notes = notes }.Notes);
 }

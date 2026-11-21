@@ -19,9 +19,18 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "test: all",
+      "label": "test: all (no browser)",
       "command": "dotnet",
-      "args": ["test", "--filter", "Category!=Growth"],
+      "args": ["test", "--filter", "Category!=Growth&Category!=E2E"],
+      "group": "test",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      // Course 2, Chapter 18: needs Chromium. Set TASKFLOW_BROWSER to a Chrome/Chromium, or once:
+      //   pwsh TaskFlow.Tests/bin/Debug/net10.0/playwright.ps1 install chromium
+      "label": "test: end-to-end (a real browser)",
+      "command": "dotnet",
+      "args": ["test", "TaskFlow.Tests", "--filter", "Category=E2E", "--logger", "console;verbosity=normal"],
       "group": "test",
       "problemMatcher": "$msCompile"
     },

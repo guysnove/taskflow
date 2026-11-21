@@ -41,6 +41,7 @@ Small programs used in Course 2 chapters live in `exercises/chNN/`, separate fro
 | `exercises/ch06` | 6 | `Ch06.slnx`: US-2's acceptance criteria as tests (`ReminderPolicy`) and a tiny requirement linter, with 11 tests. `Ch06.Demo`: `interviews`, `ours`. |
 | `exercises/ch07` | 7 | `Ch07.slnx`: a messy `DigestService` and its refactored `DailyDigest`, with characterisation tests (6); `CsvImport` to refactor (Independent B). `Ch07.Demo`: `before`, `after`, `clockbug`. |
 | `exercises/ch17` | 17 | `Ch17.slnx`: a small shop's `PriceCalculator` with 17 unit tests (AAA, theories, the five test doubles, isolation); `Ch17.Mistakes.Tests` fails **on purpose** (2 of 4); `Ch17.Legacy/LateFees.cs` to make testable (Guided 2). `.vscode/tasks.json`: run tests as VS Code tasks. |
+| `exercises/ch18` | 18 | `Ch18.slnx`: a tiny notes app (web page + JSON API + SQLite) with integration tests (`WebApplicationFactory`, a test sign-in scheme, real cookie sign-in), end-to-end tests with Playwright (`Category=E2E`, needs Chromium) and a deliberately flaky test (`Category=Flaky`). |
 
 ## Run it
 
@@ -65,7 +66,7 @@ TaskFlow/                  Presentation: the ASP.NET Core MVC app (controllers, 
 TaskFlow.Application/      Application: use cases, rules, notifications, and the ports (interfaces) they need
 TaskFlow.Domain/           Domain: entities and pure domain logic; no packages, no references
 TaskFlow.Infrastructure/   Infrastructure: EF Core + SQLite, migrations, SMTP, the background job (adapters for the ports)
-TaskFlow.Tests/            xUnit unit, integration and architecture tests
+TaskFlow.Tests/            xUnit unit, integration, architecture and end-to-end (Playwright) tests
 Deploy/              example Dockerfile, systemd service, nginx configuration, a small test proxy
 .github/workflows/   continuous integration: restore, build, test, vulnerable-package check
 ```

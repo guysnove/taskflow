@@ -2,14 +2,14 @@
 
 Course 2, Chapter 17. Read this before adding a feature: every rule you add needs a test here.
 
-## 1. Two kinds of test, two folders
+## 1. Three kinds of test, three folders
 
-| | `TaskFlow.Tests/Unit/` | `TaskFlow.Tests/Integration/` |
-|---|---|---|
-| Tests | one class (a rule, a use case, a component) on its own | several pieces together: the web app, EF Core, SQLite, migrations |
-| Collaborators | test doubles (fakes, stubs, spies, NSubstitute mocks) | the real ones (an in-memory or temp-file SQLite database, `TaskFlowFactory`) |
-| Speed | milliseconds | 10–1000 ms |
-| Run | `dotnet test --filter "FullyQualifiedName~TaskFlow.Tests.Unit"` | `dotnet test --filter "Category!=Growth"` (everything) |
+| | `TaskFlow.Tests/Unit/` | `TaskFlow.Tests/Integration/` | `TaskFlow.Tests/EndToEnd/` (Chapter 18) |
+|---|---|---|---|
+| Tests | one class (a rule, a use case, a component) on its own | several pieces together: the web app, EF Core, SQLite, migrations | a person's journey, in a real browser |
+| Collaborators | test doubles (fakes, stubs, spies, NSubstitute mocks) | the real ones (an in-memory or temp-file SQLite database, `TaskFlowFactory`) | everything real; Chromium driven by Playwright, through a real port |
+| Speed | milliseconds | 10–1000 ms | seconds |
+| Run | `dotnet test --filter "FullyQualifiedName~TaskFlow.Tests.Unit"` | `dotnet test --filter "Category!=Growth&Category!=E2E"` | `dotnet test --filter "Category=E2E"` (needs Chromium) |
 
 **Rule:** if a test needs a database, a web server, a file or the network, it belongs in `Integration/`.
 (`AccountServiceTests` moved there in Chapter 17: it used SQLite.)
@@ -56,3 +56,14 @@ Prefer checking **results and state** over checking calls. Check calls only when
 
 Use it to **find untested rules** (Chapter 17 found `ProjectExistsRule`, the email channel and the "unblocked" observer at 0%).
 Don't chase a number: an uncovered line can be harmless (`IsWarning => false`), and 100% coverage with weak assertions proves little.
+
+## 6. Integration and end-to-end tests (Chapter 18)
+
+- **One app per test class:** `IClassFixture<TaskFlowFactory>` (or `WorkflowFactory`). Starting the app takes a second; sharing it is fine because…
+- **…every test makes its own data.** `SignedInClientAsync()` registers a new account with a unique email, so tests share a database but never each other's rows. Never assume an empty database, an id, or a count of *all* rows: count *your* rows.
+- **Check the database, not only the answer.** `factory.DbAsync(db => …)` looks at what a request really stored (owner, dates, blank fields). That is how the blank-notes bug was found.
+- **The environment is a decision.** `TaskFlowFactory` runs in Development; `WorkflowFactory` runs in **Testing**: no sample tasks (in Development the first account adopts them — that made a test depend on which test registered first), production error handling, static files from the build (`UseStaticWebAssets`).
+- **Only the clock is fake** in workflow tests (`FakeTimeProvider`), so "created today" has one right answer.
+- **The API needs the anti-forgery token** in `X-CSRF-TOKEN` when it is called with the sign-in cookie, just like the forms.
+- **End-to-end tests are few:** one per important journey (register → add a task). They find what HTTP-level tests can't — the screenshot of the first run showed a page with no CSS. Playwright's assertions wait; never `Thread.Sleep`.
+- **If a test fails only sometimes,** it is a bug in the test or the app: find the shared state, the timing, or the order dependency. Don't re-run until green.

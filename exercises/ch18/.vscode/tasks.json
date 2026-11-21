@@ -1,0 +1,29 @@
+{
+  // Course 2, Chapter 18: Terminal > Run Task… (or Ctrl+Shift+P > "Tasks: Run Test Task")
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "test: integration",
+      "command": "dotnet",
+      "args": ["test", "Ch18.Notes.Tests", "--filter", "Category!=E2E&Category!=Flaky", "--logger", "console;verbosity=normal"],
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      // Needs a browser: set CH18_BROWSER to a Chrome/Chromium, or run once:
+      //   pwsh Ch18.Notes.Tests/bin/Debug/net10.0/playwright.ps1 install chromium
+      "label": "test: end-to-end (a real browser)",
+      "command": "dotnet",
+      "args": ["test", "Ch18.Notes.Tests", "--filter", "Category=E2E", "--logger", "console;verbosity=normal"],
+      "group": "test",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test: the flaky one (run it twice)",
+      "command": "dotnet",
+      "args": ["test", "Ch18.Notes.Tests", "--filter", "Category=Flaky"],
+      "group": "test",
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}

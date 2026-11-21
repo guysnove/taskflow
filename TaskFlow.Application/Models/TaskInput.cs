@@ -26,7 +26,13 @@ public class TaskInput
 
     [Display(Name = "Notes (optional)")]
     [StringLength(500, ErrorMessage = "Notes can be at most 500 characters.")]
-    public string? Notes { get; set; }
+    public string? Notes
+    {
+        get;
+        // Course 2, Chapter 18 (found by an integration test): the form sends "" as null, but the JSON API
+        // kept "", so the same empty notes were stored two ways. Blank is now always "no notes".
+        set => field = string.IsNullOrWhiteSpace(value) ? null : value;
+    }
 
     // Course 2, Chapter 2: ticked when the user confirms they really want a second task
     // with the same title as an open one. Only the add form shows it.
