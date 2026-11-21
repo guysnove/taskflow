@@ -1,0 +1,21 @@
+{
+  // Run with: Terminal > Run Task…, or Ctrl+Shift+P → "Tasks: Run Test Task".
+  // No extension needed: VS Code runs the command in its terminal panel.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "test",
+      "command": "dotnet",
+      "args": ["test", "Ch17.Pricing.Tests", "--logger", "console;verbosity=normal"],
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test: the mistakes (fails on purpose)",
+      "command": "dotnet",
+      "args": ["test", "Ch17.Mistakes.Tests"],
+      "group": "test",
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}

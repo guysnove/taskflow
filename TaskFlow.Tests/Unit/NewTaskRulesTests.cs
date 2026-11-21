@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Time.Testing;
+using NSubstitute;
 using TaskFlow.Data;
 using TaskFlow.Models;
 using TaskFlow.Services;
@@ -96,5 +97,43 @@ public class NewTaskRulesTests
         var problems = await new NewTaskChecker([new Always(true, "a warning")]).CheckAsync(new TaskInput(), alreadyInvalid: false);
 
         Assert.True(Assert.Single(problems).Warning);
+    }
+
+    // Course 2, Chapter 17: ProjectExistsRule had no unit test at all (the coverage report: 0%).
+    // Its only collaborator, IProjectRepository, is replaced by an NSubstitute "mock":
+    // we tell it what to answer, and afterwards ask it what it was asked.
+    [Fact]
+    [Trait("Req", "FR-OWN-1")]
+    public async Task ProjectExists_NoProjectChosen_DoesNotAskTheDatabase()
+    {
+        // Arrange
+        var projects = Substitute.For<IProjectRepository>();
+        var rule = new ProjectExistsRule(projects);
+
+        // Act
+        var problem = await rule.CheckAsync(new TaskInput { Title = "Pay rent", ProjectId = null });
+
+        // Assert
+        Assert.Null(problem);
+        await projects.DidNotReceive().FindAsync(Arg.Any<int>());
+    }
+
+    [Theory]
+    [Trait("Req", "FR-OWN-1")]
+    [InlineData(true, false)]       // my project: fine
+    [InlineData(false, true)]       // not found (or someone else's: FindAsync only sees mine): refused
+    public async Task ProjectExists_AsksForTheChosenProject(bool found, bool refused)
+    {
+        var projects = Substitute.For<IProjectRepository>();
+        projects.FindAsync(7).Returns(found ? new Project { Id = 7, Name = "Move flat" } : null);
+
+        var problem = await new ProjectExistsRule(projects).CheckAsync(new TaskInput { Title = "Pack books", ProjectId = 7 });
+
+        Assert.Equal(refused, problem is not null);
+        await projects.Received(1).FindAsync(7);
+        if (refused)
+        {
+            Assert.Equal(new RuleProblem("ProjectId", "Please choose a project from the list."), problem);
+        }
     }
 }

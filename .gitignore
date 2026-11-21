@@ -491,3 +491,4 @@ $RECYCLE.BIN/
 
 # Course 2, Chapter 10: development emails, written as .eml files
 mail-outbox/
+TestResults/

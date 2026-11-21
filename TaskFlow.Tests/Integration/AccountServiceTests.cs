@@ -7,10 +7,11 @@ using TaskFlow.Data;
 using TaskFlow.Models;
 using TaskFlow.Services;
 
-namespace TaskFlow.Tests.Unit;
+namespace TaskFlow.Tests.Integration;
 
-// AccountService needs a database, so these tests use SQLite "in memory":
-// a real database that lives only as long as the connection, and starts empty every time.
+// AccountService with its REAL store (EfAccountStore) and SQLite "in memory": a real database that
+// lives only as long as the connection. Course 2, Chapter 17: moved from Unit/ to Integration/ —
+// it tests two pieces together, plus the migrations. The pure unit tests are in Unit/SignInRulesTests.
 [Trait("Req", "FR-ACC-1")]
 public class AccountServiceTests : IDisposable
 {

@@ -7,13 +7,23 @@ public interface ITaskCompletedObserver
     Task OnTaskCompletedAsync(int taskId);
 }
 
-public class TaskEvents(IEnumerable<ITaskCompletedObserver> observers)
+// Course 2, Chapter 17 (found by a unit test): the task is already saved when observers run, so one
+// failing observer must neither turn a finished task into an error page, nor stop the others.
+// Failures are logged — the same rule Notifier follows for its channels.
+public class TaskEvents(IEnumerable<ITaskCompletedObserver> observers, ILogger<TaskEvents> logger)
 {
     public async Task TaskCompletedAsync(int taskId)
     {
         foreach (var observer in observers)
         {
-            await observer.OnTaskCompletedAsync(taskId);
+            try
+            {
+                await observer.OnTaskCompletedAsync(taskId);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                logger.LogError(ex, "Observer {Observer} failed for completed task {TaskId}", observer.GetType().Name, taskId);
+            }
         }
     }
 }

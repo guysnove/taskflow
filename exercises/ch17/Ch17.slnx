@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Ch17.Mistakes.Tests/Ch17.Mistakes.Tests.csproj" />
+  <Project Path="Ch17.Pricing.Tests/Ch17.Pricing.Tests.csproj" />
+  <Project Path="Ch17.Pricing/Ch17.Pricing.csproj" />
+  <Project Path="Ch17.Legacy/Ch17.Legacy.csproj" />
+</Solution>

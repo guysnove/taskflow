@@ -1,0 +1,35 @@
+{
+  // Course 2, Chapter 17: run TaskFlow's tests from VS Code, with no extension.
+  //   Ctrl+Shift+P → "Tasks: Run Test Task" runs the default test task;
+  //   Terminal > Run Task… lists them all.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "args": ["build", "-warnaserror"],
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test: unit",
+      "command": "dotnet",
+      "args": ["test", "TaskFlow.Tests", "--filter", "FullyQualifiedName~TaskFlow.Tests.Unit"],
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test: all",
+      "command": "dotnet",
+      "args": ["test", "--filter", "Category!=Growth"],
+      "group": "test",
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test: coverage of the business logic",
+      "command": "./tools/coverage.sh",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

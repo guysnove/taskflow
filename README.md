@@ -18,6 +18,8 @@ TaskFlow is the task-management web application used in two video courses:
 
 ## Requirements (Course 2, Chapter 6)
 
+`docs/testing.md` (Course 2, Chapter 17) explains how TaskFlow is tested: unit vs integration, conventions, test doubles, coverage, running tests in VS Code.
+
 `docs/requirements/` holds TaskFlow's requirements, with IDs. Tests carry `[Trait("Req", "…")]`. `dotnet run --project tools/Traceability` reports which requirements have tests; `dotnet test --filter "Req=FR-DUP-1"` runs one requirement's tests.
 
 ## Growth timings (Course 2, Chapter 5)
@@ -38,6 +40,7 @@ Small programs used in Course 2 chapters live in `exercises/chNN/`, separate fro
 | `exercises/ch05` | 5 | `Ch05.slnx`: step counters, de-duplication, six searches, snippets to analyse, space and cases, with 32 tests. `Ch05.Demo`: `dedupe`, `steps`, `doubling`, `cases`, `concat`, `space`, `jit`, `setup`. `Ch05.Benchmarks` (BenchmarkDotNet): `dotnet run -c Release -- --filter "*"`. |
 | `exercises/ch06` | 6 | `Ch06.slnx`: US-2's acceptance criteria as tests (`ReminderPolicy`) and a tiny requirement linter, with 11 tests. `Ch06.Demo`: `interviews`, `ours`. |
 | `exercises/ch07` | 7 | `Ch07.slnx`: a messy `DigestService` and its refactored `DailyDigest`, with characterisation tests (6); `CsvImport` to refactor (Independent B). `Ch07.Demo`: `before`, `after`, `clockbug`. |
+| `exercises/ch17` | 17 | `Ch17.slnx`: a small shop's `PriceCalculator` with 17 unit tests (AAA, theories, the five test doubles, isolation); `Ch17.Mistakes.Tests` fails **on purpose** (2 of 4); `Ch17.Legacy/LateFees.cs` to make testable (Guided 2). `.vscode/tasks.json`: run tests as VS Code tasks. |
 
 ## Run it
 
@@ -47,6 +50,7 @@ Requirements: the .NET 10 SDK (LTS). Editor used in the course: Visual Studio Co
 dotnet restore
 dotnet build
 dotnet test                         # 41 tests at milestone/v1.0
+./tools/coverage.sh                 # Course 2, Chapter 17: unit-test coverage of the business logic
 cd TaskFlow && dotnet run           # then open the address it prints
 # migrations now live in TaskFlow.Infrastructure:
 # dotnet ef migrations add <Name> --project TaskFlow.Infrastructure --startup-project TaskFlow
