@@ -35,6 +35,11 @@ public static class InfrastructureServices
             sp.GetRequiredService<SmtpEmailSender>(), sp.GetRequiredService<IOptions<EmailOptions>>(),
             sp.GetRequiredService<ILogger<RetryingEmailSender>>(), sp.GetRequiredService<TimeProvider>()));
 
+        // Course 2, Chapter 16: emails are queued by requests and sent by a background worker.
+        services.AddSingleton<OutgoingEmails>();
+        services.AddSingleton<IOutgoingEmails>(sp => sp.GetRequiredService<OutgoingEmails>());
+        services.AddHostedService<EmailWorker>();
+
         // The background job that runs the reminders use case.
         services.AddHostedService<DueReminderService>();
         return services;

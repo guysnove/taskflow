@@ -16,7 +16,7 @@ public sealed class DueReminderService(IServiceScopeFactory scopes, IConfigurati
             try
             {
                 using var scope = scopes.CreateScope();          // a fresh DbContext for each run
-                int sent = await scope.ServiceProvider.GetRequiredService<DueReminders>().RunAsync();
+                int sent = await scope.ServiceProvider.GetRequiredService<DueReminders>().RunAsync(stoppingToken);   // Chapter 16
                 logger.LogInformation("Due reminders: {Sent} sent", sent);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)

@@ -8,7 +8,7 @@ namespace TaskFlow.Notifications;
 // new code, which is exactly the kind of change an adapter keeps out of the rest of the app.)
 public sealed class SmtpEmailSender(IOptions<EmailOptions> options) : IEmailSender
 {
-    public async Task SendAsync(string recipient, string subject, string body)
+    public async Task SendAsync(string recipient, string subject, string body, CancellationToken cancellationToken = default)
     {
         var o = options.Value;
         using var client = new SmtpClient();
@@ -25,7 +25,7 @@ public sealed class SmtpEmailSender(IOptions<EmailOptions> options) : IEmailSend
             client.EnableSsl = true;
         }
         using var mail = new MailMessage(o.From, recipient, subject, body);
-        await client.SendMailAsync(mail);
+        await client.SendMailAsync(mail, cancellationToken);
     }
 }
 
@@ -33,20 +33,20 @@ public sealed class SmtpEmailSender(IOptions<EmailOptions> options) : IEmailSend
 public sealed class RetryingEmailSender(IEmailSender inner, IOptions<EmailOptions> options,
                                         ILogger<RetryingEmailSender> logger, TimeProvider time) : IEmailSender
 {
-    public async Task SendAsync(string recipient, string subject, string body)
+    public async Task SendAsync(string recipient, string subject, string body, CancellationToken cancellationToken = default)
     {
         int attempts = options.Value.Attempts;
         for (int attempt = 1; ; attempt++)
         {
             try
             {
-                await inner.SendAsync(recipient, subject, body);
+                await inner.SendAsync(recipient, subject, body, cancellationToken);
                 return;
             }
             catch (Exception ex) when (attempt < attempts && ex is SmtpException or IOException)
             {
                 logger.LogWarning(ex, "Email to {To} failed (attempt {Attempt} of {Attempts}); retrying", recipient, attempt, attempts);
-                await Task.Delay(options.Value.RetryDelay, time);
+                await Task.Delay(options.Value.RetryDelay, time, cancellationToken);   // Chapter 16: stops waiting when cancelled
             }
         }
     }

@@ -20,14 +20,24 @@ public class InAppChannel(INotificationRepository notifications) : INotification
 }
 
 // Email: only for users who turned it on (FR-NOTIF-4).
-public class EmailChannel(IEmailSender email, Microsoft.Extensions.Options.IOptions<EmailOptions> options) : INotificationChannel
+// Course 2, Chapter 16: the email is QUEUED, not sent: the request goes on at once, and a background
+// worker (EmailWorker) sends it, with retries and a timeout. A slow or broken mail server can't slow a page down.
+public class EmailChannel(IOutgoingEmails queue, Microsoft.Extensions.Options.IOptions<EmailOptions> options,
+                          Microsoft.Extensions.Logging.ILogger<EmailChannel> logger) : INotificationChannel
 {
     public string Name => "email";
     public bool IsWantedBy(User user) => user.EmailNotifications;
 
     // NFR-PRIV-1: the title and a link, nothing else (no notes, no project names).
-    public Task SendAsync(NotificationMessage message, User user) =>
-        email.SendAsync(user.Email, $"TaskFlow: {message.Text}",
-                        $"{message.Text}\n\n{options.Value.SiteUrl.TrimEnd('/')}{message.Link}\n\n"
-                        + "You can turn these emails off in TaskFlow: Notifications > Settings.");
+    public Task SendAsync(NotificationMessage message, User user)
+    {
+        var email = new EmailMessage(user.Email, $"TaskFlow: {message.Text}",
+                                     $"{message.Text}\n\n{options.Value.SiteUrl.TrimEnd('/')}{message.Link}\n\n"
+                                     + "You can turn these emails off in TaskFlow: Notifications > Settings.");
+        if (!queue.TryEnqueue(email))
+        {
+            Microsoft.Extensions.Logging.LoggerExtensions.LogError(logger, "Email queue full: email for notification {Key} dropped", message.Key);
+        }
+        return Task.CompletedTask;
+    }
 }

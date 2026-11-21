@@ -179,6 +179,29 @@ public class DueRemindersTests : IDisposable
         Assert.Equal(["Due Thursday 19 November: Due Thursday", "Due today: Due today"],
                      (await repository.LatestAsync(sam.Id, 10)).Select(n => n.Text).Order());
     }
+
+    // Course 2, Chapter 16: when the app is stopping, a reminder run stops between reminders,
+    // instead of finishing the whole list first.
+    [Fact]
+    [Trait("Req", "NFR-NOTIF-5")]
+    public async Task ACancelledRun_StopsBeforeTheNextReminder()
+    {
+        var sam = new User { Email = "sam@example.com", DisplayName = "Sam", PasswordHash = "x" };
+        _db.Users.Add(sam);
+        await _db.SaveChangesAsync();
+        var today = new DateOnly(2026, 11, 17);
+        _db.Tasks.AddRange(new TaskItem { Title = "Due today", Due = today, UserId = sam.Id },
+                           new TaskItem { Title = "Due tomorrow", Due = today.AddDays(1), UserId = sam.Id });
+        await _db.SaveChangesAsync();
+        var repository = new EfNotificationRepository(_db, _clock);
+        var notifier = new Notifier([new InAppChannel(repository)], repository, new EfNotificationQueries(_db), NullLogger<Notifier>.Instance);
+        var reminders = new DueReminders(new EfNotificationQueries(_db), notifier, _clock, Options.Create(new TaskFlowOptions { DueSoonDays = 2 }));
+        using var stopping = new CancellationTokenSource();
+        await stopping.CancelAsync();                                 // the app is shutting down
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => reminders.RunAsync(stopping.Token));
+        Assert.Empty(await repository.LatestAsync(sam.Id, 10));
+    }
 }
 
 public class EmailTests
@@ -188,7 +211,7 @@ public class EmailTests
     {
         public int Calls { get; private set; }
 
-        public Task SendAsync(string recipient, string subject, string body)
+        public Task SendAsync(string recipient, string subject, string body, CancellationToken cancellationToken = default)
         {
             Calls++;
             return Calls <= failures ? throw new System.Net.Mail.SmtpException("busy") : Task.CompletedTask;

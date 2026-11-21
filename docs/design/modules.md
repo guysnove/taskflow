@@ -1,6 +1,6 @@
 # TaskFlow — module and layer design
 
-Version 2.2 (Course 2, Chapter 14). Checked by the architecture tests in `TaskFlow.Tests/Architecture/`:
+Version 2.3 (Course 2, Chapter 16). Checked by the architecture tests in `TaskFlow.Tests/Architecture/`:
 `LayerRulesTests` (project references and packages) and `ModuleRulesTests` (modules inside the projects).
 `dotnet run --project tools/Modules` prints what the code actually does.
 
@@ -64,7 +64,19 @@ The whole graph is validated at startup in every environment (`ValidateScopes`, 
 | Check-then-insert across rows (no loops in dependencies) | a transaction that takes the write lock first (`BEGIN IMMEDIATE`) | `EfDependencyRepository.AddAsync` (NFR-CONC-2) |
 | Side effects after a change (notifications) | best effort, after the change is saved; a duplicate key prevents doubles | `Notifier` (Chapter 10); an outbox in Chapter 28 |
 
-## 5. Decisions and trade-offs
+## 5. Background work (Course 2, Chapter 16)
+
+| Work | Runs | Cancellation | If it fails |
+|---|---|---|---|
+| Sending an email | `EmailWorker` (BackgroundService), from `OutgoingEmails` (a bounded `Channel`, 1000) | `stoppingToken` + `SendTimeout` (30 s, linked token) | retried 3× (decorator); then logged and given up |
+| Due reminders | `DueReminderService`, every `ReminderInterval` | `stoppingToken`, checked between reminders | logged; tried again next interval |
+| Requests | never wait for a mail server: `EmailChannel` only enqueues | — | a full queue drops the email, with an error in the log |
+
+Rules: no `async void`; no `.Result` or `.Wait()`; every long `await` takes a `CancellationToken`; a background loop catches and logs
+everything except cancellation, so one bad item never stops it. **Known limit:** the queue is in memory — emails still waiting
+when the app stops are counted in the log and lost (TD-13; Chapter 28 makes it durable).
+
+## 6. Decisions and trade-offs
 
 - **Four projects (ADR 0001).** The compiler now refuses an outward reference. Cost: four project files, slower to reshape. The boundaries had stopped moving (Chapter 11), so the cost is worth it.
 - **Namespaces kept** (`TaskFlow.Models`, `TaskFlow.Services`, …) instead of `TaskFlow.Domain.Models`, … — the move changed project files, not hundreds of `using` lines and every view. Revisit if two projects ever need the same folder name for different things.
@@ -73,7 +85,9 @@ The whole graph is validated at startup in every environment (`ValidateScopes`, 
 - **The domain model is simple.** Entities with a little behaviour (`IsOverdue`, `IsDueSoon`, `StepProgress`) and public setters for EF Core. A richer domain model (private setters, methods for every change) is not worth it at TaskFlow's size; revisit if rules start appearing in several services.
 - **Infrastructure references ASP.NET Core** (`FrameworkReference`) for the background service and configuration. Acceptable: it's the outer layer.
 
-## 6. Change log
+## 7. Change log
+
+- 2.3 (Course 2, Chapter 16): background work section; emails queued and sent by `EmailWorker`; cancellation in reminders.
 
 - 2.2 (Course 2, Chapter 14): data consistency section; index (UserId, Due); transaction for dependencies.
 - 2.1 (Course 2, Chapter 13): service lifetimes section; validation in every environment (ADR 0002); `AddTaskFlowWeb`.

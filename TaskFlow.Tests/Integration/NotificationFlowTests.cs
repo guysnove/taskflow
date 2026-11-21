@@ -74,7 +74,24 @@ public class NotificationFlowTests : IClassFixture<TaskFlowFactory>
 
         await FinishABlockerAsync(sam, token);
 
-        var mine = Directory.GetFiles(_factory.MailFolder, "*.eml").Select(File.ReadAllText).Where(m => m.Contains($"To: {email}")).ToList();
+        // Course 2, Chapter 16: the email is sent in the background now, a moment AFTER the request.
+        // So wait for it — up to 5 seconds — instead of looking once.
+        var mine = await EventuallyAsync(() => Directory.Exists(_factory.MailFolder)
+            ? Directory.GetFiles(_factory.MailFolder, "*.eml").Select(File.ReadAllText).Where(m => m.Contains($"To: {email}")).ToList()
+            : []);
         Assert.Contains("Subject: TaskFlow: Ready to start: Write copy", Assert.Single(mine));
+    }
+
+    // Asks again every 50 ms until the answer isn't empty, or 5 seconds have passed.
+    private static async Task<List<string>> EventuallyAsync(Func<List<string>> look)
+    {
+        var deadline = DateTime.UtcNow.AddSeconds(5);
+        var found = look();
+        while (found.Count == 0 && DateTime.UtcNow < deadline)
+        {
+            await Task.Delay(50);
+            found = look();
+        }
+        return found;
     }
 }
