@@ -33,6 +33,11 @@ public class EfDependencyRepository : IDependencyRepository
 
     public async Task<DependencyResult> AddAsync(int taskId, int blockedById)
     {
+        // Course 2, Chapter 14: check-then-insert must happen as ONE unit. Two requests adding opposite
+        // dependencies at the same moment could each find "no loop" and both save — a loop.
+        // On SQLite, BeginTransaction starts with BEGIN IMMEDIATE: it takes the write lock first, so a
+        // second request waits here until the first has committed, and then sees its dependency.
+        await using var transaction = await _db.Database.BeginTransactionAsync();
         int userId = _user.Id;
         var titles = await _db.Tasks.Where(t => t.UserId == userId && (t.Id == taskId || t.Id == blockedById))
                                     .ToDictionaryAsync(t => t.Id, t => t.Title);
@@ -54,6 +59,7 @@ public class EfDependencyRepository : IDependencyRepository
 
         _db.Dependencies.Add(new TaskDependency { TaskId = taskId, BlockedById = blockedById });
         await _db.SaveChangesAsync();
+        await transaction.CommitAsync();                 // any early return above rolls back (nothing was written)
         return new DependencyResult(true);
     }
 

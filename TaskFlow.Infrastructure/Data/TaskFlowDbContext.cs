@@ -29,6 +29,9 @@ public class TaskFlowDbContext : DbContext
             task.Property(t => t.Priority).IsRequired().HasMaxLength(10).HasDefaultValue("Medium");
             task.Property(t => t.Notes).HasMaxLength(500);
             task.HasIndex(t => t.Due);
+            // Course 2, Chapter 14: "this user's tasks, by due date" (the overdue summary on every page).
+            // It also serves as the index for the UserId foreign key, so EF Core drops IX_Tasks_UserId.
+            task.HasIndex(t => new { t.UserId, t.Due });
             task.Property(t => t.Version).IsConcurrencyToken();     // checked on UPDATE and DELETE
 
             // Each task may belong to one project; a project with tasks can't be deleted.

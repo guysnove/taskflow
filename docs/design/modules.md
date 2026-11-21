@@ -1,6 +1,6 @@
 # TaskFlow — module and layer design
 
-Version 2.1 (Course 2, Chapter 13). Checked by the architecture tests in `TaskFlow.Tests/Architecture/`:
+Version 2.2 (Course 2, Chapter 14). Checked by the architecture tests in `TaskFlow.Tests/Architecture/`:
 `LayerRulesTests` (project references and packages) and `ModuleRulesTests` (modules inside the projects).
 `dotnet run --project tools/Modules` prints what the code actually does.
 
@@ -54,7 +54,17 @@ Rules: no cycles; the web never uses Data (only `Program.cs`, the composition ro
 
 The whole graph is validated at startup in every environment (`ValidateScopes`, `ValidateOnBuild`), and `ServiceGraphTests` checks it on every build. A class registered under two service types is registered once and **forwarded** (`ProjectExistsRule`), so a request gets one object.
 
-## 4. Decisions and trade-offs
+## 4. Data consistency (Course 2, Chapter 14)
+
+| Situation | Technique | Where |
+|---|---|---|
+| Facts that must always hold (unique email, valid priority, existing project) | database constraints: UNIQUE, CHECK, FOREIGN KEY | `TaskFlowDbContext`, migrations |
+| Editing a task someone else may have saved | optimistic concurrency: `Version` token, `UPDATE … WHERE Version = @v` | `EfTaskRepository.UpdateAsync` (NFR-CONC-1) |
+| Counters and flags ("done", "read") | one atomic `UPDATE` in the database (`ExecuteUpdate`), no read–modify–write | `MarkDoneAsync`, `MarkAllReadAsync` |
+| Check-then-insert across rows (no loops in dependencies) | a transaction that takes the write lock first (`BEGIN IMMEDIATE`) | `EfDependencyRepository.AddAsync` (NFR-CONC-2) |
+| Side effects after a change (notifications) | best effort, after the change is saved; a duplicate key prevents doubles | `Notifier` (Chapter 10); an outbox in Chapter 28 |
+
+## 5. Decisions and trade-offs
 
 - **Four projects (ADR 0001).** The compiler now refuses an outward reference. Cost: four project files, slower to reshape. The boundaries had stopped moving (Chapter 11), so the cost is worth it.
 - **Namespaces kept** (`TaskFlow.Models`, `TaskFlow.Services`, …) instead of `TaskFlow.Domain.Models`, … — the move changed project files, not hundreds of `using` lines and every view. Revisit if two projects ever need the same folder name for different things.
@@ -63,8 +73,9 @@ The whole graph is validated at startup in every environment (`ValidateScopes`, 
 - **The domain model is simple.** Entities with a little behaviour (`IsOverdue`, `IsDueSoon`, `StepProgress`) and public setters for EF Core. A richer domain model (private setters, methods for every change) is not worth it at TaskFlow's size; revisit if rules start appearing in several services.
 - **Infrastructure references ASP.NET Core** (`FrameworkReference`) for the background service and configuration. Acceptable: it's the outer layer.
 
-## 5. Change log
+## 6. Change log
 
+- 2.2 (Course 2, Chapter 14): data consistency section; index (UserId, Due); transaction for dependencies.
 - 2.1 (Course 2, Chapter 13): service lifetimes section; validation in every environment (ADR 0002); `AddTaskFlowWeb`.
 - 2.0 (Course 2, Chapter 12): four projects. `INotificationQueries` and `IAccountStore` ports with EF Core adapters; `CompleteTask` use case; each layer registers its own services. Migrations moved to `TaskFlow.Infrastructure`.
 - 1.0 (Course 2, Chapter 11): first version. Found and fixed: a cycle Data ↔ Services (`TimeProviderExtensions` moved to Common), and Controllers → Data in `AdminController` and `NotificationsController` (now `AccountService`).

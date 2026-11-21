@@ -27,6 +27,8 @@ Written down in Course 2, Chapter 6, from the features built in Courses 1 and 2,
 | ID | Requirement | Measure | Verified by |
 |---|---|---|---|
 | NFR-CONC-1 | Saving an edited task never silently overwrites a save made since the form was opened: the visitor sees a conflict, with both versions. | second save from a stale form | tests |
+| NFR-CONC-2 | Two requests changing dependencies at the same moment never leave a loop. | opposite dependencies added simultaneously → one saved, one refused | tests |
+| NFR-PERF-2 | The overdue summary's query uses an index on (UserId, Due), never a scan of a user's tasks. | EXPLAIN QUERY PLAN | tests |
 | NFR-NOTIF-2 | Notification emails are retried and failures logged; a failing channel doesn't stop the others. | 3 attempts; logged | tests |
 | NFR-PRIV-1 | Notification texts and emails contain the task title and a link, nothing else. | reviewed factory; test | tests |
 | NFR-SEC-1 | Every response carries security headers, including a Content Security Policy and `nosniff`. | checked on the home page | tests |

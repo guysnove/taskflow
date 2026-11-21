@@ -150,7 +150,7 @@ namespace TaskFlow.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "Due");
 
                     b.ToTable("Tasks", null, t =>
                         {
