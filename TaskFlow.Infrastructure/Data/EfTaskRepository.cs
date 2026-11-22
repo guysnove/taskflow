@@ -44,6 +44,13 @@ public class EfTaskRepository : ITaskRepository
                   .ToListAsync();
     }
 
+    // Course 2, Chapter 26: the task page's "waits for" list needs two columns, not whole tasks with their projects.
+    // A projection: SELECT Id, Title — nothing else is read, and EF Core builds no TaskItem objects.
+    public Task<List<TaskChoice>> GetChoicesAsync()
+    {
+        return MyTasks().Select(t => new TaskChoice(t.Id, t.Title)).ToListAsync();
+    }
+
     // Course 2, Chapter 26: the step counts of the tasks on ONE page, in ONE query (GROUP BY), not one query per task.
     public async Task<Dictionary<int, StepCount>> CountStepsAsync(IReadOnlyCollection<int> taskIds)
     {

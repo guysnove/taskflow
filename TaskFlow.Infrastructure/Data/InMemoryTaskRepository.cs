@@ -27,6 +27,14 @@ public class InMemoryTaskRepository : ITaskRepository
         _tasks.Add(new() { Id = 4, Title = "Plan team lunch", Priority = "Low" });
     }
 
+    public Task<List<TaskChoice>> GetChoicesAsync()
+    {
+        lock (_lock)
+        {
+            return Task.FromResult(_tasks.Select(t => new TaskChoice(t.Id, t.Title)).ToList());
+        }
+    }
+
     public Task<Dictionary<int, StepCount>> CountStepsAsync(IReadOnlyCollection<int> taskIds)
     {
         lock (_lock)

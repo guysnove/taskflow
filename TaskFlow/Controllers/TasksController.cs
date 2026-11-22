@@ -241,8 +241,9 @@ public class TasksController : Controller
     }
 
     // The tasks this task could wait for: not itself, and not one it already waits for.
-    private async Task<List<TaskItem>> DependencyChoicesAsync(int id, List<TaskItem> blockers) =>
-        (await _repository.GetAllAsync())
+    // Course 2, Chapter 26: ids and titles only (it loaded every task, with its project, for this list).
+    private async Task<List<TaskChoice>> DependencyChoicesAsync(int id, List<TaskItem> blockers) =>
+        (await _repository.GetChoicesAsync())
             .Where(t => t.Id != id && blockers.All(b => b.Id != t.Id))
             .OrderBy(t => t.Title).ToList();
 }
