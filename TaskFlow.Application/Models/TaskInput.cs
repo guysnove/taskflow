@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using TaskFlow.Common;
 
 namespace TaskFlow.Models;
 
@@ -8,6 +9,7 @@ public class TaskInput
 {
     [Required(ErrorMessage = "Please give the task a title.")]
     [StringLength(80, MinimumLength = 3, ErrorMessage = "A title needs 3 to 80 characters.")]
+    [NoControlCharacters(ErrorMessage = "A title can't contain line breaks or other control characters.")]   // Course 2, Ch. 20 (F1)
     public string? Title { get; set; }
 
     [Required]
@@ -26,6 +28,7 @@ public class TaskInput
 
     [Display(Name = "Notes (optional)")]
     [StringLength(500, ErrorMessage = "Notes can be at most 500 characters.")]
+    [NoControlCharacters(AllowLineBreaks = true, ErrorMessage = "Notes can't contain control characters.")]
     public string? Notes
     {
         get;

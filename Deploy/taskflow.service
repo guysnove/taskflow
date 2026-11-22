@@ -16,6 +16,9 @@ Environment=ASPNETCORE_URLS=http://127.0.0.1:5000
 Environment=ASPNETCORE_HTTPS_PORT=443
 Environment=ConnectionStrings__TaskFlow=Data Source=/srv/taskflow/data/taskflow.db
 Environment=DataProtection__KeysPath=/srv/taskflow/data/keys
+# Course 2, Chapter 20: secrets come from a file only root and the service can read (chmod 600),
+# with lines like  Email__Password=…  — never from this file, which is in git.
+EnvironmentFile=-/etc/taskflow/secrets.env
 
 [Install]
 WantedBy=multi-user.target

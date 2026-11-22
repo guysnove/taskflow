@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using TaskFlow.Common;
 
 namespace TaskFlow.Models;
 
@@ -13,6 +14,7 @@ public class RegisterInput
     [Required(ErrorMessage = "Please tell us what to call you.")]
     [StringLength(60)]
     [Display(Name = "Your name")]
+    [NoControlCharacters(ErrorMessage = "Your name can't contain line breaks or other control characters.")]   // Course 2, Ch. 20 (F1)
     public string? DisplayName { get; set; }
 
     [Required(ErrorMessage = "Please choose a password.")]

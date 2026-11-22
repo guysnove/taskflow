@@ -2,5 +2,12 @@
   <PropertyGroup>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Course 2, Chapter 20 (security review, finding F3): a package with a KNOWN vulnerability fails the
+         restore, on every machine, not only in CI. NuGet checks direct AND transitive packages (NuGetAuditMode all)
+         against the GitHub Advisory Database. NU1901..NU1904 = low, moderate, high, critical.
+         ("dotnet list package (vulnerable)" only REPORTS: its exit code is 0 even when it finds something.) -->
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <WarningsAsErrors>$(WarningsAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsAsErrors>
   </PropertyGroup>
 </Project>

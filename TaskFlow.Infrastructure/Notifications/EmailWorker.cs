@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using TaskFlow.Common;
 
 namespace TaskFlow.Notifications;
 
@@ -37,15 +38,15 @@ public sealed class EmailWorker(OutgoingEmails queue, IEmailSender sender, IOpti
         try
         {
             await sender.SendAsync(email.To, email.Subject, email.Body, timeout.Token);
-            logger.LogInformation("Email sent to {To}", email.To);
+            logger.LogInformation("Email sent to {To}", LogSafe.Email(email.To));   // Course 2, Ch. 20 (F2): masked
         }
         catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
         {
-            logger.LogError("Email to {To} timed out after {Seconds} s; given up", email.To, options.Value.SendTimeout.TotalSeconds);
+            logger.LogError("Email to {To} timed out after {Seconds} s; given up", LogSafe.Email(email.To), options.Value.SendTimeout.TotalSeconds);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            logger.LogError(ex, "Email to {To} failed after every attempt; given up", email.To);
+            logger.LogError(ex, "Email to {To} failed after every attempt; given up", LogSafe.Email(email.To));
         }
     }
 }

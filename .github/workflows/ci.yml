@@ -24,4 +24,6 @@ jobs:
       # Course 2, Chapter 18: end-to-end tests drive a real Chromium, installed here by Playwright.
       - run: pwsh TaskFlow.Tests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
       - run: dotnet test --no-build --filter "Category=E2E"
-      - run: dotnet list package --vulnerable --include-transitive   # Chapter 27: known problems in packages
+      # Course 2, Chapter 20: a REPORT only (it exits 0 even when it finds something). The gate is the restore:
+      # Directory.Build.props turns NuGet audit warnings NU1901-NU1904 into errors.
+      - run: dotnet list package --vulnerable --include-transitive

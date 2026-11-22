@@ -16,6 +16,10 @@ TaskFlow is the task-management web application used in two video courses:
 
 `.editorconfig` holds the style rules and the analyser decisions; `Directory.Build.props` turns on the recommended .NET analysers. CI runs `dotnet format --verify-no-changes` and builds with `-warnaserror`. Fix formatting with `dotnet format`.
 
+## Security (Course 2, Chapter 20)
+
+`docs/security/threat-model.md`: assets, trust boundaries, STRIDE, findings and accepted risks. `SECURITY.md`: how to report a vulnerability. `dotnet test --filter Category=Security` runs the security tests. Secrets (SMTP password…) never go into `appsettings*.json`: use `dotnet user-secrets` in development and environment variables in production.
+
 ## Requirements (Course 2, Chapter 6)
 
 `docs/testing.md` (Course 2, Chapter 17) explains how TaskFlow is tested: unit vs integration, conventions, test doubles, coverage, running tests in VS Code.
@@ -43,6 +47,7 @@ Small programs used in Course 2 chapters live in `exercises/chNN/`, separate fro
 | `exercises/ch17` | 17 | `Ch17.slnx`: a small shop's `PriceCalculator` with 17 unit tests (AAA, theories, the five test doubles, isolation); `Ch17.Mistakes.Tests` fails **on purpose** (2 of 4); `Ch17.Legacy/LateFees.cs` to make testable (Guided 2). `.vscode/tasks.json`: run tests as VS Code tasks. |
 | `exercises/ch18` | 18 | `Ch18.slnx`: a tiny notes app (web page + JSON API + SQLite) with integration tests (`WebApplicationFactory`, a test sign-in scheme, real cookie sign-in), end-to-end tests with Playwright (`Category=E2E`, needs Chromium) and a deliberately flaky test (`Category=Flaky`). |
 | `exercises/ch19` | 19 | `Ch19.slnx`: a shipping-cost kata built test-first (14 recorded steps), with 13 tests. Tasks: `test`, `test: watch` (`dotnet watch test`), `test: mutation (Stryker)` (`dotnet tool restore` first). |
+| `exercises/ch20` | 20 | `Ch20.slnx`: a notes service with four classic vulnerabilities (`/bad/...`) next to their fixes (`/good/...`), 12 attack tests, `demo.sh` (curl attacks on localhost), and `Ch20.Audit` (a deliberately vulnerable package, to see NuGet audit; **not** part of the build gate). Never deploy the `/bad` endpoints. |
 
 ## Run it
 

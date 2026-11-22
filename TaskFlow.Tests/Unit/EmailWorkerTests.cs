@@ -65,7 +65,7 @@ public class EmailWorkerTests
 
         Console.WriteLine(string.Join("\n", log.Lines));
         Assert.Equal(["ana@example.com"], server.Sent);
-        Assert.Contains(log.Lines, l => l.StartsWith("Error: Email to hang@example.com timed out", StringComparison.Ordinal));
+        Assert.Contains(log.Lines, l => l.StartsWith("Error: Email to h***@example.com timed out", StringComparison.Ordinal));   // Course 2, Ch. 20: masked (F2)
     }
 
     [Fact]

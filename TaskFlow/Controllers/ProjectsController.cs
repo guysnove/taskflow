@@ -58,7 +58,7 @@ public class ProjectsController : Controller
             ModelState.AddModelError(nameof(input.Name), NameTakenMessage(input.Name!));
             return View(input);
         }
-        _logger.LogInformation("Project {ProjectId} created: {Name}", project.Id, project.Name);
+        _logger.LogInformation("Project {ProjectId} created", project.Id);   // Course 2, Ch. 20 (F2)
         TempData["Message"] = $"Added the project \"{project.Name}\".";
         return RedirectToRoute("ProjectDetails", new { id = project.Id });
     }
@@ -129,7 +129,7 @@ public class ProjectsController : Controller
                 + "Move them to another project, or delete them, first.";
             return RedirectToAction(nameof(Delete), new { id });
         }
-        _logger.LogInformation("Project {ProjectId} deleted: {Name}", id, project.Name);
+        _logger.LogInformation("Project {ProjectId} deleted", id);
         TempData["Message"] = $"Deleted the project \"{project.Name}\".";
         return RedirectToAction(nameof(Index));
     }

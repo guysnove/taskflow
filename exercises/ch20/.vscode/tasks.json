@@ -1,0 +1,27 @@
+{
+  // Course 2, Chapter 20: Terminal > Run Task…
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "test: the attacks",
+      "command": "dotnet",
+      "args": ["test", "Ch20.Attacks.Tests", "--logger", "console;verbosity=normal"],
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      // Real HTTP requests with curl against the running service: sqli, xss, idor or redirect.
+      "label": "demo: SQL injection with curl",
+      "command": "./demo.sh",
+      "args": ["sqli"],
+      "problemMatcher": []
+    },
+    {
+      // A project with a known-vulnerable package: what does the audit say, and does anything fail?
+      "label": "audit: list vulnerable packages",
+      "command": "dotnet",
+      "args": ["list", "Ch20.Audit", "package", "--vulnerable", "--include-transitive"],
+      "problemMatcher": []
+    }
+  ]
+}

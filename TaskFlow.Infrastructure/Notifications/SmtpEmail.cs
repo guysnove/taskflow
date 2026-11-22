@@ -1,5 +1,6 @@
 using System.Net.Mail;
 using Microsoft.Extensions.Options;
+using TaskFlow.Common;
 
 namespace TaskFlow.Notifications;
 
@@ -23,6 +24,10 @@ public sealed class SmtpEmailSender(IOptions<EmailOptions> options) : IEmailSend
             client.Host = o.Host ?? throw new InvalidOperationException("Email:Host or Email:PickupDirectory must be set.");
             client.Port = o.Port;
             client.EnableSsl = true;
+            if (!string.IsNullOrEmpty(o.Username))
+            {
+                client.Credentials = new System.Net.NetworkCredential(o.Username, o.Password);   // Course 2, Ch. 20
+            }
         }
         using var mail = new MailMessage(o.From, recipient, subject, body);
         await client.SendMailAsync(mail, cancellationToken);
@@ -45,7 +50,7 @@ public sealed class RetryingEmailSender(IEmailSender inner, IOptions<EmailOption
             }
             catch (Exception ex) when (attempt < attempts && ex is SmtpException or IOException)
             {
-                logger.LogWarning(ex, "Email to {To} failed (attempt {Attempt} of {Attempts}); retrying", recipient, attempt, attempts);
+                logger.LogWarning(ex, "Email to {To} failed (attempt {Attempt} of {Attempts}); retrying", LogSafe.Email(recipient), attempt, attempts);
                 await Task.Delay(options.Value.RetryDelay, time, cancellationToken);   // Chapter 16: stops waiting when cancelled
             }
         }

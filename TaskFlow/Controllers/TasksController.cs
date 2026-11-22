@@ -109,7 +109,7 @@ public class TasksController : Controller
             return View(input);   // the same form, with the values and the messages
         }
         var task = await _repository.AddAsync(input);
-        _logger.LogInformation("Task {TaskId} created: {Title}", task.Id, task.Title);
+        _logger.LogInformation("Task {TaskId} created", task.Id);   // Course 2, Ch. 20 (F2): ids, never the user's text
         TempData["Message"] = $"Added \"{task.Title}\".";
         return RedirectToAction(nameof(Index));
     }
@@ -215,7 +215,7 @@ public class TasksController : Controller
         {
             return NotFound();
         }
-        _logger.LogInformation("Task {TaskId} deleted: {Title}", id, task.Title);
+        _logger.LogInformation("Task {TaskId} deleted", id);
         TempData["Message"] = $"Deleted \"{task.Title}\".";
         return RedirectToAction(nameof(Index));
     }

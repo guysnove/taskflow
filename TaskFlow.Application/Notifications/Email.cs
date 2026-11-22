@@ -11,6 +11,11 @@ public class EmailOptions
     [Required] public string SiteUrl { get; set; } = "https://localhost:5001";
     public string? Host { get; set; }
     public int Port { get; set; } = 587;
+    // Course 2, Chapter 20 (F4): most mail servers need a sign-in. These are SECRETS: never in
+    // appsettings*.json or git. Development: dotnet user-secrets set "Email:Password" "…".
+    // Production: an environment variable (Email__Password) or a secret store. See docs/security.
+    public string? Username { get; set; }
+    public string? Password { get; set; }
     public string? PickupDirectory { get; set; }
     [Range(1, 10)] public int Attempts { get; set; } = 3;
     public TimeSpan RetryDelay { get; set; } = TimeSpan.FromSeconds(2);
