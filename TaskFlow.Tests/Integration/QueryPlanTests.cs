@@ -69,4 +69,18 @@ public sealed class QueryPlanTests : IDisposable
         Console.WriteLine(string.Join(Environment.NewLine, plan.Prepend(sql)));
         Assert.Contains(plan, step => step.Contains("IX_Tasks_UserId_Due", StringComparison.Ordinal));
     }
+
+    // Course 2, Chapter 26: the task list asks for the step counts of a whole page in ONE query, however many tasks
+    // are on it. One query per task (an "N+1") would be 51 round trips for a page of 50.
+    [Fact]
+    [Trait("Req", "NFR-PERF-5")]
+    public async Task StepCounts_ForAPageOfTasks_AreOneQuery()
+    {
+        var repository = new EfTaskRepository(_db, TimeProvider.System, new SignedInUser(7));
+        _capture.Commands.Clear();
+
+        await repository.CountStepsAsync(Enumerable.Range(1, 50).ToList());
+
+        Assert.Single(_capture.Commands);
+    }
 }
