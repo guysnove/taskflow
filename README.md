@@ -43,7 +43,7 @@ TaskFlow.Domain/           entities and pure domain logic; no packages, no refer
 TaskFlow.Infrastructure/   EF Core + SQLite, migrations, SMTP, the background email worker
 TaskFlow.Tests/            unit, integration, architecture, security and end-to-end (Playwright) tests
 tools/                     coverage gate, traceability report, commit-message hook, module and metrics tools
-Deploy/                    example Dockerfile, systemd service, nginx configuration
+Deploy/                    Dockerfile, deploy script, systemd service, nginx configuration
 docs/                      documentation (start at docs/README.md)
 exercises/                 small programs used in Course 2's chapters (exercises/README.md)
 ```
