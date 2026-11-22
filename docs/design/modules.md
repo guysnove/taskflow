@@ -39,6 +39,7 @@ Every arrow points inwards, towards the Domain. Infrastructure depends on Applic
 | Services | Application | Models, Settings, Common |
 | Notifications | Application (+ SMTP and the job in Infrastructure) | Models, Services, Settings, Common |
 | Data | Infrastructure | Models, Services, Notifications, Common |
+| Caching | Infrastructure | Models, Services, Common (Course 2, Chapter 27: decorators that cache a port's reads) |
 | Models | Domain (+ input records in Application) | Common |
 | Settings, Common | Application, Domain | nothing |
 

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using TaskFlow.Data;
 using TaskFlow.Models;
@@ -19,7 +20,14 @@ public static class InfrastructureServices
             options.UseSqlite(configuration.GetConnectionString("TaskFlow")));
 
         // Ports implemented with EF Core.
-        services.AddScoped<ITaskRepository, EfTaskRepository>();
+        services.AddScoped<EfTaskRepository>();
+        // Course 2, Chapter 27: the header's due counts are cached per user for Caching:DueCountsSeconds (default 30; 0 = off).
+        int seconds = configuration.GetValue("Caching:DueCountsSeconds", 30);
+        services.AddMemoryCache();
+        services.AddScoped<ITaskRepository>(sp => seconds <= 0
+            ? sp.GetRequiredService<EfTaskRepository>()
+            : new Caching.CachingTaskRepository(sp.GetRequiredService<EfTaskRepository>(), sp.GetRequiredService<IMemoryCache>(),
+                                                sp.GetRequiredService<ICurrentUser>(), TimeSpan.FromSeconds(seconds)));
         services.AddScoped<IProjectRepository, EfProjectRepository>();
         services.AddScoped<IStepRepository, EfStepRepository>();
         services.AddScoped<IDependencyRepository, EfDependencyRepository>();
