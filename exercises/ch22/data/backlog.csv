@@ -1,0 +1,12 @@
+# Chapter 22: the invoice team's backlog for version 2. Points: relative size (Fibonacci). Value: 1-10, from the product owner.
+id,title,points,value,priority
+INV-1,Email an invoice as a PDF,8,9,Must
+INV-2,Mark an invoice as paid,3,8,Must
+INV-3,List unpaid invoices older than 30 days,5,8,Must
+INV-4,Invoices in euros (currency on screen and PDF),5,6,Should
+INV-5,A reminder email for overdue invoices,5,7,Should
+INV-6,Company logo on the PDF,2,4,Could
+INV-7,Search invoices by customer,3,5,Should
+INV-8,Dark mode,3,2,Could
+INV-9,Import invoices from the old spreadsheet,13,6,Must
+INV-10,Customer portal with log-in,21,7,Wont

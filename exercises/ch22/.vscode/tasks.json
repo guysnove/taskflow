@@ -1,0 +1,9 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "test", "type": "shell", "command": "dotnet test Ch22.slnx", "group": { "kind": "test", "isDefault": true }, "problemMatcher": "$msCompile" },
+    { "label": "plan: the example backlog", "type": "shell", "command": "dotnet run --project Ch22.Planning -- plan data/backlog.csv --capacity 16", "problemMatcher": [] },
+    { "label": "forecast: 47 points", "type": "shell", "command": "dotnet run --project Ch22.Planning -- forecast data/sprints.csv --remaining 47", "problemMatcher": [] },
+    { "label": "flow: the Kanban board", "type": "shell", "command": "dotnet run --project Ch22.Planning -- flow data/cards.csv --from 2026-11-02 --to 2026-11-20", "problemMatcher": [] }
+  ]
+}

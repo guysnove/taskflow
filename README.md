@@ -59,6 +59,7 @@ Small programs used in Course 2 chapters live in `exercises/chNN/`, separate fro
 | `exercises/ch19` | 19 | `Ch19.slnx`: a shipping-cost kata built test-first (14 recorded steps), with 13 tests. Tasks: `test`, `test: watch` (`dotnet watch test`), `test: mutation (Stryker)` (`dotnet tool restore` first). |
 | `exercises/ch20` | 20 | `Ch20.slnx`: a notes service with four classic vulnerabilities (`/bad/...`) next to their fixes (`/good/...`), 12 attack tests, `demo.sh` (curl attacks on localhost), and `Ch20.Audit` (a deliberately vulnerable package, to see NuGet audit; **not** part of the build gate). Never deploy the `/bad` endpoints. |
 | `exercises/ch21` | 21 | `setup.sh` builds a small team on your computer: `team/origin.git` (a stand-in for GitHub), `team/ana` and `team/ben`. `start/` is the invoice library they share; `steps/` holds each developer's edits, the conflict resolution, the history with a hidden bug, and `bisect.sh` for `git bisect run`. |
+| `exercises/ch22` | 22 | `Ch22.slnx`: a small planning tool (`dotnet run --project Ch22.Planning -- prioritise|plan|velocity|forecast|burndown|flow …`) with 10 tests, and example data in `data/` (an invented backlog, sprint history, burndown and Kanban board). |
 
 ## Run it
 
