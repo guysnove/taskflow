@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Ch25.Notes.Tests/Ch25.Notes.Tests.csproj" />
+  <Project Path="Ch25.Notes/Ch25.Notes.csproj" />
+</Solution>

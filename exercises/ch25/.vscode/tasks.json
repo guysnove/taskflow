@@ -1,0 +1,9 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "test", "type": "shell", "command": "dotnet test Ch25.slnx", "group": { "kind": "test", "isDefault": true }, "problemMatcher": "$msCompile" },
+    { "label": "compose: up", "type": "shell", "command": "docker compose up -d --build --wait && docker compose ps", "problemMatcher": [] },
+    { "label": "compose: logs", "type": "shell", "command": "docker compose logs --tail 20", "problemMatcher": [] },
+    { "label": "compose: down (keep the data)", "type": "shell", "command": "docker compose down", "problemMatcher": [] }
+  ]
+}

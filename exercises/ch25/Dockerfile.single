@@ -1,0 +1,10 @@
+# Chapter 25: the SAME app in ONE stage, for comparison. Don't ship this one:
+# it contains the whole SDK and the source code, and it runs as root.
+ARG SDK_IMAGE=mcr.microsoft.com/dotnet/sdk:10.0
+FROM ${SDK_IMAGE}
+WORKDIR /src
+COPY . .
+RUN dotnet publish Ch25.Notes/Ch25.Notes.csproj -c Release -o /app
+WORKDIR /app
+ENV ASPNETCORE_HTTP_PORTS=8080
+ENTRYPOINT ["dotnet", "Ch25.Notes.dll"]

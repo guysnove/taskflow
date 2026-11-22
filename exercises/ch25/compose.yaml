@@ -1,0 +1,37 @@
+# Chapter 25: the notes service and its database, started together with "docker compose up".
+services:
+  db:
+    image: ${POSTGRES_IMAGE:-postgres:16}
+    environment:
+      POSTGRES_PASSWORD: ${NOTES_DB_PASSWORD:?set NOTES_DB_PASSWORD in .env (see .env.example)}
+      POSTGRES_DB: notes
+    volumes:
+      - db-data:/var/lib/postgresql/data      # the data outlives the container
+    healthcheck:                              # "healthy" only when it accepts connections
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "notes"]
+      interval: 2s
+      retries: 15
+    # no "ports:": only containers on this network can reach the database
+
+  app:
+    build:
+      context: .
+      args:
+        SDK_IMAGE: ${SDK_IMAGE:-mcr.microsoft.com/dotnet/sdk:10.0}
+        RUNTIME_IMAGE: ${RUNTIME_IMAGE:-mcr.microsoft.com/dotnet/aspnet:10.0}
+    image: ch25-notes
+    ports:
+      - "8080:8080"                           # your machine's port 8080 → the container's 8080
+    environment:
+      ConnectionStrings__Notes: "Host=db;Database=notes;Username=postgres;Password=${NOTES_DB_PASSWORD}"
+      Greeting: ${GREETING:-Hello from Compose}
+    depends_on:
+      db:
+        condition: service_healthy            # start the app once the database is healthy
+    healthcheck:                              # no curl in the image: ask /health with bash alone
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q Healthy <&3"]
+      interval: 2s
+      retries: 15
+
+volumes:
+  db-data:

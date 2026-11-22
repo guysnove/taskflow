@@ -1,0 +1,8 @@
+# What "docker build" must NOT send to the builder: build output, local secrets, tooling.
+**/bin/
+**/obj/
+publish/
+.git/
+.vscode/
+.env
+*.md

@@ -20,6 +20,7 @@ Small programs used in Course 2 chapters live in `exercises/chNN/`, separate fro
 | `exercises/ch22` | 22 | `Ch22.slnx`: a small planning tool (`dotnet run --project Ch22.Planning -- prioritise|plan|velocity|forecast|burndown|flow …`) with 10 tests, and example data in `data/` (an invented backlog, sprint history, burndown and Kanban board). |
 | `exercises/ch23` | 23 | `Ch23.slnx`: `Ch23.DocsCheck`, a checker for relative links and heading anchors in Markdown, with 10 tests; `sample/` (a tiny project's docs with two broken links); `templates/` (README, ADR, proposal, incident report, engineering update). |
 | `exercises/ch24` | 24 | `Ch24.slnx`: `Ch24.Hello`, the smallest web app worth a pipeline (greeting, `/version`, `/health`), with 2 tests; `.github/workflows/pipeline.yml` (build, test, publish, deploy; copy the folder into its own repository to run it); `deploy.sh` (keeps releases, checks health, rolls back by itself); VS Code tasks to deploy v1 and a broken v2. |
+| `exercises/ch25` | 25 | `Ch25.slnx`: `Ch25.Notes`, a small notes service using PostgreSQL, with 5 tests; `Dockerfile` (two stages) and `Dockerfile.single` (one, for comparison); `compose.yaml` (the app and PostgreSQL with a volume and health checks; copy `.env.example` to `.env`); `bases/` (how the recording built its own base images without registry access). |
 
 
 Each folder builds and tests on its own; `exercises/Directory.Build.props` keeps TaskFlow's build rules out of them.
