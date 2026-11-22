@@ -93,8 +93,20 @@ public static partial class Links
     private static bool IsExternal(string t) => t.Contains("://", StringComparison.Ordinal) || t.StartsWith("mailto:", StringComparison.Ordinal);
     private static string StripInlineCode(string line) => Regex.Replace(line, "`[^`]*`", "");
 
+    // A folder below the root with a ".docscheck-ignore" file is skipped, with everything under it
+    // (e.g. exercises/ch23/sample, which is broken on purpose).
     private static IEnumerable<string> MarkdownFiles(string root) =>
         Directory.EnumerateFiles(root, "*.md", SearchOption.AllDirectories)
             .Where(f => !f.Split(Path.DirectorySeparatorChar).Any(part => part is "bin" or "obj" or "node_modules" or ".git" or "TestResults" or "StrykerOutput"))
+            .Where(f => !IsIgnored(root, Path.GetDirectoryName(f)!))
             .Order(StringComparer.Ordinal);
+
+    private static bool IsIgnored(string root, string dir)
+    {
+        for (var d = new DirectoryInfo(dir); d is not null && d.FullName.Length > root.Length; d = d.Parent)
+        {
+            if (File.Exists(Path.Combine(d.FullName, ".docscheck-ignore"))) return true;
+        }
+        return false;
+    }
 }

@@ -55,4 +55,13 @@ public class CheckTests : IDisposable
         Write("README.md", "Use `[x](nowhere.md)` like this.\n```\n[y](nowhere.md)\n```\n");
         Assert.Empty(Links.Check(_root));
     }
+
+    [Fact]
+    public void AFolderWithADocscheckIgnoreFile_IsSkipped()
+    {
+        Write("README.md", "Fine.\n");
+        Write("sample/README.md", "Broken on purpose: [x](missing.md).\n");
+        Write("sample/.docscheck-ignore", "");
+        Assert.Empty(Links.Check(_root));
+    }
 }
