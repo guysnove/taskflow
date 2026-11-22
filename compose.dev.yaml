@@ -1,0 +1,13 @@
+# Development settings on top of compose.yaml:
+#   docker compose -f compose.yaml -f compose.dev.yaml up -d --build --wait
+# Sample data, OpenAPI and /debug/routes are on; the data lives in its OWN volume, never mixed with the other one.
+services:
+  taskflow:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      TaskFlow__SiteName: TaskFlow (dev container)
+    volumes: !override
+      - taskflow-dev-data:/data
+
+volumes:
+  taskflow-dev-data:

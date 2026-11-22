@@ -18,6 +18,7 @@ Course 2, Chapter 23. The map of everything written down about TaskFlow, arrange
 | Trace a requirement to its tests | `dotnet run --project tools/Traceability` ([requirements/README.md](requirements/README.md)) |
 | Deploy behind nginx with systemd | [configuration.md](configuration.md), [../Deploy/](../Deploy/) |
 | Deploy a release, and roll back | [ci-cd.md](ci-cd.md#deployment-and-rollback) |
+| Run TaskFlow in a container (Docker, Compose) | [containers.md](containers.md) |
 | Fix a red build | [ci-cd.md](ci-cd.md#when-the-build-is-red) |
 | Respond to an incident | [incidents/README.md](incidents/README.md) |
 | Contribute a change: branch, commit, pull request, review | [../CONTRIBUTING.md](../CONTRIBUTING.md) |

@@ -33,4 +33,5 @@ user secrets (Development only) → environment variables. In an environment var
 |---|---|
 | `Deploy/taskflow.service` | a systemd unit: runs TaskFlow as its own user, restarts it, loads the secrets file |
 | `Deploy/nginx-taskflow.conf` | nginx in front: HTTPS, forwarded headers |
-| `Deploy/Dockerfile` | a container image (Chapter 25 covers containers) |
+| `Deploy/Dockerfile` | the container image ([containers.md](containers.md)) |
+| `compose.yaml`, `compose.dev.yaml` | run the image with its data volume; development settings on top |

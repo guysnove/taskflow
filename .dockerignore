@@ -6,3 +6,11 @@
 **/*.db-wal
 .git/
 TaskFlow.Tests/
+# Course 2, Chapter 25: nothing else the image doesn't need
+docs/
+exercises/
+tools/
+Deploy/
+.github/
+.vscode/
+*.md

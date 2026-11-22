@@ -1,0 +1,31 @@
+# TaskFlow in a container (Course 2, Chapter 25).
+#   Production-like:  docker compose up -d --build --wait            → http://localhost:8080
+#   Development:      docker compose -f compose.yaml -f compose.dev.yaml up -d --build --wait
+#   Stop (keep data): docker compose down          Delete the data too: docker compose down --volumes
+services:
+  taskflow:
+    build:
+      context: .
+      dockerfile: Deploy/Dockerfile
+      args:
+        SDK_IMAGE: ${SDK_IMAGE:-mcr.microsoft.com/dotnet/sdk:10.0}
+        RUNTIME_IMAGE: ${RUNTIME_IMAGE:-mcr.microsoft.com/dotnet/aspnet:10.0}
+        VERSION: ${VERSION:-0.0.0-compose}
+    image: taskflow:local
+    ports:
+      - "8080:8080"
+    volumes:
+      - taskflow-data:/data                  # the SQLite database and the sign-in keys survive "down" and rebuilds
+    environment:
+      TaskFlow__SiteName: ${SITE_NAME:-TaskFlow (container)}
+      Email__SiteUrl: http://localhost:8080
+      Email__PickupDirectory: /data/outbox   # no mail server here: each email becomes a file in the volume
+    healthcheck:                             # the image has no curl (less to attack): ask /health with bash alone
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q Healthy <&3"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  taskflow-data:
