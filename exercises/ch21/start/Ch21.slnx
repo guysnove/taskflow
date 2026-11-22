@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Ch21.Invoices/Ch21.Invoices.csproj" />
+  <Project Path="Ch21.Invoices.Tests/Ch21.Invoices.Tests.csproj" />
+</Solution>
