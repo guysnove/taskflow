@@ -19,6 +19,7 @@ user secrets (Development only) → environment variables. In an environment var
 | `Email:Username`, `Email:Password` | none | SMTP sign-in. **Secrets**: never in a settings file (see below) |
 | `Email:PickupDirectory` | none (`mail-outbox` in Development) | write emails as `.eml` files here instead of sending |
 | `Email:Attempts`, `Email:RetryDelay`, `Email:SendTimeout` | `3`, `00:00:02`, `00:00:30` | retrying a failed send (1–10 attempts) |
+| `Caching:DueCountsSeconds` | `30` | how long the header's due counts are cached per user; `0` = no cache (Course 2, Chapter 27) |
 | `ASPNETCORE_ENVIRONMENT` | `Production` (`Development` with `dotnet run`) | turns on sample data, the mail outbox, OpenAPI and `/debug/routes` in Development |
 
 ## Secrets
