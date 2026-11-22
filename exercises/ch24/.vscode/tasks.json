@@ -1,0 +1,9 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "test", "type": "shell", "command": "dotnet test Ch24.slnx", "group": { "kind": "test", "isDefault": true }, "problemMatcher": "$msCompile" },
+    { "label": "publish", "type": "shell", "command": "dotnet publish Ch24.Hello -c Release -o publish", "problemMatcher": [] },
+    { "label": "deploy: v1", "type": "shell", "command": "APP_DLL=Ch24.Hello.dll bash deploy.sh /tmp/ch24-server publish v1", "problemMatcher": [] },
+    { "label": "deploy: a broken v2 (rolls back)", "type": "shell", "command": "APP_DLL=Ch24.Hello.dll bash deploy.sh /tmp/ch24-server publish v2 FailOnStart=true", "problemMatcher": [] }
+  ]
+}

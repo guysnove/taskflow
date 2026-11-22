@@ -19,6 +19,7 @@ Small programs used in Course 2 chapters live in `exercises/chNN/`, separate fro
 | `exercises/ch21` | 21 | `setup.sh` builds a small team on your computer: `team/origin.git` (a stand-in for GitHub), `team/ana` and `team/ben`. `start/` is the invoice library they share; `steps/` holds each developer's edits, the conflict resolution, the history with a hidden bug, and `bisect.sh` for `git bisect run`. |
 | `exercises/ch22` | 22 | `Ch22.slnx`: a small planning tool (`dotnet run --project Ch22.Planning -- prioritise|plan|velocity|forecast|burndown|flow …`) with 10 tests, and example data in `data/` (an invented backlog, sprint history, burndown and Kanban board). |
 | `exercises/ch23` | 23 | `Ch23.slnx`: `Ch23.DocsCheck`, a checker for relative links and heading anchors in Markdown, with 10 tests; `sample/` (a tiny project's docs with two broken links); `templates/` (README, ADR, proposal, incident report, engineering update). |
+| `exercises/ch24` | 24 | `Ch24.slnx`: `Ch24.Hello`, the smallest web app worth a pipeline (greeting, `/version`, `/health`), with 2 tests; `.github/workflows/pipeline.yml` (build, test, publish, deploy; copy the folder into its own repository to run it); `deploy.sh` (keeps releases, checks health, rolls back by itself); VS Code tasks to deploy v1 and a broken v2. |
 
 
 Each folder builds and tests on its own; `exercises/Directory.Build.props` keeps TaskFlow's build rules out of them.
