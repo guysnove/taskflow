@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Ch23.DocsCheck/Ch23.DocsCheck.csproj" />
+  <Project Path="Ch23.DocsCheck.Tests/Ch23.DocsCheck.Tests.csproj" />
+</Solution>
