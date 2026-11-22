@@ -4,6 +4,10 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Course 2, Chapter 23: /// comments on the API become descriptions in /openapi/v1.json.
+         CS1591 (a public member without a /// comment) is off: only the API is documented this way. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <UserSecretsId>0043b07f-141f-4b53-8b57-ea6d11acd20a</UserSecretsId>
   </PropertyGroup>
 
