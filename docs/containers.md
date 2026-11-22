@@ -63,8 +63,17 @@ changes in `taskflow.db-wal` while it runs).
 
 The `container` job builds the image with Microsoft's base images on every push and pull request, runs it, checks
 `/health` and the sign-in page, and checks the data survives a new container. On `main` it pushes the image to
-`ghcr.io/guysnove/taskflow:<commit sha>`. A tag can be moved; the image's **digest** (`sha256:…`, printed by the push)
+`ghcr.io/guysnove/taskflow/web:<commit sha>`. A tag can be moved; the image's **digest** (`sha256:…`, printed by the push)
 can't: deploy by digest when you need exactly the image you tested.
+
+### Why `taskflow/web`, not `taskflow`
+
+The first push from `main`, as `ghcr.io/guysnove/taskflow`, failed after uploading every layer: `error from registry: denied`.
+A workflow's token can only push to a package it is allowed to write: one this repository's workflows created, or one
+whose settings grant this repository access (*Package settings → Manage Actions access*). The usual cause of that
+message is a package with the same name that isn't connected to the repository. We couldn't inspect the account's
+packages from the course machine, so we fixed forward with a new name, and an `org.opencontainers.image.source` label
+that connects the package to this repository when the workflow first creates it.
 
 ## A note on the course recording
 

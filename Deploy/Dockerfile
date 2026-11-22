@@ -29,6 +29,8 @@ RUN dotnet publish TaskFlow/TaskFlow.csproj -c Release -o /app --no-restore -p:I
 FROM ${RUNTIME_IMAGE}
 WORKDIR /app
 COPY --from=build /app .
+# Links the image to its repository on GitHub's container registry (and tells anyone where its source is).
+LABEL org.opencontainers.image.source="https://github.com/guysnove/taskflow"
 # The database and the sign-in keys live in /data: mount a named volume there, or they vanish with
 # the container. Course 2, Chapter 25: the folder must exist AND belong to the non-root user, BEFORE "VOLUME"
 # (a new volume starts as a copy of it). Without this line the first start failed: SQLite Error 14.

@@ -161,8 +161,11 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
-          docker tag taskflow:ci "ghcr.io/${{ github.repository }}:${{ github.sha }}"
-          docker push "ghcr.io/${{ github.repository }}:${{ github.sha }}"
+          # Course 2, Chapter 25: pushing as ghcr.io/guysnove/taskflow was "denied" (see docs/containers.md). A new
+          # package name, linked to this repository by the image's source label, is created by this workflow itself.
+          docker tag taskflow:ci "ghcr.io/${{ github.repository }}/web:${{ github.sha }}"
+          docker push "ghcr.io/${{ github.repository }}/web:${{ github.sha }}"
+          docker inspect --format "digest: {{index .RepoDigests 0}}" "ghcr.io/${{ github.repository }}/web:${{ github.sha }}"
 
   # A report, not a gate (Course 2, Chapter 20): the gate is NuGet audit during restore.
   vulnerable-packages:
