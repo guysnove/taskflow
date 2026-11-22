@@ -5,6 +5,7 @@ namespace TaskFlow.Tests.Integration;
 
 // Course 2, Chapter 26: the task list shows 50 tasks a page (it used to render every task: 2.1 MB for 2,000),
 // and the step counts come from one query for the tasks on the page.
+[Trait("Req", "NFR-PERF-4")]
 public class TaskListPagingTests(TaskFlowFactory app) : IClassFixture<TaskFlowFactory>
 {
     private async Task<string> AnaWith60TasksAsync(HttpClient client, string email)
