@@ -8,8 +8,9 @@ namespace TaskFlow.Services;
 public sealed record TaskListQuery(string Show, string Sort, int? Project, string? Q)
 {
     // Unknown values fall back to the defaults: all tasks, by due date (FR-LIST-1).
+    // Course 2, Chapter 21: "overdue" (FR-LIST-2): unfinished tasks whose due date has passed.
     public static TaskListQuery From(string? show, string? sort, int? project, string? q) => new(
-        Show: show == "open" ? "open" : "all",
+        Show: show is "open" or "overdue" ? show : "all",
         Sort: sort is "priority" or "title" ? sort : "due",
         Project: project,
         Q: string.IsNullOrWhiteSpace(q) ? null : q.Trim());
@@ -25,6 +26,10 @@ public sealed record TaskListQuery(string Show, string Sort, int? Project, strin
         if (Show == "open")
         {
             shown = shown.Where(t => !t.Done);
+        }
+        if (Show == "overdue")
+        {
+            shown = shown.Where(t => !t.Done && t.Due < today);
         }
         return Sort switch
         {
