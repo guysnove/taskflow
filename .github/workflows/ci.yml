@@ -1,31 +1,143 @@
-# Continuous integration (Chapter 28): GitHub runs this on every push and pull request.
+# TaskFlow's pipeline (Course 1, Chapter 28; rebuilt in Course 2, Chapter 24).
+# Every push and pull request: build and test. On main, also: package once, deploy that package to
+# staging, smoke-test it, then to production (an environment that can require approval).
 name: build-and-test
 
 on:
   push:
     branches: [ main ]
   pull_request:
+  workflow_dispatch:            # "Run workflow" button, for a manual run
+
+permissions:
+  contents: read                # least privilege: jobs ask for more only if they need it
+
+concurrency:                    # a newer push to the same branch cancels the older run
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
+  # 1. Fast feedback: everything a pull request needs.
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4            # get the code
-      - uses: actions/setup-dotnet@v4        # install the .NET SDK
+      # Actions are pinned to a full commit SHA (a tag can be moved; a SHA can't). Dependabot updates them.
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683       # v4.2.2
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9   # v4.3.1
         with:
-          dotnet-version: '10.0.x'
-      - run: bash tools/hooks/test-commit-msg.sh     # Course 2, Chapter 21: the commit-message hook works
-      - run: dotnet restore
-      - run: dotnet run --project tools/DocsCheck -- .      # Course 2, Chapter 23: no broken links in the docs
-      - run: dotnet format --verify-no-changes --no-restore   # Course 2, Chapter 7: formatting and style, as .editorconfig says
-      - run: dotnet build --no-restore -warnaserror           # Course 2, Chapter 7: analyser warnings fail the build
-      - run: dotnet test --no-build --filter "Category!=Growth&Category!=E2E"   # growth timings run only on request (Course 2, Chapter 5)
-      # Course 2, Chapter 19: a quality gate. Fails the build if unit-test coverage of the business
-      # logic drops below the floor in tools/coverage.sh.
-      - run: ./tools/coverage.sh
-      # Course 2, Chapter 18: end-to-end tests drive a real Chromium, installed here by Playwright.
+          global-json-file: global.json                                      # the SDK version is in the repo
+      - run: bash tools/hooks/test-commit-msg.sh                             # Course 2, Chapter 21
+      - run: dotnet restore --locked-mode                                    # Course 2, Chapter 24: exactly the locked versions
+      - run: dotnet run --project tools/DocsCheck -- .                       # Course 2, Chapter 23: no broken links in the docs
+      - run: dotnet format --verify-no-changes --no-restore                  # Course 2, Chapter 7
+      - run: dotnet build --no-restore -warnaserror                          # Course 2, Chapter 7
+      - run: dotnet test --no-build --filter "Category!=Growth&Category!=E2E" --logger trx --results-directory test-results
+      - run: ./tools/coverage.sh                                             # Course 2, Chapter 19: the quality gate
       - run: pwsh TaskFlow.Tests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
-      - run: dotnet test --no-build --filter "Category=E2E"
-      # Course 2, Chapter 20: a REPORT only (it exits 0 even when it finds something). The gate is the restore:
-      # Directory.Build.props turns NuGet audit warnings NU1901-NU1904 into errors.
+      - run: dotnet test --no-build --filter "Category=E2E" --logger trx --results-directory test-results   # Course 2, Chapter 18
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02   # v4.6.2
+        if: always()                                                         # especially when a test failed
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 14
+
+  # 2. Build ONCE. The same files go to staging and to production.
+  package:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write          # to sign the provenance attestation
+      attestations: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683       # v4.2.2
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9   # v4.3.1
+        with:
+          global-json-file: global.json
+      - id: version
+        run: echo "version=1.1.${{ github.run_number }}+${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+      - run: dotnet restore --locked-mode
+      - run: dotnet publish TaskFlow -c Release --no-restore -o publish -p:InformationalVersion="${{ steps.version.outputs.version }}"
+      - run: |
+          cd publish && zip -qr ../taskflow.zip . && cd ..
+          sha256sum taskflow.zip | tee taskflow.zip.sha256
+      # Who built this, from which commit, with which workflow: anyone can check it with
+      # "gh attestation verify taskflow.zip --repo guysnove/taskflow".
+      - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be   # v2.4.0
+        with:
+          subject-path: taskflow.zip
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02   # v4.6.2
+        with:
+          name: taskflow-${{ github.sha }}
+          path: |
+            taskflow.zip
+            taskflow.zip.sha256
+          retention-days: 30
+
+  # 3. Deploy the package, check it, roll back by itself if it's unhealthy.
+  #    TaskFlow has no real servers in this course: each environment is a folder on the runner, deployed with the
+  #    same Deploy/deploy.sh a real server would use. The environments, their variables and approvals are real.
+  deploy-staging:
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: staging
+    env:
+      TaskFlow__SiteName: ${{ vars.SITE_NAME || 'TaskFlow (staging)' }}    # an environment variable for this environment
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683       # v4.2.2 (for Deploy/)
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9   # v4.3.1
+        with:
+          global-json-file: global.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093   # v4.3.0
+        with:
+          name: taskflow-${{ github.sha }}
+      - run: sha256sum --check taskflow.zip.sha256                          # the files we tested, unchanged
+      - run: unzip -q taskflow.zip -d release
+      - run: bash Deploy/deploy.sh "$RUNNER_TEMP/server" release "${{ needs.package.outputs.version }}" "TaskFlow__SiteName=$TaskFlow__SiteName"
+      - name: Smoke test
+        run: |
+          curl --fail --silent http://127.0.0.1:5040/health && echo
+          curl --fail --silent --output /dev/null --write-out "%{http_code} /account/signin\n" http://127.0.0.1:5040/account/signin
+          curl --silent http://127.0.0.1:5040/account/signin | grep -o "<title>[^<]*</title>"
+
+  deploy-production:
+    needs: [package, deploy-staging]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production          # Settings → Environments → production → Required reviewers: someone must approve
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683       # v4.2.2
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9   # v4.3.1
+        with:
+          global-json-file: global.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093   # v4.3.0
+        with:
+          name: taskflow-${{ github.sha }}
+      - run: sha256sum --check taskflow.zip.sha256
+      - run: unzip -q taskflow.zip -d release
+      - run: bash Deploy/deploy.sh "$RUNNER_TEMP/server" release "${{ needs.package.outputs.version }}"
+      - run: curl --fail --silent http://127.0.0.1:5040/health && echo
+
+  # A report, not a gate (Course 2, Chapter 20): the gate is NuGet audit during restore.
+  vulnerable-packages:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683       # v4.2.2
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9   # v4.3.1
+        with:
+          global-json-file: global.json
       - run: dotnet list package --vulnerable --include-transitive

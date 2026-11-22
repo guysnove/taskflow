@@ -1,0 +1,18 @@
+# Course 2, Chapter 24: Dependabot opens a pull request when a newer version of a dependency is out.
+# CI runs on each one; we merge when it's green. Grouped, weekly, so it isn't noise.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule: { interval: "weekly" }
+    groups:
+      actions: { patterns: ["*"] }
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule: { interval: "weekly" }
+    groups:
+      microsoft: { patterns: ["Microsoft.*", "System.*"] }
+      other: { patterns: ["*"], exclude-patterns: ["Microsoft.*", "System.*"] }
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]   # a new major version is a decision, not a routine update
