@@ -17,6 +17,8 @@ Course 2, Chapter 23. The map of everything written down about TaskFlow, arrange
 | Check unit-test coverage, the quality gate | [testing.md](testing.md), `tools/coverage.sh` |
 | Trace a requirement to its tests | `dotnet run --project tools/Traceability` ([requirements/README.md](requirements/README.md)) |
 | Deploy behind nginx with systemd | [configuration.md](configuration.md), [../Deploy/](../Deploy/) |
+| Deploy a release, and roll back | [ci-cd.md](ci-cd.md#deployment-and-rollback) |
+| Fix a red build | [ci-cd.md](ci-cd.md#when-the-build-is-red) |
 | Respond to an incident | [incidents/README.md](incidents/README.md) |
 | Contribute a change: branch, commit, pull request, review | [../CONTRIBUTING.md](../CONTRIBUTING.md) |
 
@@ -39,6 +41,7 @@ Course 2, Chapter 23. The map of everything written down about TaskFlow, arrange
 | Security: threats, findings, accepted risks | [security/threat-model.md](security/threat-model.md), [../SECURITY.md](../SECURITY.md) |
 | Technical debt we know about | [tech-debt.md](tech-debt.md) |
 | How we plan | [planning/README.md](planning/README.md) |
+| How code reaches production: the pipeline | [ci-cd.md](ci-cd.md) |
 
 ## Course material
 
