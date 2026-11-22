@@ -12,6 +12,7 @@ main ──●────●──────────●────●─
                                   release/1.4 ──●── v1.4.1   only fixes, cherry-picked from main
 ```
 
+0. Pick the top **Ready** story on the board (docs/planning/README.md); one story = one branch = one pull request.
 1. `git switch main && git pull`, then `git switch -c feature/<short-name>` (or `fix/<bug-number>-<name>`, `docs/<name>`).
 2. Small commits, each one building and passing its tests. Push early: `git push -u origin feature/<name>`.
 3. Open a **pull request** to `main` when it's ready for review (or a *draft* PR to show work in progress).

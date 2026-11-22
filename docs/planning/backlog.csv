@@ -1,0 +1,13 @@
+# Course 2, Chapter 22: TaskFlow release 1.2 "Teams" — the product backlog, as data.
+# Points: relative size, compared with the reference stories in estimation.md. Value: 1-10 (product owner).
+# Read by the Chapter 22 planning tool: dotnet run --project Ch22.Planning -- plan docs/planning/backlog.csv --capacity 13
+id,title,points,value,priority
+T-1,Spike: how a task belongs to a team (ADR 0003),2,8,Must
+T-2,Create a team and invite members,8,9,Must
+T-3,Team tasks are visible only to members,8,10,Must
+T-4,Assign a team task to a member,5,9,Must
+T-5,Team lead sees open tasks by assignee,5,6,Should
+T-6,Leave a team (assigned tasks become unassigned),3,4,Should
+T-7,Filter the task list to my team's tasks,2,5,Could
+T-8,Decline an invitation,2,3,Could
+T-9,Comments on tasks,8,5,Wont

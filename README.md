@@ -16,6 +16,11 @@ TaskFlow is the task-management web application used in two video courses:
 
 `.editorconfig` holds the style rules and the analyser decisions; `Directory.Build.props` turns on the recommended .NET analysers. CI runs `dotnet format --verify-no-changes` and builds with `-warnaserror`. Fix formatting with `dotnet format`.
 
+## Planning (Course 2, Chapter 22)
+
+How we plan and track work: [docs/planning/](docs/planning/README.md): the process, the Definitions of Ready and Done,
+estimation with reference stories, and the plan for release 1.2 "Teams". Stories are GitHub issues in a milestone per release.
+
 ## Working together (Course 2, Chapter 21)
 
 How to branch, write commits, open pull requests and review: [CONTRIBUTING.md](CONTRIBUTING.md).
