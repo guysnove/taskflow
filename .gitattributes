@@ -1,0 +1,7 @@
+# Course 2, Chapter 21: the same line endings for everyone (Windows, macOS, Linux), so a diff shows
+# real changes, not every line "changed" because an editor saved CRLF.
+* text=auto eol=lf
+*.cs     diff=csharp
+*.png    binary
+*.ico    binary
+*.db     binary

@@ -16,6 +16,11 @@ TaskFlow is the task-management web application used in two video courses:
 
 `.editorconfig` holds the style rules and the analyser decisions; `Directory.Build.props` turns on the recommended .NET analysers. CI runs `dotnet format --verify-no-changes` and builds with `-warnaserror`. Fix formatting with `dotnet format`.
 
+## Working together (Course 2, Chapter 21)
+
+How to branch, write commits, open pull requests and review: [CONTRIBUTING.md](CONTRIBUTING.md).
+After cloning, turn on the commit-message check once: `git config core.hooksPath tools/hooks`.
+
 ## Security (Course 2, Chapter 20)
 
 `docs/security/threat-model.md`: assets, trust boundaries, STRIDE, findings and accepted risks. `SECURITY.md`: how to report a vulnerability. `dotnet test --filter Category=Security` runs the security tests. Secrets (SMTP password…) never go into `appsettings*.json`: use `dotnet user-secrets` in development and environment variables in production.

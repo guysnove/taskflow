@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Course 2, Chapter 21: checks the subject line of every commit message (CONTRIBUTING.md §2).
+# Turn on once per clone:  git config core.hooksPath tools/hooks
+# Skip in an emergency:    git commit --no-verify   (then fix the message before the pull request)
+subject="$(grep -v '^#' "$1" | head -n 1)"
+
+fail() { echo "commit-msg: $1" >&2; echo "  subject: \"$subject\"" >&2; echo "  see CONTRIBUTING.md, section 2" >&2; exit 1; }
+
+case "$subject" in
+  "fixup! "*|"squash! "*|"amend! "*) exit 0 ;;          # temporary, squashed before review (git rebase --autosquash)
+  "Merge "*|"Revert "*) exit 0 ;;                         # written by git
+esac
+[ -n "$subject" ]                         || fail "the subject line is empty"
+[ "${#subject}" -le 72 ]                  || fail "the subject is ${#subject} characters; keep it to 72 or fewer"
+[[ "$subject" != *. ]]                    || fail "no full stop at the end of the subject"
+[[ "$subject" =~ ^[A-Z] ]]                || fail "start the subject with a capital letter (\"Add…\", \"Fix…\")"
+shopt -s nocasematch
+[[ ! "$subject" =~ ^(wip|fix|fixes|update|changes|stuff|misc|asdf|test)$ ]] || fail "say what the commit does (\"Fix the overdue filter for tasks due today\")"
+exit 0

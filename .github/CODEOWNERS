@@ -1,0 +1,7 @@
+# Course 2, Chapter 21: who is asked to review changes to which files (GitHub requests them automatically).
+# The last matching line wins. On a real team, use different people or teams per area, e.g. @org/security.
+*                               @guysnove
+/docs/security/                 @guysnove
+/Directory.Build.props          @guysnove
+/.github/workflows/             @guysnove
+/TaskFlow.Infrastructure/Migrations/  @guysnove

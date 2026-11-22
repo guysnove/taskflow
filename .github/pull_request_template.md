@@ -1,4 +1,4 @@
-<!-- Course 2, Chapter 19: what a reviewer needs. Delete what doesn't apply. -->
+<!-- Course 2, Chapters 19 and 21: what a reviewer needs. Delete what doesn't apply. How we review: CONTRIBUTING.md §3. -->
 
 ## What and why
 
@@ -17,3 +17,8 @@
 - [ ] Names say what things do; no commented-out code
 - [ ] Tests check behaviour (results, stored rows), not implementation details
 - [ ] Docs updated if behaviour changed (`docs/requirements`, `docs/testing.md`, API guidelines)
+
+## Size and history (Course 2, Chapter 21)
+
+- [ ] One change, small enough to review in about 20 minutes (under ~400 changed lines)
+- [ ] Up to date with `main`; fixups squashed; commit subjects follow CONTRIBUTING.md §2

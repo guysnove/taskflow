@@ -14,6 +14,7 @@ jobs:
       - uses: actions/setup-dotnet@v4        # install the .NET SDK
         with:
           dotnet-version: '10.0.x'
+      - run: bash tools/hooks/test-commit-msg.sh     # Course 2, Chapter 21: the commit-message hook works
       - run: dotnet restore
       - run: dotnet format --verify-no-changes --no-restore   # Course 2, Chapter 7: formatting and style, as .editorconfig says
       - run: dotnet build --no-restore -warnaserror           # Course 2, Chapter 7: analyser warnings fail the build
