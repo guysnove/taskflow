@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Ch26.Bench/Ch26.Bench.csproj" />
+  <Project Path="Ch26.Db/Ch26.Db.csproj" />
+  <Project Path="Ch26.Load.Tests/Ch26.Load.Tests.csproj" />
+  <Project Path="Ch26.Load/Ch26.Load.csproj" />
+</Solution>

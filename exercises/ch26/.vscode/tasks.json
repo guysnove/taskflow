@@ -1,0 +1,10 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "test", "type": "shell", "command": "dotnet test Ch26.slnx", "group": { "kind": "test", "isDefault": true }, "problemMatcher": "$msCompile" },
+    { "label": "benchmarks (Release)", "type": "shell", "command": "dotnet run -c Release --project Ch26.Bench -- --filter '*'", "problemMatcher": [] },
+    { "label": "N+1: SQLite", "type": "shell", "command": "dotnet run -c Release --project Ch26.Db -- sqlite", "problemMatcher": [] },
+    { "label": "N+1: PostgreSQL (starts a container)", "type": "shell",
+      "command": "docker run -d --rm --name shop-db -e POSTGRES_PASSWORD=bench-only -e POSTGRES_DB=shop -p 55433:5432 ${POSTGRES_IMAGE:-postgres:16} && sleep 5 && dotnet run -c Release --project Ch26.Db -- postgres 'Host=localhost;Port=55433;Username=postgres;Password=bench-only;Database=shop'; docker rm -f shop-db", "problemMatcher": [] }
+  ]
+}
