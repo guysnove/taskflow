@@ -9,5 +9,8 @@
     <NuGetAudit>true</NuGetAudit>
     <NuGetAuditMode>all</NuGetAuditMode>
     <WarningsAsErrors>$(WarningsAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsAsErrors>
+    <!-- Course 2, Chapter 24 (supply chain): record the exact version of every package, direct and transitive,
+         in packages.lock.json. CI restores with locked mode: if anything would resolve differently, it fails. -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 </Project>
