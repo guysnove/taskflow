@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "My tasks";
     int left = Model.Count(t => !t.Done);
-    string show = (string)ViewData["Show"]!;   // "all" or "open"
+    string show = (string)ViewData["Show"]!;   // "all", "open" or "overdue"
     string sort = (string)ViewData["Sort"]!;   // "due", "priority" or "title"
     var today = (DateOnly)ViewData["Today"]!;  // Course 2, Chapter 19: for the effective priority
     int? project = (int?)ViewData["Project"];  // only this project's tasks, or null for all
@@ -32,7 +32,7 @@
         <label for="q" class="visually-hidden">Search tasks</label>
         <input id="q" name="q" value="@q" class="form-control form-control-sm" placeholder="Search titles, e.g. login bug">
     </div>
-    <input type="hidden" name="show" value="@(show == "open" ? "open" : null)" disabled="@(show != "open")">
+    <input type="hidden" name="show" value="@(show == "all" ? null : show)" disabled="@(show == "all")">
     <input type="hidden" name="sort" value="@sort">
     <div class="col-auto"><button type="submit" class="btn btn-outline-secondary btn-sm">Search</button></div>
     @if (q is not null)
@@ -46,7 +46,9 @@
     <a asp-action="Index" asp-route-sort="@sort" asp-route-q="@q"
        aria-current="@(show == "all" ? "true" : null)">all</a> ·
     <a asp-action="Index" asp-route-show="open" asp-route-sort="@sort" asp-route-q="@q"
-       aria-current="@(show == "open" ? "true" : null)">still to do</a>
+       aria-current="@(show == "open" ? "true" : null)">still to do</a> ·
+    <a asp-action="Index" asp-route-show="overdue" asp-route-sort="@sort" asp-route-q="@q"
+       aria-current="@(show == "overdue" ? "true" : null)">overdue</a>
     <span class="mx-2">|</span>
     Sort by:
     <a asp-action="Index" asp-route-show="@show" asp-route-sort="due" asp-route-q="@q"

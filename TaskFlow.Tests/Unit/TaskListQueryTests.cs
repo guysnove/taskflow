@@ -10,6 +10,7 @@ public class TaskListQueryTests
     [Theory]
     [InlineData(null, null, "all", "due")]
     [InlineData("open", "priority", "open", "priority")]
+    [InlineData("overdue", null, "overdue", "due")]        // Course 2, Chapter 21 (FR-LIST-2)
     [InlineData("OPEN", "Title", "all", "due")]            // case matters today: unknown → defaults
     [InlineData("nonsense", "nonsense", "all", "due")]
     public void From_FallsBackToTheDefaults(string? show, string? sort, string expectedShow, string expectedSort)
@@ -58,5 +59,36 @@ public class TaskListQueryTests
         var sorted = TaskListQuery.From(null, "priority", null, null).Apply(tasks, today);
 
         Assert.Equal([3, 4, 1, 2], sorted.Select(t => t.Id));          // High: 3, 4 · Medium: 1, 2 (same level: as before)
+    }
+
+    // Course 2, Chapter 21 (FR-LIST-2): only unfinished tasks whose due date has passed.
+    [Fact]
+    [Trait("Req", "FR-LIST-2")]
+    public void Overdue_OnlyUnfinishedTasksPastTheirDueDate()
+    {
+        var today = new DateOnly(2026, 11, 23);
+        List<TaskItem> tasks =
+        [
+            new() { Id = 1, Title = "late", Due = today.AddDays(-1) },
+            new() { Id = 2, Title = "late but done", Due = today.AddDays(-3), Done = true },
+            new() { Id = 3, Title = "no date" },
+            new() { Id = 4, Title = "next week", Due = today.AddDays(7) },
+            new() { Id = 5, Title = "very late", Due = today.AddDays(-30) },
+        ];
+
+        var shown = TaskListQuery.From("overdue", null, null, null).Apply(tasks, today);
+
+        Assert.Equal([1, 5], shown.Select(t => t.Id));
+    }
+
+    // Asked for in review (pull request #2): the boundary. Due today is "still to do", not overdue.
+    [Fact]
+    [Trait("Req", "FR-LIST-2")]
+    public void Overdue_ATaskDueToday_IsNotOverdueYet()
+    {
+        var today = new DateOnly(2026, 11, 23);
+        List<TaskItem> tasks = [new() { Id = 1, Title = "due today", Due = today }];
+
+        Assert.Empty(TaskListQuery.From("overdue", null, null, null).Apply(tasks, today));
     }
 }
