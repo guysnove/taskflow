@@ -29,10 +29,12 @@ public class TasksApiController : ControllerBase
         _newTaskRules = newTaskRules;
     }
 
-    // GET /api/tasks  the signed-in user's tasks
-    // Course 2, Chapter 15: optional filters and paging, e.g. /api/tasks?done=false&page=2&pageSize=20
-    // Without them: every task, as before — programs written for the old API keep working.
-    // The total is in X-Total-Count; a Link header points to the next page, if there is one.
+    /// <summary>Lists the signed-in user's tasks.</summary>
+    /// <remarks>
+    /// Optional filters and paging, e.g. <c>?done=false</c>, <c>?page=2</c>, <c>?pageSize=20</c>; without them, every task.
+    /// The total is in the <c>X-Total-Count</c> header; a <c>Link</c> header points to the next page, if there is one.
+    /// (Course 2, Chapter 15; XML documentation added in Chapter 23.)
+    /// </remarks>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -52,7 +54,9 @@ public class TasksApiController : ControllerBase
         return result.Items.Select(TaskDto.From);
     }
 
-    // GET /api/tasks/3
+    /// <summary>Gets one of the signed-in user's tasks.</summary>
+    /// <param name="id">The task's id.</param>
+    /// <response code="404">No such task, or it isn't yours (TaskFlow never says which).</response>
     [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -66,8 +70,13 @@ public class TasksApiController : ControllerBase
         return TaskDto.From(task);
     }
 
-    // POST /api/tasks  with a JSON body; answers 201 Created, and where to find the new task
-    // Course 2, Chapter 15: send an Idempotency-Key header, and repeating the request is safe.
+    /// <summary>Creates a task.</summary>
+    /// <remarks>
+    /// Answers 201 Created, with the new task and its address in <c>Location</c>.
+    /// Send an <c>Idempotency-Key</c> header, and repeating the same request is safe (Course 2, Chapter 15).
+    /// </remarks>
+    /// <response code="400">Invalid input; <c>errors</c> lists the reasons per field.</response>
+    /// <response code="422">The <c>Idempotency-Key</c> was already used for a different request.</response>
     [HttpPost]
     [ServiceFilter<IdempotencyFilter>]
     [ProducesResponseType(StatusCodes.Status201Created)]   // tells /openapi/v1.json what really happens
@@ -91,7 +100,11 @@ public class TasksApiController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = task.Id }, TaskDto.From(saved!));
     }
 
-    // PUT /api/tasks/3  replaces the editable fields; the body must include the Version it was based on
+    /// <summary>Replaces a task's editable fields.</summary>
+    /// <remarks>The body must include the <c>version</c> it was based on (optimistic concurrency).</remarks>
+    /// <param name="id">The task's id.</param>
+    /// <param name="input">The new title, priority, due date, notes and project, and the <c>version</c>.</param>
+    /// <response code="409">Someone changed the task since that version: fetch it again, and retry.</response>
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -119,7 +132,10 @@ public class TasksApiController : ControllerBase
         return TaskDto.From(saved!);
     }
 
-    // POST /api/tasks/3/done
+    /// <summary>Marks a task as done.</summary>
+    /// <remarks>Idempotent: marking a done task done again changes nothing. Tasks that were waiting only for this one
+    /// produce a "Ready to start" notification for their owner.</remarks>
+    /// <param name="id">The task's id.</param>
     [HttpPost("{id:int}/done")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -132,7 +148,8 @@ public class TasksApiController : ControllerBase
         return NoContent();
     }
 
-    // DELETE /api/tasks/3
+    /// <summary>Deletes a task and its steps.</summary>
+    /// <param name="id">The task's id.</param>
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
