@@ -3,7 +3,7 @@
    on other pages that show this view (e.g. after an invalid step), the section is left out. *@
 @{
     var blockers = ViewData["Blockers"] as List<TaskItem>;
-    var choices = ViewData["DependencyChoices"] as List<TaskItem>;
+    var choices = ViewData["DependencyChoices"] as List<TaskFlow.Services.TaskChoice>;
 }
 @if (blockers is not null && choices is not null)
 {

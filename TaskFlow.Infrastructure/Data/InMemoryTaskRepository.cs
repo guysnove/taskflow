@@ -27,6 +27,23 @@ public class InMemoryTaskRepository : ITaskRepository
         _tasks.Add(new() { Id = 4, Title = "Plan team lunch", Priority = "Low" });
     }
 
+    public Task<List<TaskChoice>> GetChoicesAsync()
+    {
+        lock (_lock)
+        {
+            return Task.FromResult(_tasks.Select(t => new TaskChoice(t.Id, t.Title)).ToList());
+        }
+    }
+
+    public Task<Dictionary<int, StepCount>> CountStepsAsync(IReadOnlyCollection<int> taskIds)
+    {
+        lock (_lock)
+        {
+            return Task.FromResult(_tasks.Where(t => taskIds.Contains(t.Id) && t.Steps.Count > 0)
+                                         .ToDictionary(t => t.Id, t => new StepCount(t.Steps.Count(s => s.Done), t.Steps.Count)));
+        }
+    }
+
     // All tasks: unfinished first, then by due date (no date last).
     public Task<List<TaskItem>> GetAllAsync()
     {

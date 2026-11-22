@@ -38,13 +38,8 @@ public class TaskItem
     }
 
     // Chapter 30 (written test-first): "2 of 5 steps done", or null when the task has no steps.
-    public string? StepProgress()
-    {
-        if (Steps.Count == 0)
-        {
-            return null;
-        }
-        int done = Steps.Count(s => s.Done);
-        return $"{done} of {Steps.Count} steps done";
-    }
+    public string? StepProgress() => DescribeSteps(Steps.Count(s => s.Done), Steps.Count);
+
+    // Course 2, Chapter 26: the same words when only the counts were loaded (the task list).
+    public static string? DescribeSteps(int done, int total) => total == 0 ? null : $"{done} of {total} steps done";
 }

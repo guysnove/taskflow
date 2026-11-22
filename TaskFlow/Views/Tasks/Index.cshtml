@@ -1,7 +1,11 @@
 @model List<TaskItem>
+@using TaskFlow.Services
 @{
     ViewData["Title"] = "My tasks";
-    int left = Model.Count(t => !t.Done);
+    int left = (int)ViewData["Left"]!;         // Course 2, Chapter 26: of ALL matching tasks, not only this page
+    int total = (int)ViewData["Total"]!;
+    int pageNumber = (int)ViewData["Page"]!, pages = (int)ViewData["Pages"]!;
+    var stepCounts = (Dictionary<int, StepCount>)ViewData["StepCounts"]!;
     string show = (string)ViewData["Show"]!;   // "all", "open" or "overdue"
     string sort = (string)ViewData["Sort"]!;   // "due", "priority" or "title"
     var today = (DateOnly)ViewData["Today"]!;  // Course 2, Chapter 19: for the effective priority
@@ -23,7 +27,7 @@
 }
 
 <p>
-    @left of @Model.Count tasks still to do.
+    @left of @total tasks still to do.
     <a asp-action="Create" class="btn btn-primary btn-sm ms-2">Add a task</a>
 </p>
 
@@ -82,8 +86,9 @@ else
                 <tr class="@(task.Done ? "task-done" : "")">
                     <td data-label="Task">
                         <a asp-action="Details" asp-route-id="@task.Id">@task.Title</a>
-                        @if (task.StepProgress() is string progress)
+                        @if (stepCounts.TryGetValue(task.Id, out var steps))
                         {
+                            string progress = steps.Progress;
                             <div class="small text-muted">@progress</div>    @* Chapter 30 *@
                         }
                     </td>
@@ -110,4 +115,18 @@ else
             }
         </tbody>
     </table>
+    @if (pages > 1)
+    {
+        <nav aria-label="Pages" class="small">
+            Page @pageNumber of @pages (@total tasks).
+            @if (pageNumber > 1)
+            {
+                <a asp-action="Index" asp-route-show="@(show == "all" ? null : show)" asp-route-sort="@sort" asp-route-project="@project" asp-route-q="@q" asp-route-page="@(pageNumber - 1)">← Previous</a>
+            }
+            @if (pageNumber < pages)
+            {
+                <a asp-action="Index" asp-route-show="@(show == "all" ? null : show)" asp-route-sort="@sort" asp-route-project="@project" asp-route-q="@q" asp-route-page="@(pageNumber + 1)">Next →</a>
+            }
+        </nav>
+    }
 }

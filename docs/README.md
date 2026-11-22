@@ -39,6 +39,7 @@ Course 2, Chapter 23. The map of everything written down about TaskFlow, arrange
 | Architecture: layers, modules, the main flows (diagrams) | [architecture.md](architecture.md), [design/modules.md](design/modules.md) |
 | Decisions and their reasons | [adr/](adr/) (architecture decision records), [proposals/](proposals/) |
 | How we test, and why | [testing.md](testing.md) |
+| Performance: requirements, how we measure, what we found | [performance.md](performance.md) |
 | Security: threats, findings, accepted risks | [security/threat-model.md](security/threat-model.md), [../SECURITY.md](../SECURITY.md) |
 | Technical debt we know about | [tech-debt.md](tech-debt.md) |
 | How we plan | [planning/README.md](planning/README.md) |
