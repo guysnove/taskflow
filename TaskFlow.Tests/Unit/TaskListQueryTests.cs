@@ -80,4 +80,15 @@ public class TaskListQueryTests
 
         Assert.Equal([1, 5], shown.Select(t => t.Id));
     }
+
+    // Asked for in review (pull request #2): the boundary. Due today is "still to do", not overdue.
+    [Fact]
+    [Trait("Req", "FR-LIST-2")]
+    public void Overdue_ATaskDueToday_IsNotOverdueYet()
+    {
+        var today = new DateOnly(2026, 11, 23);
+        List<TaskItem> tasks = [new() { Id = 1, Title = "due today", Due = today }];
+
+        Assert.Empty(TaskListQuery.From("overdue", null, null, null).Apply(tasks, today));
+    }
 }
