@@ -43,19 +43,32 @@ public class TasksController : Controller
     // GET /tasks?project=2  only one project's tasks (Chapter 24)
     // GET /tasks?q=login   only tasks whose title has all these words (Course 2, Chapter 3)
     [HttpGet("")]
-    public async Task<IActionResult> Index(string? show, string? sort, int? project, string? q)
+    public async Task<IActionResult> Index(string? show, string? sort, int? project, string? q, int page = 1)
     {
         // Course 2, Chapter 9: the filtering and sorting moved to TaskListQuery (Extract Class).
         var query = TaskListQuery.From(show, sort, project, q);
         var tasks = query.Apply(await _repository.GetAllAsync(), _time.Today());   // Course 2, Chapter 19: effective priority
+
+        // Course 2, Chapter 26: show one page of 50, not every task. Measured with 2,000 tasks: rendering them all
+        // (2.1 MB of HTML) cost about half of the page's time, for rows nobody scrolls to.
+        int pages = Math.Max(1, (tasks.Count + PageSize - 1) / PageSize);
+        page = Math.Clamp(page, 1, pages);
+        var shown = tasks.Skip((page - 1) * PageSize).Take(PageSize).ToList();
+        ViewData["StepCounts"] = await _repository.CountStepsAsync(shown.Select(t => t.Id).ToList());
+        ViewData["Total"] = tasks.Count;
+        ViewData["Left"] = tasks.Count(t => !t.Done);
+        ViewData["Page"] = page;
+        ViewData["Pages"] = pages;
         ViewData["Today"] = _time.Today();
 
         ViewData["Show"] = query.Show;
         ViewData["Sort"] = query.Sort;
         ViewData["Project"] = query.Project;
         ViewData["Q"] = query.Q;
-        return View(tasks);
+        return View(shown);
     }
+
+    public const int PageSize = 50;
 
     // GET /tasks/3
     [HttpGet("{id:int:min(1)}", Name = "TaskDetails")]

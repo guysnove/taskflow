@@ -31,17 +31,28 @@ public class EfTaskRepository : ITaskRepository
 
     // Unfinished first, then by due date, tasks without a date last (as in Chapter 22's SQL).
     // Include: each task's project comes in the same query (a LEFT JOIN), not one query per task.
-    // Chapter 30: and its steps, for "2 of 5 steps done" in the list.
+    // Course 2, Chapter 26: NOT the steps any more. Measured with 2,000 tasks, loading every task's steps (6,000 rows)
+    // took about 33 ms of the list's 48 ms, for a page that shows 50 tasks. The list asks CountStepsAsync instead.
     public Task<List<TaskItem>> GetAllAsync()
     {
         return MyTasks()
                   .AsNoTracking()
                   .Include(t => t.Project)
-                  .Include(t => t.Steps)
                   .OrderBy(t => t.Done)
                   .ThenBy(t => t.Due == null)
                   .ThenBy(t => t.Due)
                   .ToListAsync();
+    }
+
+    // Course 2, Chapter 26: the step counts of the tasks on ONE page, in ONE query (GROUP BY), not one query per task.
+    public async Task<Dictionary<int, StepCount>> CountStepsAsync(IReadOnlyCollection<int> taskIds)
+    {
+        int userId = _user.Id;
+        return await _db.Steps
+                        .Where(s => taskIds.Contains(s.TaskItemId) && s.TaskItem!.UserId == userId)
+                        .GroupBy(s => s.TaskItemId)
+                        .Select(g => new { TaskId = g.Key, Done = g.Count(s => s.Done), Total = g.Count() })
+                        .ToDictionaryAsync(x => x.TaskId, x => new StepCount(x.Done, x.Total));
     }
 
     // Course 2, Chapter 15: filter, count and page IN THE DATABASE. The order must be total (Id last):
