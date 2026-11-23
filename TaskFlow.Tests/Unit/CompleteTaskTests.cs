@@ -1,5 +1,10 @@
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.Metrics.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
+using TaskFlow.Common;
 using TaskFlow.Data;
 using TaskFlow.Notifications;
 using TaskFlow.UseCases;
@@ -22,7 +27,11 @@ public class CompleteTaskTests
     private readonly InMemoryTaskRepository _tasks = new(new FakeTimeProvider(new DateTimeOffset(2026, 11, 19, 9, 0, 0, TimeSpan.Zero)));
     private readonly RecordingObserver _observer = new();
 
-    private CompleteTask UseCase() => new(_tasks, new TaskEvents([_observer], NullLogger<TaskEvents>.Instance), NullLogger<CompleteTask>.Instance);
+    // Course 2, Chapter 29: real metrics, from a real IMeterFactory (each test class gets its own).
+    private static readonly IMeterFactory Meters = new ServiceCollection().AddMetrics().BuildServiceProvider().GetRequiredService<IMeterFactory>();
+    private readonly TaskFlowMetrics _metrics = new(Meters);
+
+    private CompleteTask UseCase() => new(_tasks, new TaskEvents([_observer], NullLogger<TaskEvents>.Instance), NullLogger<CompleteTask>.Instance, _metrics);
 
     [Fact]
     public async Task CompletingATask_MarksItDone_AndAnnouncesIt()
@@ -55,12 +64,35 @@ public class CompleteTaskTests
     public async Task AFailingObserver_DoesNotFailTheUseCase_OrStopTheOthers()
     {
         var first = (await _tasks.GetAllAsync()).First(t => !t.Done);
-        var useCase = new CompleteTask(_tasks, new TaskEvents([new BrokenObserver(), _observer], NullLogger<TaskEvents>.Instance), NullLogger<CompleteTask>.Instance);
+        var useCase = new CompleteTask(_tasks, new TaskEvents([new BrokenObserver(), _observer], NullLogger<TaskEvents>.Instance), NullLogger<CompleteTask>.Instance, _metrics);
 
         bool completed = await useCase.RunAsync(first.Id);
 
         Assert.True(completed);
         Assert.True((await _tasks.FindAsync(first.Id))!.Done);
         Assert.Equal([first.Id], _observer.Completed);                // the second observer still ran
+    }
+
+    // Course 2, Chapter 29: completing a task counts, and makes a span with the task's id.
+    [Fact]
+    [Trait("Req", "NFR-OPS-3")]
+    public async Task CompletingATask_IsCounted_AndTraced()
+    {
+        var first = (await _tasks.GetAllAsync()).First(t => !t.Done);
+        using var completed = new MetricCollector<long>(Meters, TaskFlowTelemetry.Name, "taskflow.tasks.completed");
+        var spans = new List<Activity>();
+        using var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == TaskFlowTelemetry.Name,
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
+            ActivityStopped = spans.Add,
+        };
+        ActivitySource.AddActivityListener(listener);
+
+        await UseCase().RunAsync(first.Id);
+
+        Assert.Equal(1, completed.GetMeasurementSnapshot().EvaluateAsCounter());
+        var span = Assert.Single(spans, s => s.OperationName == "CompleteTask");
+        Assert.Equal(first.Id, span.GetTagItem("taskflow.task.id"));
     }
 }

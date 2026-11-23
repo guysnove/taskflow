@@ -1,8 +1,13 @@
+using System.Diagnostics.Metrics;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.Metrics.Testing;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Time.Testing;
+using TaskFlow.Common;
 using TaskFlow.Data;
 using TaskFlow.Notifications;
 
@@ -143,5 +148,48 @@ public sealed class EmailOutboxTests : IDisposable
         var row = Row();
         Assert.Null(row.SentAt);
         Assert.Null(row.ClaimedUntil);                 // free for the next start: it will be sent then
+    }
+
+    // Course 2, Chapter 29: the signals. Every attempt is counted by outcome, and the gauge shows what's still waiting.
+    private static readonly IMeterFactory Meters = new ServiceCollection().AddMetrics().BuildServiceProvider().GetRequiredService<IMeterFactory>();
+
+    [Fact]
+    [Trait("Req", "NFR-OPS-3")]
+    public async Task EveryAttempt_IsCounted_ByOutcome()
+    {
+        var metrics = new TaskFlowMetrics(Meters);
+        using var emails = new MetricCollector<long>(Meters, TaskFlowTelemetry.Name, "taskflow.emails");
+        using var waiting = new MetricCollector<int>(Meters, TaskFlowTelemetry.Name, "taskflow.email.outbox.waiting");
+        await QueueAsync("ana@example.com", "k1");
+        await QueueAsync("sam@example.com", "k2");
+        var server = new MailServer(failures: 1);                 // the first send fails, the second succeeds
+        await using (var db = Db())
+        {
+            await new EmailOutboxProcessor(db, server, Options.Create(Settings), _clock, NullLogger<EmailOutboxProcessor>.Instance, new NoJitter(), metrics)
+                .ProcessDueAsync(CancellationToken.None);
+        }
+        Assert.Equal(["failed", "sent"], emails.GetMeasurementSnapshot().Select(m => (string)m.Tags["taskflow.outcome"]!));
+        waiting.RecordObservableInstruments();
+        Assert.Equal(1, waiting.LastMeasurement!.Value);          // ana's email waits for its retry
+    }
+
+    [Fact]
+    [Trait("Req", "NFR-OPS-2")]
+    public async Task TheHealthCheck_IsDegraded_WhenAnEmailWasGivenUp_OrIsStuck()
+    {
+        await using var db = Db();
+        var check = new OutboxHealthCheck(db, _clock);
+        Assert.Equal(HealthStatus.Healthy, (await check.CheckHealthAsync(new HealthCheckContext())).Status);
+
+        await QueueAsync("ana@example.com", "k1");
+        _clock.Advance(TimeSpan.FromMinutes(11));                 // due for 11 minutes, and no worker sent it
+        var stuck = await check.CheckHealthAsync(new HealthCheckContext());
+        Assert.Equal((HealthStatus.Degraded, 1), (stuck.Status, (int)stuck.Data["overdue_10min"]));
+
+        await db.OutboxEmails.ExecuteUpdateAsync(s => s.SetProperty(e => e.DeadAt, _clock.GetUtcNow().UtcDateTime));
+        var dead = await check.CheckHealthAsync(new HealthCheckContext());
+        Assert.Equal((HealthStatus.Degraded, 1, 0), (dead.Status, (int)dead.Data["dead_last_24h"], (int)dead.Data["overdue_10min"]));
+        _clock.Advance(TimeSpan.FromHours(25));
+        Assert.Equal(HealthStatus.Healthy, (await check.CheckHealthAsync(new HealthCheckContext())).Status);   // a day later
     }
 }

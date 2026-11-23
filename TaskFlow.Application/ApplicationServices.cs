@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using TaskFlow.Common;
 using TaskFlow.Notifications;
 using TaskFlow.Services;
 using TaskFlow.UseCases;
@@ -29,6 +30,7 @@ public static class ApplicationServices
 
         // Use cases and account rules.
         services.AddScoped<CompleteTask>();
+        services.AddSingleton<TaskFlowMetrics>();               // Course 2, Chapter 29: counters and gauges, one set per app
         services.AddScoped<AccountService>();
         return services;
     }
