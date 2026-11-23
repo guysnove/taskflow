@@ -25,6 +25,7 @@ Small programs used in Course 2 chapters live in `exercises/chNN/`, separate fro
 | `exercises/ch27` | 27 | `Ch27.slnx`: `Ch27.Counter` (a page-view counter, memory or Redis) with `compose.yaml` and `lb/nginx.conf` (two copies behind nginx: `STORE=memory|redis docker compose up -d --build --scale app=2`); `Ch27.Caching` (cache-aside, TTL, invalidation; a capacity calculator) with 5 tests. |
 | `exercises/ch28` | 28 | `Ch28.slnx`: `Ch28.Stock` (a stock service that fails on purpose: `--FailEvery 4 --SlowEvery 5 --SlowSeconds 3`; honours `Idempotency-Key`); `Ch28.Client` (scenarios `naive`, `timeout`, `retry`, `idempotent`: timeouts, retries with exponential backoff and jitter); `Ch28.Notify` (an at-least-once queue; `naive` and `idempotent` consumers); 9 tests. |
 | `exercises/ch29` | 29 | `Ch29.slnx`: `Ch29.Orders` and `Ch29.Stock` (two services with JSON logs, a meter, and OpenTelemetry traces printed to the console; one trace id across both); `Ch29.Logs` (the same event logged as text, interpolated, and as a template); 2 tests for the metrics. |
+| `exercises/ch30` | 30 | The capstone kit: `review-template.md` (an engineering review's structure), `review.sh` and `smoke.sh` (TaskFlow's own copies are in `tools/`). |
 
 
 Each folder builds and tests on its own; `exercises/Directory.Build.props` keeps TaskFlow's build rules out of them.
