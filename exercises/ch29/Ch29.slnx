@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Ch29.Logs/Ch29.Logs.csproj" />
+  <Project Path="Ch29.Orders/Ch29.Orders.csproj" />
+  <Project Path="Ch29.Stock/Ch29.Stock.csproj" />
+  <Project Path="Ch29.Tests/Ch29.Tests.csproj" />
+</Solution>
