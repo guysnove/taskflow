@@ -192,4 +192,14 @@ public sealed class EmailOutboxTests : IDisposable
         _clock.Advance(TimeSpan.FromHours(25));
         Assert.Equal(HealthStatus.Healthy, (await check.CheckHealthAsync(new HealthCheckContext())).Status);   // a day later
     }
+
+    // Course 2, Chapter 30: the drill showed "SmtpException: Failure sending mail." and nothing else. Now the cause is kept.
+    [Fact]
+    public void AFailure_KeepsItsInnerCause()
+    {
+        var ex = new InvalidOperationException("Failure sending mail.", new System.Net.Sockets.SocketException(111));
+        string text = EmailOutboxProcessor.Describe(ex);
+        Assert.StartsWith("InvalidOperationException: Failure sending mail. → SocketException: ", text);
+        Assert.Contains("refused", text, StringComparison.OrdinalIgnoreCase);
+    }
 }

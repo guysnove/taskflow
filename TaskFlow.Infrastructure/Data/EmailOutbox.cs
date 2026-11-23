@@ -81,6 +81,19 @@ public sealed class EmailOutboxProcessor(TaskFlowDbContext db, IEmailSender send
         return tried;
     }
 
+    // Course 2, Chapter 30 (an action from the Chapter 29 drill): the whole chain of causes, not just the outer message.
+    // SmtpClient says only "Failure sending mail."; the reason ("Connection refused") is in an inner exception.
+    public static string Describe(Exception ex)
+    {
+        var parts = new List<string>();
+        for (var e = ex; e is not null && parts.Count < 4; e = e.InnerException)
+        {
+            parts.Add(e.GetType().Name + ": " + e.Message);
+        }
+        string text = string.Join(" → ", parts);
+        return text.Length <= 500 ? text : text[..500];
+    }
+
     // Only one sender wins the UPDATE: it says "1 row", the others "0 rows".
     private async Task<bool> ClaimAsync(int id, DateTime now, CancellationToken ct)
     {
@@ -112,7 +125,7 @@ public sealed class EmailOutboxProcessor(TaskFlowDbContext db, IEmailSender send
             throw;
         }
         catch (OperationCanceledException) { error = $"timed out after {_o.SendTimeout.TotalSeconds} s"; }
-        catch (Exception ex) { error = ex.GetType().Name + ": " + ex.Message; }
+        catch (Exception ex) { error = Describe(ex); }
 
         var now = time.GetUtcNow().UtcDateTime;
         int attempts = email.Attempts + 1;
