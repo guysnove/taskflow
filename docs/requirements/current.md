@@ -35,6 +35,7 @@ Written down in Course 2, Chapter 6, from the features built in Courses 1 and 2,
 | NFR-PERF-2 | The overdue summary's query uses an index on (UserId, Due), never a scan of a user's tasks. | EXPLAIN QUERY PLAN | tests |
 | NFR-PERF-4 | The task list stays fast for heavy users: with 2,000 tasks, `GET /tasks` p95 under 100 ms for 5 users at once. | `Ch26.Load`, conditions in [performance.md](../performance.md) | measured (Course 2, Ch. 26) |
 | NFR-PERF-5 | The task list's step counts are one query per page, never one per task. | SQL commands counted | tests |
+| NFR-PERF-6 | The header's due counts come from a per-user cache (at most 30 s old); a change made through TaskFlow shows in them at once. | cache tests; stale only for changes from another copy | tests (Course 2, Ch. 27) |
 | NFR-PERF-3 | Finishing a task never waits for the mail server, even when it is slow or down. | `POST /api/tasks/{id}/done` < 1 s with a 3 s or failing mail server | tests |
 | NFR-API-1 | The API contract changes only when a person approves the change. | approved OpenAPI summary | tests |
 | NFR-API-2 | Every API error is a problem details document (`application/problem+json`). | 400, 401, 404 (three kinds), 429 | tests |

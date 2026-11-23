@@ -22,6 +22,7 @@ public class ModuleRulesTests
         ["UseCases"] = ["Models", "Services", "Notifications", "Common"],          // Chapter 12: what the app does
         // Infrastructure (Data): implements the Application's ports, so it uses them (Chapter 12: the arrow flipped).
         ["Data"] = ["Models", "Services", "Notifications", "Common"],
+        ["Caching"] = ["Models", "Services", "Common"],                              // Course 2, Chapter 27: caching decorators
         // The core: depends on nothing.
         ["Models"] = ["Common"],
         ["Settings"] = [],
