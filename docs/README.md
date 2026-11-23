@@ -21,6 +21,7 @@ Course 2, Chapter 23. The map of everything written down about TaskFlow, arrange
 | Run TaskFlow in a container (Docker, Compose) | [containers.md](containers.md) |
 | Fix a red build | [ci-cd.md](ci-cd.md#when-the-build-is-red) |
 | Respond to an incident | [incidents/README.md](incidents/README.md) |
+| Monitor TaskFlow: metrics, traces, dashboards, alerts, runbooks | [operations.md](operations.md) |
 | Contribute a change: branch, commit, pull request, review | [../CONTRIBUTING.md](../CONTRIBUTING.md) |
 
 ## Reference: looking something up
@@ -42,6 +43,7 @@ Course 2, Chapter 23. The map of everything written down about TaskFlow, arrange
 | Performance: requirements, how we measure, what we found | [performance.md](performance.md) |
 | Scalability: capacity, caching, what breaks with two copies | [scalability.md](scalability.md), [adr/0004](adr/0004-one-instance-for-now.md) |
 | Sending emails reliably: the outbox, retries, duplicates | [adr/0005](adr/0005-email-outbox.md) |
+| Observability: why OpenTelemetry; /health and /health/details | [adr/0006](adr/0006-opentelemetry.md) |
 | Security: threats, findings, accepted risks | [security/threat-model.md](security/threat-model.md), [../SECURITY.md](../SECURITY.md) |
 | Technical debt we know about | [tech-debt.md](tech-debt.md) |
 | How we plan | [planning/README.md](planning/README.md) |

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using TaskFlow.Common;
@@ -49,7 +50,8 @@ public sealed class EfOutgoingEmails(TaskFlowDbContext db, TimeProvider time) : 
 // Delivery is AT LEAST ONCE: if the app dies after the mail server accepted an email but before SentAt is saved, that email
 // is sent again. The claim (ClaimedUntil) stops two copies of TaskFlow sending the same email at the same time.
 public sealed class EmailOutboxProcessor(TaskFlowDbContext db, IEmailSender sender, IOptions<EmailOptions> options,
-                                         TimeProvider time, ILogger<EmailOutboxProcessor> logger, Random? jitter = null)
+                                         TimeProvider time, ILogger<EmailOutboxProcessor> logger, Random? jitter = null,
+                                         TaskFlowMetrics? metrics = null)
 {
     private readonly EmailOptions _o = options.Value;
     private readonly Random _jitter = jitter ?? Random.Shared;
@@ -74,6 +76,8 @@ public sealed class EmailOutboxProcessor(TaskFlowDbContext db, IEmailSender send
         {
             if (await ClaimAsync(id, now, stoppingToken)) { tried++; await SendOneAsync(id, stoppingToken); }
         }
+        // Course 2, Chapter 29: how many emails are still waiting (a gauge on dashboards; it should stay near 0).
+        metrics?.OutboxWaiting(await db.OutboxEmails.CountAsync(e => e.SentAt == null && e.DeadAt == null, CancellationToken.None));
         return tried;
     }
 
@@ -89,6 +93,11 @@ public sealed class EmailOutboxProcessor(TaskFlowDbContext db, IEmailSender send
     private async Task SendOneAsync(int id, CancellationToken stoppingToken)
     {
         var email = await db.OutboxEmails.AsNoTracking().SingleAsync(e => e.Id == id, stoppingToken);
+        // Course 2, Chapter 29: one span per attempt; the log lines below carry its trace id.
+        using var activity = TaskFlowTelemetry.Traces.StartActivity("SendEmail");
+        activity?.SetTag("taskflow.email.id", id);
+        activity?.SetTag("taskflow.email.attempt", email.Attempts + 1);
+        var started = time.GetTimestamp();
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
         timeout.CancelAfter(_o.SendTimeout);
         string? error = null;
@@ -107,11 +116,14 @@ public sealed class EmailOutboxProcessor(TaskFlowDbContext db, IEmailSender send
 
         var now = time.GetUtcNow().UtcDateTime;
         int attempts = email.Attempts + 1;
+        var took = time.GetElapsedTime(started);
+        if (error is not null) activity?.SetStatus(ActivityStatusCode.Error, error);
         if (error is null)
         {
             await db.OutboxEmails.Where(e => e.Id == id).ExecuteUpdateAsync(s => s
                 .SetProperty(e => e.SentAt, now).SetProperty(e => e.Attempts, attempts).SetProperty(e => e.ClaimedUntil, (DateTime?)null), CancellationToken.None);
             logger.LogInformation("Email {Id} sent to {To} (attempt {Attempt})", id, LogSafe.Email(email.To), attempts);
+            metrics?.EmailAttempt("sent", took);
         }
         else if (attempts >= _o.OutboxMaxAttempts)
         {
@@ -119,6 +131,7 @@ public sealed class EmailOutboxProcessor(TaskFlowDbContext db, IEmailSender send
                 .SetProperty(e => e.DeadAt, now).SetProperty(e => e.Attempts, attempts).SetProperty(e => e.LastError, error)
                 .SetProperty(e => e.ClaimedUntil, (DateTime?)null), CancellationToken.None);
             logger.LogError("Email {Id} to {To} failed {Attempts} times; given up (dead): {Error}", id, LogSafe.Email(email.To), attempts, error);
+            metrics?.EmailAttempt("dead", took);
         }
         else
         {
@@ -128,6 +141,7 @@ public sealed class EmailOutboxProcessor(TaskFlowDbContext db, IEmailSender send
                 .SetProperty(e => e.ClaimedUntil, (DateTime?)null), CancellationToken.None);
             logger.LogWarning("Email {Id} to {To} failed (attempt {Attempt} of {Max}): {Error}; next try in {Seconds:F0} s",
                               id, LogSafe.Email(email.To), attempts, _o.OutboxMaxAttempts, error, wait.TotalSeconds);
+            metrics?.EmailAttempt("failed", took);
         }
     }
 }

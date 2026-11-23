@@ -103,7 +103,7 @@ public class TasksController : Controller
     // POST /tasks/new  model binding fills a TaskInput from the form
     [HttpPost("new")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(TaskInput input)
+    public async Task<IActionResult> Create(TaskInput input, [FromServices] TaskFlowMetrics metrics)
     {
         // Course 2, Chapter 8: the rules live in their own classes (Services/NewTaskRules.cs).
         // The controller only turns their answers into messages on the form.
@@ -123,6 +123,7 @@ public class TasksController : Controller
         }
         var task = await _repository.AddAsync(input);
         _logger.LogInformation("Task {TaskId} created", task.Id);   // Course 2, Ch. 20 (F2): ids, never the user's text
+        metrics.TaskCreated("web");                                  // Course 2, Chapter 29: a counter, for dashboards
         TempData["Message"] = $"Added \"{task.Title}\".";
         return RedirectToAction(nameof(Index));
     }

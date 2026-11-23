@@ -21,6 +21,8 @@ user secrets (Development only) → environment variables. In an environment var
 | `Email:Attempts`, `Email:RetryDelay`, `Email:SendTimeout` | `3`, `00:00:02`, `00:00:30` | retrying a failed send (1–10 attempts) |
 | `Email:OutboxMaxAttempts`, `OutboxFirstRetry`, `OutboxMaxDelay`, `OutboxPollInterval` | `6`, `00:00:30`, `00:30:00`, `00:00:02` | the outbox: tries before an email is set aside; first wait (doubling each time); longest wait; how often it looks (Course 2, Ch. 28) |
 | `Caching:DueCountsSeconds` | `30` | how long the header's due counts are cached per user; `0` = no cache (Course 2, Chapter 27) |
+| `Telemetry:ConsoleTraces` | `false` | print every finished trace span to the console (learning, debugging; Course 2, Chapter 29) |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | none | send metrics and traces to an OpenTelemetry collector (e.g. `http://collector:4317`); other `OTEL_*` variables work too ([operations.md](operations.md)) |
 | `ASPNETCORE_ENVIRONMENT` | `Production` (`Development` with `dotnet run`) | turns on sample data, the mail outbox, OpenAPI and `/debug/routes` in Development |
 
 ## Secrets

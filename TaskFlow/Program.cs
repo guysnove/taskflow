@@ -22,6 +22,7 @@ builder.Host.UseDefaultServiceProvider(options =>
 builder.Services.AddTaskFlowWeb(builder.Configuration);
 builder.Services.AddTaskFlowApplication();
 builder.Services.AddTaskFlowInfrastructure(builder.Configuration);
+builder.Services.AddTaskFlowTelemetry(builder.Configuration);   // Course 2, Chapter 29: metrics, traces, /health/details
 builder.Services.AddOptions<EmailOptions>().Bind(builder.Configuration.GetSection(EmailOptions.Section))
     .ValidateDataAnnotations().ValidateOnStart();
 
@@ -79,7 +80,10 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-app.MapHealthChecks("/health").AllowAnonymous();   // hosting platforms don't sign in
+app.MapHealthChecks("/health", TelemetryServices.LiveOnly).AllowAnonymous();   // hosting platforms don't sign in
+// Course 2, Chapter 29: every check with its numbers, for monitoring and for people on call. No secrets in it, but it shows
+// how TaskFlow is doing: in a real deployment, allow only the monitoring system's address (a firewall or the reverse proxy).
+app.MapHealthChecks("/health/details", TelemetryServices.Details).AllowAnonymous();
 
 // Development only: list the routes of every controller action.
 if (app.Environment.IsDevelopment())

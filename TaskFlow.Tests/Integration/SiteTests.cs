@@ -24,6 +24,33 @@ public class SiteTests : IClassFixture<TaskFlowFactory>
         Assert.Equal("Healthy", await response.Content.ReadAsStringAsync());
     }
 
+    // Course 2, Chapter 29: a dead email makes /health/details Degraded, but NOT /health: deploys (Chapter 24) and
+    // container health checks (Chapter 25) restart or roll back on /health, and a mail problem isn't fixed by that.
+    [Fact]
+    [Trait("Req", "NFR-OPS-2")]
+    public async Task ADeadEmail_ShowsInHealthDetails_ButNotInHealth()
+    {
+        using var factory = new TaskFlowFactory();
+        var client = factory.CreateClient();
+        await factory.DbAsync(async db =>
+        {
+            db.OutboxEmails.Add(new Data.OutboxEmail
+            {
+                Key = "test:dead", To = "ana@example.com", Subject = "s", Body = "b",
+                CreatedAt = DateTime.UtcNow, NextAttemptAt = DateTime.UtcNow, DeadAt = DateTime.UtcNow, Attempts = 6
+            });
+            return await db.SaveChangesAsync();
+        });
+
+        Assert.Equal("Healthy", await client.GetStringAsync("/health"));
+        var details = await client.GetAsync("/health/details");
+        Assert.Equal(HttpStatusCode.OK, details.StatusCode);
+        using var json = System.Text.Json.JsonDocument.Parse(await details.Content.ReadAsStringAsync());
+        Assert.Equal("Degraded", json.RootElement.GetProperty("status").GetString());
+        var outbox = json.RootElement.GetProperty("checks").GetProperty("email-outbox");
+        Assert.Equal(1, outbox.GetProperty("data").GetProperty("dead_last_24h").GetInt32());
+    }
+
     [Fact]
     [Trait("Req", "FR-ACC-1")]
     public async Task TasksPage_WhenSignedOut_RedirectsToSignIn()

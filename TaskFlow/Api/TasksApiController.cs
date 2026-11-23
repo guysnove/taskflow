@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using TaskFlow.Common;
 using TaskFlow.Models;
 using TaskFlow.Notifications;
 using TaskFlow.Services;
@@ -82,7 +83,7 @@ public class TasksApiController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]   // tells /openapi/v1.json what really happens
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<TaskDto>> Create(TaskInput input)
+    public async Task<ActionResult<TaskDto>> Create(TaskInput input, [FromServices] TaskFlowMetrics metrics)
     {
         // Course 2, Chapter 8: the same rules as the form. Warnings (a probable duplicate)
         // are for people at a form; a program gets only the errors.
@@ -96,6 +97,7 @@ public class TasksApiController : ControllerBase
             return ValidationProblem(ModelState);
         }
         var task = await _tasks.AddAsync(input);
+        metrics.TaskCreated("api");                           // Course 2, Chapter 29
         var saved = await _tasks.FindAsync(task.Id);          // with its project's name
         return CreatedAtAction(nameof(GetById), new { id = task.Id }, TaskDto.From(saved!));
     }

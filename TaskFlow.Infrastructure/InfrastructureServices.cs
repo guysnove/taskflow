@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using TaskFlow.Common;
 using TaskFlow.Data;
 using TaskFlow.Models;
 using TaskFlow.Notifications;
@@ -48,7 +49,8 @@ public static class InfrastructureServices
         services.AddScoped<IOutgoingEmails, EfOutgoingEmails>();
         services.AddScoped<EmailOutboxProcessor>(sp => new EmailOutboxProcessor(sp.GetRequiredService<TaskFlowDbContext>(),
             sp.GetRequiredService<IEmailSender>(), sp.GetRequiredService<IOptions<EmailOptions>>(), sp.GetRequiredService<TimeProvider>(),
-            sp.GetRequiredService<ILogger<EmailOutboxProcessor>>()));
+            sp.GetRequiredService<ILogger<EmailOutboxProcessor>>(),
+            metrics: sp.GetRequiredService<TaskFlowMetrics>()));
         services.AddHostedService<EmailOutboxWorker>();
 
         // The background job that runs the reminders use case.
