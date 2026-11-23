@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Ch27.Caching.Tests/Ch27.Caching.Tests.csproj" />
+  <Project Path="Ch27.Caching/Ch27.Caching.csproj" />
+  <Project Path="Ch27.Counter/Ch27.Counter.csproj" />
+</Solution>

@@ -1,0 +1,27 @@
+# Chapter 27: two copies of the counter behind a load balancer.
+#   STORE=memory docker compose up -d --build --scale app=2      (each copy counts on its own)
+#   STORE=redis  docker compose up -d --build --scale app=2      (one shared count)
+#   then: for i in 1 2 3 4 5 6; do curl -s localhost:8080/; echo; done
+services:
+  app:
+    build:
+      context: Ch27.Counter
+      args:
+        SDK_IMAGE: ${SDK_IMAGE:-mcr.microsoft.com/dotnet/sdk:10.0}
+        RUNTIME_IMAGE: ${RUNTIME_IMAGE:-mcr.microsoft.com/dotnet/aspnet:10.0}
+    image: ch27-counter
+    environment:
+      Store: ${STORE:-memory}
+      Redis: redis:6379
+    depends_on: [redis]
+
+  lb:
+    image: ${NGINX_IMAGE:-nginx:1}
+    ports:
+      - "8080:80"
+    volumes:
+      - ./lb/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on: [app]
+
+  redis:
+    image: ${REDIS_IMAGE:-redis:7}
