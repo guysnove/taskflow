@@ -39,8 +39,8 @@ Written down in Course 2, Chapter 6, from the features built in Courses 1 and 2,
 | NFR-PERF-3 | Finishing a task never waits for the mail server, even when it is slow or down. | `POST /api/tasks/{id}/done` < 1 s with a 3 s or failing mail server | tests |
 | NFR-API-1 | The API contract changes only when a person approves the change. | approved OpenAPI summary | tests |
 | NFR-API-2 | Every API error is a problem details document (`application/problem+json`). | 400, 401, 404 (three kinds), 429 | tests |
-| NFR-NOTIF-2 | Notification emails are retried and failures logged; a failing channel doesn't stop the others. | 3 attempts; logged | tests |
-| NFR-NOTIF-5 | Background work can be stopped: a hanging mail server is given up after `SendTimeout`; stopping the app cancels the current send and logs what wasn't sent; a reminder run stops between reminders. | timeout 30 s; stop < 2 s | tests |
+| NFR-NOTIF-2 | Notification emails are retried and failures logged; a failing channel doesn't stop the others. Course 2, Ch. 28: kept in an outbox table, retried with exponential backoff (30 s, 1 min, 2 min… up to 30 min), set aside after 6 attempts; the same notification is never emailed twice by TaskFlow. | 3 quick attempts per try; outbox tests | tests |
+| NFR-NOTIF-5 | Background work can be stopped: a hanging mail server is given up after `SendTimeout`; stopping the app cancels the current send, which stays in the outbox for the next start; a reminder run stops between reminders. | timeout 30 s; stop < 2 s | tests |
 | NFR-PRIV-1 | Notification texts and emails contain the task title and a link, nothing else. | reviewed factory; test | tests |
 | NFR-SEC-1 | Every response carries security headers, including a Content Security Policy and `nosniff`. | checked on the home page | tests |
 | NFR-SEC-2 | State-changing requests require an anti-forgery token. | POST without token → 400 | tests |

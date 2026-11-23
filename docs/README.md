@@ -41,6 +41,7 @@ Course 2, Chapter 23. The map of everything written down about TaskFlow, arrange
 | How we test, and why | [testing.md](testing.md) |
 | Performance: requirements, how we measure, what we found | [performance.md](performance.md) |
 | Scalability: capacity, caching, what breaks with two copies | [scalability.md](scalability.md), [adr/0004](adr/0004-one-instance-for-now.md) |
+| Sending emails reliably: the outbox, retries, duplicates | [adr/0005](adr/0005-email-outbox.md) |
 | Security: threats, findings, accepted risks | [security/threat-model.md](security/threat-model.md), [../SECURITY.md](../SECURITY.md) |
 | Technical debt we know about | [tech-debt.md](tech-debt.md) |
 | How we plan | [planning/README.md](planning/README.md) |
