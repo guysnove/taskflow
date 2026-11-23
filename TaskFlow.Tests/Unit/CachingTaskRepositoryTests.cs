@@ -9,7 +9,7 @@ namespace TaskFlow.Tests.Unit;
 
 // Course 2, Chapter 27: the header's due counts are cached per user, and every write that can change them invalidates the entry.
 [Trait("Req", "NFR-PERF-6")]
-public class CachingTaskRepositoryTests
+public sealed class CachingTaskRepositoryTests : IDisposable
 {
     private sealed class User(int id) : ICurrentUser { public bool IsSignedIn => true; public int Id => id; }
 
@@ -34,6 +34,7 @@ public class CachingTaskRepositoryTests
     private readonly MemoryCache _cache = new(new MemoryCacheOptions());
     private readonly Counting _real = new(new InMemoryTaskRepository(Clock));
     private CachingTaskRepository As(int userId) => new(_real, _cache, new User(userId), TimeSpan.FromMinutes(1));
+    public void Dispose() => _cache.Dispose();      // CA1001: CI's -warnaserror build caught the missing Dispose
 
     [Fact]
     public async Task TheSecondPage_DoesNotAskTheDatabase()
