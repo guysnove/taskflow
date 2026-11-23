@@ -24,3 +24,4 @@ what didn't, and actions with owners. Reports are reviewed like code, in a pull 
 | Report | Severity | Summary |
 |---|---|---|
 | [2026-11-22-drill-database-path.md](2026-11-22-drill-database-path.md) | SEV-1 (drill) | a settings change pointed the database at a missing folder; TaskFlow wouldn't start |
+| [2026-11-23-drill-mail-port.md](2026-11-23-drill-mail-port.md) | SEV-2 (drill) | a wrong mail port: emails given up; `/health/details` Degraded; fixed and re-sent |

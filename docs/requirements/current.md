@@ -47,4 +47,6 @@ Written down in Course 2, Chapter 6, from the features built in Courses 1 and 2,
 | NFR-SEC-3 | The API is rate limited per signed-in user. | more than 20 requests in 10 s → 429; other users unaffected | tests |
 | NFR-SEC-4 | Sign-in and registration are rate limited per IP address. | 6th try within a minute → 429 | not yet tested |
 | NFR-OPS-1 | `/health` reports whether the app and its database are working. | 200 "Healthy" | tests |
+| NFR-OPS-2 | `/health/details` shows every health check as JSON; a dead or stuck email makes it **Degraded** while `/health` stays `Healthy`. Course 2, Ch. 29. | degraded on a dead email in 24 h or one overdue 10 min | tests |
+| NFR-OPS-3 | TaskFlow emits metrics (tasks created and completed, email attempts by outcome, send duration, outbox waiting) and traces (requests, `CompleteTask`, `SendEmail`); log lines carry the trace id. Course 2, Ch. 29. | instruments in [operations.md](../operations.md) | tests |
 | NFR-PERF-1 | The overdue summary's cost does not grow with the number of tasks. | `/tasks/new` stays flat from 100 to 8,000 tasks | growth test (measured, not pass/fail) |
