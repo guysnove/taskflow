@@ -21,6 +21,8 @@ Course 2, Chapter 23. The map of everything written down about TaskFlow, arrange
 | Run TaskFlow in a container (Docker, Compose) | [containers.md](containers.md) |
 | Fix a red build | [ci-cd.md](ci-cd.md#when-the-build-is-red) |
 | Respond to an incident | [incidents/README.md](incidents/README.md) |
+| Check a running TaskFlow (smoke test) or a whole release (review) | `tools/smoke.sh`, `tools/review.sh`; the 2.0 review: [review/2026-11-23-taskflow-2.0.md](review/2026-11-23-taskflow-2.0.md) |
+| What changed in 2.0 | [release-notes/2.0.0.md](release-notes/2.0.0.md) |
 | Monitor TaskFlow: metrics, traces, dashboards, alerts, runbooks | [operations.md](operations.md) |
 | Contribute a change: branch, commit, pull request, review | [../CONTRIBUTING.md](../CONTRIBUTING.md) |
 

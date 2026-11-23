@@ -28,6 +28,12 @@ dotnet run -c Release --project exercises/ch26/Ch26.Load -- http://localhost:505
 
 Numbers from another machine are not comparable with these. Compare before and after **on the same machine, the same day**.
 
+**Warm up first** (Course 2, Chapter 30). A just-started TaskFlow is slow for its first 20–30 seconds under load: .NET compiles
+methods quickly at first and recompiles the busy ones into faster code later (tiered compilation), and caches fill. In the final
+review, `/tasks` measured 60, then 110, then 129 requests a second in three back-to-back 10-second runs of the same process — a
+cold start that looked like a 2.5× regression. So: one throwaway run of at least 30 seconds, then measure; and measure the
+pages in the same order every time.
+
 ## What we found (22 November 2026)
 
 | Page | Before | After | Change |

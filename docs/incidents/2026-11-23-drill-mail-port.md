@@ -69,6 +69,6 @@ $ ls mail | wc -l                          → 2
 | Action | Owner | When |
 |---|---|---|
 | Alert on `/health/details` Degraded (ticket), and page when more than 10 emails are dead | operations | done in [operations.md §5](../operations.md#5-alerts) |
-| Log the inner exception's message in `LastError` ("Failure sending mail. → Connection refused") | a developer | next sprint |
+| Log the inner exception's message in `LastError` ("Failure sending mail. → Connection refused") | a developer | **done** (Course 2, Chapter 30: `EmailOutboxProcessor.Describe`) |
 | An admin page or command to re-send dead emails, instead of SQL | a developer | backlog |
-| After a deploy, a smoke test that sends one email to a test mailbox | CI/CD | backlog |
+| After a deploy, a smoke test that sends one email to a test mailbox | CI/CD | partly done (Chapter 30: `tools/smoke.sh` after every staging deploy and container build; email not yet) |
