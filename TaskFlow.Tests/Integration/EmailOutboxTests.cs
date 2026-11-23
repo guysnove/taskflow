@@ -34,6 +34,14 @@ public sealed class EmailOutboxTests : IDisposable
         }
     }
     private sealed class NoJitter : Random { public override double NextDouble() => 0; }
+    private sealed class StopsTheAppWhileSending(CancellationTokenSource stopping) : IEmailSender
+    {
+        public async Task SendAsync(string recipient, string subject, string body, CancellationToken cancellationToken = default)
+        {
+            await stopping.CancelAsync();                            // the app is told to stop while this send is in progress
+            await Task.Delay(Timeout.Infinite, cancellationToken);
+        }
+    }
 
     private readonly string _file = Path.Combine(Path.GetTempPath(), $"outbox-{Guid.NewGuid():N}.db");
     private readonly FakeTimeProvider _clock = new(new DateTimeOffset(2026, 11, 23, 9, 0, 0, TimeSpan.Zero));
@@ -138,11 +146,13 @@ public sealed class EmailOutboxTests : IDisposable
     public async Task Stopping_DuringASend_LosesNothing()
     {
         await QueueAsync("hang@example.com");
-        using var stopping = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
+        // Course 2, Chapter 30: the stop now happens INSIDE the send, every time. It used to be a 100 ms timer, which on a slow
+        // CI runner sometimes fired before the send — and revealed that a stop there kept the claim (fixed in EmailOutbox.cs).
+        using var stopping = new CancellationTokenSource();
         var bigTimeout = new EmailOptions { SendTimeout = TimeSpan.FromMinutes(5) };
         await using (var db = Db())
         {
-            var processor = new EmailOutboxProcessor(db, new MailServer(), Options.Create(bigTimeout), _clock, NullLogger<EmailOutboxProcessor>.Instance);
+            var processor = new EmailOutboxProcessor(db, new StopsTheAppWhileSending(stopping), Options.Create(bigTimeout), _clock, NullLogger<EmailOutboxProcessor>.Instance);
             await Assert.ThrowsAnyAsync<OperationCanceledException>(() => processor.ProcessDueAsync(stopping.Token));
         }
         var row = Row();
@@ -201,5 +211,36 @@ public sealed class EmailOutboxTests : IDisposable
         string text = EmailOutboxProcessor.Describe(ex);
         Assert.StartsWith("InvalidOperationException: Failure sending mail. → SocketException: ", text);
         Assert.Contains("refused", text, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // Course 2, Chapter 30: a stop right after the claim, BEFORE the send (the window CI found), loses nothing either.
+    [Fact]
+    public async Task Stopping_BetweenClaimAndSend_ReleasesTheClaim()
+    {
+        await QueueAsync("ana@example.com");
+        using var stopping = new CancellationTokenSource();
+        var options = new DbContextOptionsBuilder<TaskFlowDbContext>().UseSqlite($"Data Source={_file}")
+                          .AddInterceptors(new StopRightAfterTheClaim(stopping)).Options;
+        await using (var db = new TaskFlowDbContext(options))
+        {
+            var server = new MailServer();
+            var processor = new EmailOutboxProcessor(db, server, Options.Create(Settings), _clock, NullLogger<EmailOutboxProcessor>.Instance);
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => processor.ProcessDueAsync(stopping.Token));
+            Assert.Equal(0, server.Calls);                       // it never got as far as sending
+        }
+        var row = Row();
+        Assert.Null(row.SentAt);
+        Assert.Null(row.ClaimedUntil);
+    }
+
+    // Cancels the stopping token as soon as the claim's UPDATE has run: the app is told to stop at exactly that moment.
+    private sealed class StopRightAfterTheClaim(CancellationTokenSource stopping) : Microsoft.EntityFrameworkCore.Diagnostics.DbCommandInterceptor
+    {
+        public override async ValueTask<int> NonQueryExecutedAsync(System.Data.Common.DbCommand command,
+            Microsoft.EntityFrameworkCore.Diagnostics.CommandExecutedEventData eventData, int result, CancellationToken cancellationToken = default)
+        {
+            if (command.CommandText.Contains("\"ClaimedUntil\" = @", StringComparison.Ordinal) && !stopping.IsCancellationRequested) await stopping.CancelAsync();
+            return result;
+        }
     }
 }

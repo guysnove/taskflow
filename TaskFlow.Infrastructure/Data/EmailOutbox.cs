@@ -74,7 +74,20 @@ public sealed class EmailOutboxProcessor(TaskFlowDbContext db, IEmailSender send
         int tried = 0;
         foreach (int id in due)
         {
-            if (await ClaimAsync(id, now, stoppingToken)) { tried++; await SendOneAsync(id, stoppingToken); }
+            if (!await ClaimAsync(id, now, stoppingToken)) continue;
+            tried++;
+            try
+            {
+                await SendOneAsync(id, stoppingToken);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                // Stopping, anywhere between the claim and the end of the send: leave it in the outbox, unclaimed, for the next
+                // start. Nothing is lost. (Course 2, Chapter 30: this used to cover only the send itself; a stop just before it,
+                // while reading the row, kept the claim for 5 minutes — found by a red main build.)
+                await db.OutboxEmails.Where(e => e.Id == id).ExecuteUpdateAsync(s => s.SetProperty(e => e.ClaimedUntil, (DateTime?)null), CancellationToken.None);
+                throw;
+            }
         }
         // Course 2, Chapter 29: how many emails are still waiting (a gauge on dashboards; it should stay near 0).
         metrics?.OutboxWaiting(await db.OutboxEmails.CountAsync(e => e.SentAt == null && e.DeadAt == null, CancellationToken.None));
@@ -120,9 +133,7 @@ public sealed class EmailOutboxProcessor(TaskFlowDbContext db, IEmailSender send
         }
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
         {
-            // Stopping: leave it in the outbox, unclaimed, for the next start. Nothing is lost.
-            await db.OutboxEmails.Where(e => e.Id == id).ExecuteUpdateAsync(s => s.SetProperty(e => e.ClaimedUntil, (DateTime?)null), CancellationToken.None);
-            throw;
+            throw;                                              // stopping: the caller releases the claim
         }
         catch (OperationCanceledException) { error = $"timed out after {_o.SendTimeout.TotalSeconds} s"; }
         catch (Exception ex) { error = Describe(ex); }
