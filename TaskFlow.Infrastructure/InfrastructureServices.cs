@@ -44,9 +44,12 @@ public static class InfrastructureServices
             sp.GetRequiredService<ILogger<RetryingEmailSender>>(), sp.GetRequiredService<TimeProvider>()));
 
         // Course 2, Chapter 16: emails are queued by requests and sent by a background worker.
-        services.AddSingleton<OutgoingEmails>();
-        services.AddSingleton<IOutgoingEmails>(sp => sp.GetRequiredService<OutgoingEmails>());
-        services.AddHostedService<EmailWorker>();
+        // Course 2, Chapter 28: the queue is the OutboxEmails table (durable, idempotent); the worker retries with backoff.
+        services.AddScoped<IOutgoingEmails, EfOutgoingEmails>();
+        services.AddScoped<EmailOutboxProcessor>(sp => new EmailOutboxProcessor(sp.GetRequiredService<TaskFlowDbContext>(),
+            sp.GetRequiredService<IEmailSender>(), sp.GetRequiredService<IOptions<EmailOptions>>(), sp.GetRequiredService<TimeProvider>(),
+            sp.GetRequiredService<ILogger<EmailOutboxProcessor>>()));
+        services.AddHostedService<EmailOutboxWorker>();
 
         // The background job that runs the reminders use case.
         services.AddHostedService<DueReminderService>();

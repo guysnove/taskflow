@@ -18,6 +18,7 @@ public class TaskFlowDbContext : DbContext
     public DbSet<TaskDependency> Dependencies => Set<TaskDependency>();   // Course 2, Chapter 4
     public DbSet<Notification> Notifications => Set<Notification>();     // Course 2, Chapter 10
     public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();   // Course 2, Chapter 15
+    public DbSet<OutboxEmail> OutboxEmails => Set<OutboxEmail>();                     // Course 2, Chapter 28
 
     // The rules for the table: the same ones as Chapter 22's 01_schema.sql.
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -92,6 +93,16 @@ public class TaskFlowDbContext : DbContext
 
         // Course 2, Chapter 10: notifications. (UserId, Key) is unique, so a reminder for the same
         // task and due date can never be stored twice, even if two reminder runs overlap.
+        // Course 2, Chapter 28: the email outbox. Key is unique: queuing the same email twice is impossible.
+        modelBuilder.Entity<OutboxEmail>(e =>
+        {
+            e.Property(x => x.Key).IsRequired().HasMaxLength(120);
+            e.HasIndex(x => x.Key).IsUnique();
+            e.Property(x => x.To).IsRequired().HasMaxLength(254);
+            e.Property(x => x.Subject).IsRequired().HasMaxLength(300);
+            e.HasIndex(x => new { x.SentAt, x.DeadAt, x.NextAttemptAt });   // "what's due?"
+        });
+
         modelBuilder.Entity<Notification>(n =>
         {
             n.Property(x => x.Kind).IsRequired().HasMaxLength(20);

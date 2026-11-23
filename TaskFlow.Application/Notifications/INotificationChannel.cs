@@ -29,15 +29,15 @@ public class EmailChannel(IOutgoingEmails queue, Microsoft.Extensions.Options.IO
     public bool IsWantedBy(User user) => user.EmailNotifications;
 
     // NFR-PRIV-1: the title and a link, nothing else (no notes, no project names).
-    public Task SendAsync(NotificationMessage message, User user)
+    public async Task SendAsync(NotificationMessage message, User user)
     {
         var email = new EmailMessage(user.Email, $"TaskFlow: {message.Text}",
                                      $"{message.Text}\n\n{options.Value.SiteUrl.TrimEnd('/')}{message.Link}\n\n"
                                      + "You can turn these emails off in TaskFlow: Notifications > Settings.");
-        if (!queue.TryEnqueue(email))
+        // Course 2, Chapter 28: one email per user and notification, even if this runs twice.
+        if (!await queue.EnqueueAsync(email, $"{user.Id}:{message.Key}"))
         {
-            Microsoft.Extensions.Logging.LoggerExtensions.LogError(logger, "Email queue full: email for notification {Key} dropped", message.Key);
+            Microsoft.Extensions.Logging.LoggerExtensions.LogInformation(logger, "Email for notification {Key} was already queued: duplicate ignored", message.Key);
         }
-        return Task.CompletedTask;
     }
 }

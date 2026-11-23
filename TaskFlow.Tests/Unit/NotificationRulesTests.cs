@@ -94,16 +94,17 @@ public class NotificationRulesTests
         Assert.Throws<ArgumentException>(() => NotificationFactory.DueSoon(task, new DateOnly(2026, 11, 21)));
     }
 
-    // The email channel only queues (Chapter 16). A spy queue shows what it queued;
+    // The email channel only queues (Chapter 16). A spy queue shows what it queued, and with which key;
     // FakeLogger (Microsoft.Extensions.Diagnostics.Testing) shows what it logged.
-    private sealed class SpyQueue(bool full = false) : IOutgoingEmails
+    // Course 2, Chapter 28: the queue is idempotent: the same key twice is one email.
+    private sealed class SpyQueue : IOutgoingEmails
     {
-        public List<EmailMessage> Queued { get; } = [];
-        public bool TryEnqueue(EmailMessage email)
+        public List<(EmailMessage Email, string Key)> Queued { get; } = [];
+        public Task<bool> EnqueueAsync(EmailMessage email, string key)
         {
-            if (full) return false;
-            Queued.Add(email);
-            return true;
+            if (Queued.Any(q => q.Key == key)) return Task.FromResult(false);
+            Queued.Add((email, key));
+            return Task.FromResult(true);
         }
     }
 
@@ -118,21 +119,24 @@ public class NotificationRulesTests
 
         await channel.SendAsync(Ready, Sam);
 
-        var email = Assert.Single(queue.Queued);
+        var (email, _) = Assert.Single(queue.Queued);
         Assert.Equal("sam@example.com", email.To);
         Assert.Equal("TaskFlow: Ready to start: Write copy", email.Subject);
         Assert.StartsWith("Ready to start: Write copy\n\nhttps://taskflow.example/tasks/2\n\n", email.Body, StringComparison.Ordinal);
     }
 
     [Fact]
-    public async Task AFullQueue_DropsTheEmail_AndLogsAnError()
+    public async Task TheSameNotificationTwice_IsOneEmail_AndTheDuplicateIsLogged()
     {
+        var queue = new SpyQueue();
         var logger = new FakeLogger<EmailChannel>();
-        var channel = new EmailChannel(new SpyQueue(full: true), Options.Create(new EmailOptions()), logger);
+        var channel = new EmailChannel(queue, Options.Create(new EmailOptions()), logger);
 
-        await channel.SendAsync(Ready, Sam);                            // must not throw: the request goes on
+        await channel.SendAsync(Ready, Sam);
+        await channel.SendAsync(Ready, Sam);                            // e.g. the observer ran again after a retry
 
-        Assert.Equal(LogLevel.Error, logger.LatestRecord.Level);
-        Assert.Equal("Email queue full: email for notification unblocked:2:1 dropped", logger.LatestRecord.Message);
+        var (_, key) = Assert.Single(queue.Queued);
+        Assert.Equal($"{Sam.Id}:unblocked:2:1", key);
+        Assert.Equal("Email for notification unblocked:2:1 was already queued: duplicate ignored", logger.LatestRecord.Message);
     }
 }
