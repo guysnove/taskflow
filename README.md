@@ -13,7 +13,7 @@ You need the [.NET 10 SDK](https://dotnet.microsoft.com/download) and Git.
 
 ```bash
 git clone https://github.com/guysnove/taskflow.git && cd taskflow
-dotnet test --filter "Category!=Growth&Category!=E2E"   # about 240 tests, under a minute
+dotnet test --filter "Category!=Growth&Category!=E2E"   # about 260 tests, under a minute
 dotnet run --project TaskFlow                           # then open the http://localhost:… address it prints
 ```
 
@@ -42,7 +42,7 @@ TaskFlow.Application/      use cases, rules, notifications, and the interfaces t
 TaskFlow.Domain/           entities and pure domain logic; no packages, no references
 TaskFlow.Infrastructure/   EF Core + SQLite, migrations, SMTP, the background email worker
 TaskFlow.Tests/            unit, integration, architecture, security and end-to-end (Playwright) tests
-tools/                     coverage gate, traceability report, commit-message hook, module and metrics tools
+tools/                     review.sh and smoke.sh (Chapter 30), coverage gate, traceability, commit-message hook, metrics
 Deploy/                    Dockerfile, deploy script, systemd service, nginx configuration
 docs/                      documentation (start at docs/README.md)
 exercises/                 small programs used in Course 2's chapters (exercises/README.md)
