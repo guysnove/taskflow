@@ -23,6 +23,7 @@ Small programs used in Course 2 chapters live in `exercises/chNN/`, separate fro
 | `exercises/ch25` | 25 | `Ch25.slnx`: `Ch25.Notes`, a small notes service using PostgreSQL, with 5 tests; `Dockerfile` (two stages) and `Dockerfile.single` (one, for comparison); `compose.yaml` (the app and PostgreSQL with a volume and health checks; copy `.env.example` to `.env`); `bases/` (how the recording built its own base images without registry access). |
 | `exercises/ch26` | 26 | `Ch26.slnx`: `Ch26.Load` (a load tester: throughput and p50/p90/p99, optional TaskFlow sign-in) with 4 tests; `Ch26.Bench` (BenchmarkDotNet: string building, List vs HashSet); `Ch26.Db` (N+1 vs IN vs JOIN on SQLite and PostgreSQL). Measure in Release. |
 | `exercises/ch27` | 27 | `Ch27.slnx`: `Ch27.Counter` (a page-view counter, memory or Redis) with `compose.yaml` and `lb/nginx.conf` (two copies behind nginx: `STORE=memory|redis docker compose up -d --build --scale app=2`); `Ch27.Caching` (cache-aside, TTL, invalidation; a capacity calculator) with 5 tests. |
+| `exercises/ch28` | 28 | `Ch28.slnx`: `Ch28.Stock` (a stock service that fails on purpose: `--FailEvery 4 --SlowEvery 5 --SlowSeconds 3`; honours `Idempotency-Key`); `Ch28.Client` (scenarios `naive`, `timeout`, `retry`, `idempotent`: timeouts, retries with exponential backoff and jitter); `Ch28.Notify` (an at-least-once queue; `naive` and `idempotent` consumers); 9 tests. |
 
 
 Each folder builds and tests on its own; `exercises/Directory.Build.props` keeps TaskFlow's build rules out of them.

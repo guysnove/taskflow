@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Ch28.Client.Tests/Ch28.Client.Tests.csproj" />
+  <Project Path="Ch28.Client/Ch28.Client.csproj" />
+  <Project Path="Ch28.Notify/Ch28.Notify.csproj" />
+  <Project Path="Ch28.Stock/Ch28.Stock.csproj" />
+</Solution>
